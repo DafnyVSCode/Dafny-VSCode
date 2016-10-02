@@ -1,7 +1,7 @@
 {
     "name": "dafny-vscode",
     "displayName": "dafny-vscode",
-    "description": "Dafny support for Visual Studio Code",
+    "description": "Dafny inline verification output for Visual Studio Code",
     "version": "0.0.1",
     "publisher": "JR",
     "engines": {
