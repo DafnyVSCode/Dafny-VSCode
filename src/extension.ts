@@ -3,17 +3,24 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-export class DafnyDiagnostics {
-    public diagCollection: vscode.DiagnosticCollection = null;
-}
+import {DafnyDiagnosticsProvider} from './dafnyProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    var inst = new DafnyDiagnostics();
-    context["instance"] = inst;
+    let config = vscode.workspace.getConfiguration("dafny");
+    let dafnyServerPath = config.get<string>("dafnyServerPath");
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    if (!dafnyServerPath) {
+        vscode.window.showErrorMessage("Dafny Verifier error: dafnyServerPath not set");
+    }
+    else {
+        var verifier = new DafnyDiagnosticsProvider();
+        verifier.activate(context.subscriptions);
+    }
+    
+
+    /*// Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "dafny-vscode" is now active!');
 
@@ -27,10 +34,11 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('Hello World!');
     });
 
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);*/
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
+    
 }
 
