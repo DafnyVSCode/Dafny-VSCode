@@ -4,6 +4,8 @@
   "description": "Dafny inline verification output for Visual Studio Code",
   "version": "0.0.1",
   "publisher": "JR",
+  "license": "MIT",
+  "repository": "https://onlyatomsandthevoid.site/gogs/roscaj/dafny-vscode.git",
   "engines": {
     "vscode": "^1.5.0"
   },
