@@ -3,9 +3,9 @@
   "displayName": "dafny-vscode",
   "description": "Dafny inline verification output for Visual Studio Code",
   "version": "0.0.1",
-  "publisher": "Jonathan Rosca",
+  "publisher": "roscaj",
   "license": "MIT",
-  "repository": "https://onlyatomsandthevoid.site/gogs/roscaj/dafny-vscode.git",
+  "repository": "https://github.com/ferry-/dafny-vscode.git",
   "engines": {
     "vscode": "^1.5.0"
   },

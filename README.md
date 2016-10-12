@@ -1,21 +1,22 @@
+# dafny-vscode
 
 Dafny support for Visual Studio Code.
 Requires a binary distribution of DafnyServer, and mono on non-windows platforms; see installation guide below.
 
-<br><br>
+
 ## Features
 
 * Provides .dfy language id to vscode.
 * Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
 * Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a 
 
-<br><br>
+
 ## Requirements
 
 * A C# runtime. Mono should be supported on all platforms that vscode runs on. On windows, you may also use .net - see config below.
 * [Binary dafny distribution](https://github.com/Microsoft/dafny/releases), which contains `DafnyServer.exe` and its dependencies - path must be specified in config.
 
-<br><br>
+
 ## Extension Settings
 
 The following are necessary:
@@ -30,16 +31,20 @@ The following are optional:
 [//]: # "* `dafny.automaticVerification`: Verify as soon as the document is changed (default). When false, only verify on save."
 [//]: # "* `dafny.automaticVerificationDelayMS`: Delay to wait after a document change before actually sending a verification request. This is done to avoid * getting syntax errors as one is typing. Only relevant when automaticVerification is true."
 
-<br><br>
+
 ## Release Notes
 
 ### 0.0.1
 Initial release, some half baked features turned off.
 
-<br><br>
+
 ## TODO
 * get mono from path if available.
 * atomatic verification as one types (with 'deboucing' waiting period).
 * syntax highlighting (see if you can adapt sublime-dafny).
 * context aware suggestiions.
 * full context awareness, code completion.
+
+
+## License
+MIT © Jonathan Rosca
