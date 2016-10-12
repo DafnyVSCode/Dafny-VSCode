@@ -8,8 +8,9 @@ Requires a binary distribution of DafnyServer, and mono on non-windows platforms
 
 * Provides .dfy language id to vscode.
 * Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
-* Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a 
+* Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
 
+![assertions animation](example.gif)
 
 ## Requirements
 
@@ -44,7 +45,3 @@ Initial release, some half baked features turned off.
 * syntax highlighting (see if you can adapt sublime-dafny).
 * context aware suggestiions.
 * full context awareness, code completion.
-
-
-## License
-MIT © Jonathan Rosca
