@@ -35,6 +35,9 @@ The following are optional:
 
 ## Release Notes
 
+### 0.0.3
+Getting `mono` from PATH when `monoPath` isn't set.
+
 ### 0.0.2
 Fixed readme and license, added use animation.
 
