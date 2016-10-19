@@ -26,7 +26,7 @@ The following are necessary:
 
 The following are optional:
 
-* `dafny.monoPath`: Absolute path to mono binary. Only required if mono isn't at `/usr/bin/mono`.
+* `dafny.monoPath`: Absolute path to `mono` binary. Only required if `mono` isn't found in PATH.
 * `dafny.useMono`: Only applicable to Windows; requires .net 4.0 or higher when false. Attempts to launch dafny process directly when set to false 
 
 [//]: # "* `dafny.automaticVerification`: Verify as soon as the document is changed (default). When false, only verify on save."
@@ -43,6 +43,7 @@ Initial release, some half baked features turned off.
 
 
 ## TODO
+* add restart server action.
 * get mono from path if available.
 * atomatic verification as one types (with 'deboucing' waiting period).
 * syntax highlighting (see if you can adapt sublime-dafny).

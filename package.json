@@ -2,7 +2,7 @@
   "name": "dafny-vscode",
   "displayName": "dafny-vscode",
   "description": "Dafny inline verification output for Visual Studio Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "roscaj",
   "license": "MIT",
   "repository": "https://github.com/ferry-/dafny-vscode.git",
@@ -41,8 +41,8 @@
         },
         "dafny.monoPath": {
           "type": "string",
-          "default": "/usr/bin/mono",
-          "description": "Absolute path to mono binary. Ignored on Windows when useMono is set to false."
+          "default": "",
+          "description": "Absolute path to mono binary. Only necessary if mono is not in system PATH. Ignored on Windows when useMono is set to false."
         },
         "dafny.automaticVerification": {
           "type": "boolean",

@@ -132,7 +132,15 @@ export class DafnyDiagnosticsProvider {
         this.verificationStatusBarTxt.show();
     }
 
-    private resetServer() {
+    private testCommand(path: string): boolean {
+        let proc = cp.exec(path);
+        let good = proc.pid != 0;
+        if (good) proc.kill();
+
+        return good;
+    }
+
+    private resetServer(): boolean {
         if (this.serverProc !== null) {
             this.serverProc.kill();
             this.serverProc.disconnect(); //don't listen to messages any more
@@ -143,18 +151,36 @@ export class DafnyDiagnosticsProvider {
         this.verificationStatusBarTxt.show();
 
         let config = vscode.workspace.getConfiguration("dafny");
-        let useMono = config.get<boolean>("useMono"); 
+        let useMono = config.get<boolean>("useMono") || os.platform() !== "win32"; //setting only relevant on windows
         let monoPath = config.get<string>("monoPath");
+        let hasCustomMonoPath = monoPath !== "";
         let dafnyServerPath = config.get<string>("dafnyServerPath");
 
         let command: string;
         let args: string[];
 
-        if (os.platform() === "win32" && !useMono) {
+        if (!useMono) {
             command = dafnyServerPath;
             args = [];
         }
         else {
+            //see if mono is in PATH
+            let monoInSystemPath = this.testCommand("mono");
+
+            //now test specific path
+            let monoAtConfigPath = hasCustomMonoPath && this.testCommand(monoPath);
+            
+            if (monoInSystemPath && !monoAtConfigPath) {
+                if (hasCustomMonoPath) {
+                    vscode.window.showWarningMessage("dafny.monoPath set incorrectly; found mono in system PATH and will use it")
+                }
+                monoPath = "mono";
+            }
+            else if (!monoInSystemPath && !monoAtConfigPath) {
+                vscode.window.showErrorMessage("Could not find mono, neither in system PATH nor at dafny.monoPath");
+                return false; //failed to start DafnyServer
+            }
+
             command = monoPath;
             args = [dafnyServerPath];
         }
@@ -196,10 +222,12 @@ export class DafnyDiagnosticsProvider {
             });
 
             this.verificationStatusBarTxt.text = "DafnyServer started";
+            return true;
         }
 
         else {
             vscode.window.showErrorMessage("failed to start DafnyServer, check paths in config");
+            return false;
         }
     }
 
