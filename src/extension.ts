@@ -10,31 +10,24 @@ import {DafnyDiagnosticsProvider} from './dafnyProvider';
 export function activate(context: vscode.ExtensionContext) {
     let config = vscode.workspace.getConfiguration("dafny");
     let dafnyServerPath = config.get<string>("dafnyServerPath");
+    var verifier: DafnyDiagnosticsProvider = null;
 
     if (!dafnyServerPath) {
         vscode.window.showErrorMessage("Dafny Verifier error: dafnyServerPath not set");
     }
     else {
-        var verifier = new DafnyDiagnosticsProvider();
+        verifier = new DafnyDiagnosticsProvider();
         verifier.activate(context.subscriptions);
     }
-    
 
-    /*// Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "dafny-vscode" is now active!');
-
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
-
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
+    let restartServerCommand = vscode.commands.registerCommand("dafny.restartDafnyServer", () => {
+        if (verifier) {
+            return verifier.resetServer();
+        }
+        return false;
     });
 
-    context.subscriptions.push(disposable);*/
+    context.subscriptions.push(restartServerCommand);
 }
 
 // this method is called when your extension is deactivated

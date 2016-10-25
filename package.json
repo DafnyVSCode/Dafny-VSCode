@@ -2,10 +2,17 @@
   "name": "dafny-vscode",
   "displayName": "dafny-vscode",
   "description": "Dafny inline verification output for Visual Studio Code",
-  "version": "0.0.3",
+  "version": "0.1.1",
   "publisher": "roscaj",
   "license": "MIT",
   "repository": "https://github.com/ferry-/dafny-vscode.git",
+  "keywords": [
+    "dafny"
+  ],
+  "bugs": {
+    "email": "roscaj@tcd.ie",
+    "url": "https://github.com/ferry-/dafny-vscode/issues"
+  },
   "engines": {
     "vscode": "^1.5.0"
   },
@@ -24,6 +31,13 @@
         "extensions": [
           ".dfy"
         ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dafny",
+        "scopeName": "text.dfy.dafny",
+        "path": "./syntaxes/Dafny.tmLanguage"
       }
     ],
     "configuration": {
@@ -55,7 +69,14 @@
           "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "dafny.restartDafnyServer",
+        "icon": "$(issue-reopened)",
+        "title": "Restart DafnyServer"
+      }
+    ]
   },
   "activationEvents": [
     "onLanguage:dafny"

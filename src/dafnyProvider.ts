@@ -32,6 +32,12 @@ export function regexEscape(s: string) {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+export enum VerificationResult {
+    Verified = 0,
+    NotVerified = 1,
+    Failed = 2
+};
+
 class VerificationRequest {
     public doc: vscode.TextDocument;
     public src: string; //avoid calling doc.getText() again (not sure if it may change while extension code is running)
@@ -77,6 +83,9 @@ export class DafnyDiagnosticsProvider {
     //gets deleted if it becomes the active request
     private queuedRequests: { [docPathName: string]: VerificationRequest } = {};
 
+    //the latest results related to each file
+    private latestResults: { [docPathName: string]: VerificationResult } = {};
+
     //onTextChanged events are sent on each character change,
     //but we only want to send a verification request after a bunch of changes are done
     private docChangeTimers: { [docPathName: string]: DocChangeTimerRecord } = {};
@@ -96,14 +105,28 @@ export class DafnyDiagnosticsProvider {
     //used to display typing/verifying/error count status
     private currentDocStatucBarTxt: vscode.StatusBarItem = null;
 
+    private currentEditor: vscode.TextEditor = null;
+
+    private static StatusBarVerifying = "$(sync) Verifying";
+    private static StatusBarQueued = "$(sync) Queued for verification";
+    private static StatusBarServerOff = "$(x) Verification server off";
+    private static StatusBarVerified = "$(thumbsup) Verified";
+    private static StatusBarNotVerified = "$(thumbsdown) Not verified";
+
+    private static verificationResultToString (res: VerificationResult): string {
+        switch(res){
+            case VerificationResult.Verified: return DafnyDiagnosticsProvider.StatusBarVerified;
+            case VerificationResult.NotVerified: return DafnyDiagnosticsProvider.StatusBarNotVerified;
+        }
+        return "$(x) Verification technical error";
+    }
+
     constructor() {
+        this.currentEditor = vscode.window.activeTextEditor;
         this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
         
         this.currentDocStatucBarTxt = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
         this.verificationStatusBarTxt = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
-
-        this.currentDocStatucBarTxt.show();
-        this.verificationStatusBarTxt.show();
 
         let config = vscode.workspace.getConfiguration("dafny");
         this.docChangeVerify = config.get<boolean>("automaticVerification");
@@ -115,21 +138,50 @@ export class DafnyDiagnosticsProvider {
         this.intervalTimer = setInterval(this.timerCallback.bind(this), 250);
     }
 
-    private updateVerificationStatusBar() {
-        if (this.activeRequest) {
-            let remaining = Object.keys(this.queuedRequests).filter((k) => {
-                return !!(this.activeRequest[k]);
-            }).length;
-
-            //set status bar text
-            this.verificationStatusBarTxt.text = "$(beaker)Verifying " + this.activeRequest.doc.fileName;
-            if (remaining > 0) this.verificationStatusBarTxt.text += " (+ " + remaining.toString(10) + " queued)";
+    private updateStatusBars() {
+        let editor = this.currentEditor;
+        if (editor.document.languageId !== 'dafny') {
+            //disable UI on other doc types or when vscode.window.activeTextEditor is undefined
+            this.verificationStatusBarTxt.hide();
+            this.currentDocStatucBarTxt.hide();
         }
         else {
-            this.verificationStatusBarTxt.text = "$(watch)DafnyServer idle";
-        }
+            if (!this.serverProc) {
+                this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.StatusBarServerOff;
+                this.verificationStatusBarTxt.text = "$(x)DafnyServer not started";
+            }
+            else {
+                if (this.activeRequest) {
+                    let remaining = Object.keys(this.queuedRequests).filter((k) => {
+                        return !!(this.activeRequest[k]);
+                    }).length;
 
-        this.verificationStatusBarTxt.show();
+                    //set status bar text
+                    this.verificationStatusBarTxt.text = "$(beaker)Verifying " + this.activeRequest.doc.fileName;
+                    if (remaining > 0) this.verificationStatusBarTxt.text += " (+ " + remaining.toString(10) + " queued)";
+                }
+                else {
+                    this.verificationStatusBarTxt.text = "$(watch)DafnyServer idle";
+                }
+                this.verificationStatusBarTxt.text += " (pid " + this.serverProc.pid + ")";
+
+                if (this.activeRequest && editor.document === this.activeRequest.doc) {
+                    this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.StatusBarVerifying;
+                }
+                else if (this.queuedRequests[editor.document.fileName]) {
+                    this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.StatusBarQueued;
+                }
+                else {
+                    let res: undefined | VerificationResult = this.latestResults[editor.document.fileName];
+                    if (res !== undefined) {
+                        this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.verificationResultToString(res);
+                    }
+                }
+            }
+
+            this.verificationStatusBarTxt.show();
+            this.currentDocStatucBarTxt.show();
+        }
     }
 
     private testCommand(path: string): boolean {
@@ -140,12 +192,18 @@ export class DafnyDiagnosticsProvider {
         return good;
     }
 
-    private resetServer(): boolean {
+    public resetServer(): boolean {
         if (this.serverProc !== null) {
+            //detach old callback listeners - this is done to prevent a spurious 'end' event response
+            this.serverProc.stdout.removeAllListeners();
+            this.serverProc.removeAllListeners();
+
             this.serverProc.kill();
-            this.serverProc.disconnect(); //don't listen to messages any more
+            //this.serverProc.disconnect(); //TODO: this fails, needs testing without //don't listen to messages any more
             this.serverProc = null;
         }
+
+        this.updateStatusBars();
 
         this.verificationStatusBarTxt.text = "starting DafnyServer..";
         this.verificationStatusBarTxt.show();
@@ -202,13 +260,11 @@ export class DafnyDiagnosticsProvider {
 
         if (this.serverProc.pid) {
             /*on(event: "close", listener: () => void): this;
-            on(event: "data", listener: (chunk: Buffer | string) => void): this;
-            on(event: "end", listener: () => void): this;
             on(event: "readable", listener: () => void): this;
             on(event: "error", listener: (err: Error) => void): this;*/
 
             this.serverProc.stdout.on('error', (err: Error) => {
-                vscode.window.showErrorMessage("DafnyServer process " + this.serverProc.pid + " error: " + err);
+                vscode.window.showErrorMessage("DafnyServer process " + inst.serverProc.pid + " error: " + err);
                 console.error("dafny server stdout error:" + err.message);
             });
 
@@ -217,15 +273,26 @@ export class DafnyDiagnosticsProvider {
                 inst.gotData();
             });
 
-            this.serverProc.stdout.on('end', () => {
-                vscode.window.showInformationMessage("DafnyServer process " + this.serverProc.pid + " quit");
+            this.serverProc.on('exit', () => {
+                inst.serverProc = null;
+                vscode.window.showErrorMessage("DafnyServer process quit unexpectedly; attempting restart");
+                setTimeout((inst) => {
+                    if (inst.resetServer()) {
+                        vscode.window.showInformationMessage("Restart succeeded");
+                    }
+                    else {
+                        vscode.window.showErrorMessage("Restart failed");
+                    }
+                }, 1000, inst);
+                inst.updateStatusBars();
             });
 
-            this.verificationStatusBarTxt.text = "DafnyServer started";
+            this.updateStatusBars();
             return true;
         }
 
         else {
+            this.updateStatusBars();
             vscode.window.showErrorMessage("failed to start DafnyServer, check paths in config");
             return false;
         }
@@ -233,7 +300,6 @@ export class DafnyDiagnosticsProvider {
 
     private doVerify(textDocument: vscode.TextDocument) {
         if (textDocument.languageId === 'dafny') {
-            this.currentDocStatucBarTxt.text = "$(sync) Verifying";
             this.currentDocStatucBarTxt.show();
 
             let docName = textDocument.fileName;
@@ -243,8 +309,8 @@ export class DafnyDiagnosticsProvider {
                 throw "active document must not be also in queue";
             }
 
-            if (this.activeRequest === null) {
-                //ignore the queued request and run the new request directly, instead
+            if (this.activeRequest === null && this.serverProc) {
+                //ignore the queued request (if any) and run the new request directly
                 this.activeRequest = req;
                 this.queuedRequests[docName] = null;
                 this.sendVerificationRequest(this.activeRequest);
@@ -253,6 +319,8 @@ export class DafnyDiagnosticsProvider {
                 //overwrite any older requests as this is more up to date
                 this.queuedRequests[docName] = req;
             }
+
+            this.updateStatusBars();
         }
     }
 
@@ -284,7 +352,7 @@ export class DafnyDiagnosticsProvider {
 
     private timerCallback() {
         let now = Date.now();
-        if (this.activeRequest === null) {
+        if (this.activeRequest === null && this.serverProc) {
             //see if there are documents that were recently modified
             for (var ti in this.docChangeTimers) {
                 let rec = this.docChangeTimers[ti];
@@ -297,9 +365,7 @@ export class DafnyDiagnosticsProvider {
                 }
             }
             
-
             //schedule the oldest request first
-
             let oldest: VerificationRequest = null;
             let oldestName: string = null;
             for (var ni in this.queuedRequests) {
@@ -322,7 +388,8 @@ export class DafnyDiagnosticsProvider {
                 this.sendVerificationRequest(oldest);
             }
         }
-        this.updateVerificationStatusBar();
+
+        this.updateStatusBars();
     }
 
     private sendVerificationRequest(req: VerificationRequest) {
@@ -372,19 +439,14 @@ export class DafnyDiagnosticsProvider {
             //parse output
             let log = this.outBuf.substr(0, endId);
             let errorCount = this.parseVerifierLog(log, this.activeRequest);
+            let fileName = this.activeRequest.doc.fileName;
             this.activeRequest = null;
             this.outBuf = '';
 
-            this.updateVerificationStatusBar();
+            this.latestResults[fileName] = 
+                (errorCount == 0)? VerificationResult.Verified : VerificationResult.NotVerified;
 
-            if (errorCount === 0) {
-                this.currentDocStatucBarTxt.text = "$(thumbsup) Verified";
-                this.currentDocStatucBarTxt.show();
-            }
-            else {
-                this.currentDocStatucBarTxt.text = "$(thumbsdown) Not verified";
-                this.currentDocStatucBarTxt.show();
-            }
+            this.updateStatusBars();
         }
     }
 
@@ -430,13 +492,20 @@ export class DafnyDiagnosticsProvider {
     public activate(subs: vscode.Disposable[]) {
         subs.push(this);
 
+        vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
+            if (editor) { //may be undefined
+                this.currentEditor = editor;
+                this.updateStatusBars();
+            }
+        }, this, subs);
+
         vscode.workspace.onDidOpenTextDocument(this.doVerify, this, subs);
         vscode.workspace.onDidCloseTextDocument((textDocument)=> {
             this.diagCol.delete(textDocument.uri);
-        }, null, subs);
+        }, this, subs);
 
-        vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
-        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+        vscode.workspace.onDidChangeTextDocument(this.docChanged, this, subs);
+        vscode.workspace.onDidSaveTextDocument(this.doVerify, this, subs);
         vscode.workspace.textDocuments.forEach(this.doVerify, this); //verify each active document
     }
     
