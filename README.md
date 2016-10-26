@@ -33,7 +33,7 @@ The following are optional:
 
 
 ## Release Notes
-* 0.1.1: Refactored/tweaked UI code, Added `dafny.restartDafnyServer` ("Restart Dafny Server") command.
+* 0.1.2: Refactored/tweaked UI code, Added `dafny.restartDafnyServer` ("Restart Dafny Server") command.
 * 0.1.0: Added syntax highlighting, tested on Ubuntu and OSX.
 * 0.0.3: Getting `mono` from PATH when `monoPath` isn't set.
 * 0.0.2: Fixed readme and license, added use animation.

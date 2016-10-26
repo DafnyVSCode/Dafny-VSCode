@@ -140,7 +140,9 @@ export class DafnyDiagnosticsProvider {
 
     private updateStatusBars() {
         let editor = this.currentEditor;
-        if (editor.document.languageId !== 'dafny') {
+        //editor.document is a get() that can try to resolve an undefined value
+        let editorsOpen = vscode.window.visibleTextEditors.length;
+        if (!editor || editorsOpen == 0 || editor.document.languageId !== 'dafny') {
             //disable UI on other doc types or when vscode.window.activeTextEditor is undefined
             this.verificationStatusBarTxt.hide();
             this.currentDocStatucBarTxt.hide();
@@ -490,22 +492,20 @@ export class DafnyDiagnosticsProvider {
     }
 
     public activate(subs: vscode.Disposable[]) {
-        subs.push(this);
-
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) { //may be undefined
                 this.currentEditor = editor;
                 this.updateStatusBars();
             }
-        }, this, subs);
+        }, this);
 
-        vscode.workspace.onDidOpenTextDocument(this.doVerify, this, subs);
+        vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
         vscode.workspace.onDidCloseTextDocument((textDocument)=> {
             this.diagCol.delete(textDocument.uri);
-        }, this, subs);
+        }, this);
 
-        vscode.workspace.onDidChangeTextDocument(this.docChanged, this, subs);
-        vscode.workspace.onDidSaveTextDocument(this.doVerify, this, subs);
+        vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
+        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.textDocuments.forEach(this.doVerify, this); //verify each active document
     }
     

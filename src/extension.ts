@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
     else {
         verifier = new DafnyDiagnosticsProvider();
         verifier.activate(context.subscriptions);
+        context.subscriptions.push(verifier);
     }
 
     let restartServerCommand = vscode.commands.registerCommand("dafny.restartDafnyServer", () => {
@@ -27,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
         return false;
     });
 
-    context.subscriptions.push(restartServerCommand);
+    context.subscriptions.push(restartServerCommand);  
 }
 
 // this method is called when your extension is deactivated
