@@ -242,7 +242,7 @@ export class DafnyDiagnosticsProvider {
             }
 
             command = monoPath;
-            args = [dafnyServerPath];
+            args = [dafnyServerPath];       
         }
 
         let opts: cp.SpawnOptions = {};
@@ -257,7 +257,7 @@ export class DafnyDiagnosticsProvider {
         //detached?: boolean;
         //shell?: boolean | string;
 
-        this.serverProc = cp.spawn(monoPath, args, opts);
+        this.serverProc = cp.spawn(command, args, opts);
         let inst = this;
 
         if (this.serverProc.pid) {

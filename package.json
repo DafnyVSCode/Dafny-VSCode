@@ -1,26 +1,17 @@
 {
-  "name": "dafny-vscode",
-  "displayName": "dafny-vscode",
-  "description": "Dafny inline verification output for Visual Studio Code",
-  "version": "0.1.2",
-  "publisher": "roscaj",
-  "license": "MIT",
-  "repository": "https://github.com/ferry-/dafny-vscode.git",
-  "keywords": [
-    "dafny"
-  ],
-  "bugs": {
-    "email": "roscaj@tcd.ie",
-    "url": "https://github.com/ferry-/dafny-vscode/issues"
-  },
-  "engines": {
-    "vscode": "^1.5.0"
-  },
-  "categories": [
-    "Languages"
-  ],
-  "main": "./out/src/extension",
-  "contributes": {
+    "name": "dafny-vscode",
+    "displayName": "dafny-vscode",
+    "description": "",
+    "version": "0.0.1",
+    "publisher": "FunctionalCorrectness",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
     "languages": [
       {
         "id": "dafny",
@@ -86,14 +77,14 @@
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
-  "devDependencies": {
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0",
-    "mocha": "^2.3.3",
-    "@types/node": "*",
-    "@types/mocha": "^2.2.32"
-  },
-  "dependencies": {
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
     "utf8": "*",
     "base64-js": "*"
   }

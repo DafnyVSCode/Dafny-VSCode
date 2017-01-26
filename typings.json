@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "base64-js": "registry:npm/base64-js#1.1.2+20160526222755"
+    "base64-js": "registry:npm/base64-js"
   },
   "globalDependencies": {
-    "utf8": "registry:dt/utf8#2.1.1+20160730041255"
+    "utf8": "registry:dt/utf8"
   }
 }
