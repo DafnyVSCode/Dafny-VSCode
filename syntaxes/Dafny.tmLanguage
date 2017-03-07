@@ -16,7 +16,7 @@
 	<array>
 		<dict>
 			<key>match</key>
-			<string>\b(class|datatype|codatatype|type|function|ghost|var|method|constructor|comethod|abstract|module|import|default|as|opened|static|refines|returns|break|then|else|if|label|return|while|print|where|new|parallel|in|this|fresh|choose|match|case|assert|assume|predicate|copredicate|forall|exists|false|true|null|old|calc|iterator|yields|yield)\b</string>
+			<string>\b(class|datatype|codatatype|type|function|ghost|var|method|constructor|comethod|abstract|module|import|default|as|opened|static|refines|returns|break|then|else|if|label|return|while|print|where|new|parallel|in|fresh|choose|match|case|assert|assume|predicate|copredicate|forall|exists|false|true|null|old|calc|iterator|yields|yield)\b</string>
 			<key>name</key>
 			<string>keyword.control.dafny</string>
 		</dict>
@@ -143,7 +143,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>\b(class|datatype|codatatype|type|function|ghost|var|method|constructor|comethod|abstract|module|import|default|as|opened|static|refines|returns|break|then|else|if|label|return|while|print|where|new|parallel|in|this|fresh|choose|match|case|assert|assume|predicate|copredicate|forall|exists|false|true|null|old|calc|iterator|yields|yield)\b</string>
+					<string>\b(class|datatype|codatatype|type|function|ghost|var|method|constructor|comethod|abstract|module|import|default|as|opened|static|refines|returns|break|then|else|if|label|return|while|print|where|new|parallel|in|fresh|choose|match|case|assert|assume|predicate|copredicate|forall|exists|false|true|null|old|calc|iterator|yields|yield)\b</string>
 					<key>name</key>
 					<string>keyword.control.dafny</string>
 				</dict>
@@ -170,6 +170,12 @@
 					<string>\b(bool|multiset|map|nat|int|object|set|seq|array)\b</string>
 					<key>name</key>
 					<string>keyword.type.dafny</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>this</string>
+					<key>name</key>
+					<string>storage.type.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>

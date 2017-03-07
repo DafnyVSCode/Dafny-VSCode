@@ -22,7 +22,7 @@ export class Statusbar {
     // used to display typing/verifying/error count status
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
-    private static CurrentDocumentStatusBarVerified = Strings.NotVerified;
+    private static CurrentDocumentStatusBarVerified = Strings.Verified;
     private static CurrentDocumentStatusBarNotVerified = Strings.NotVerified;
 
     public activeRequest : VerificationRequest;
@@ -79,7 +79,8 @@ export class Statusbar {
         } else {
             let res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
             if (res !== undefined) {
-                this.currentDocumentStatucBar.text = this.verificationResultToString(res);
+                const displayText = this.verificationResultToString(res);
+                this.currentDocumentStatucBar.text = displayText;
             } else {
                 this.currentDocumentStatucBar.text = Strings.Error;
             }

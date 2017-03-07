@@ -1,4 +1,5 @@
 "use strict";
+import { Command } from "./Environment";
 import { Environment } from "./Environment";
 import { Strings } from "./stringRessources";
 
@@ -7,7 +8,6 @@ import {Statusbar} from "./dafnyStatusbar";
 import {VerificationRequest} from "./VerificationRequest";
 import {Context} from "./Context";
 import * as cp from "child_process";
-import * as os from "os";
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
 
@@ -29,7 +29,7 @@ export class DafnyServer {
 
     constructor(private statusbar : Statusbar, private context : Context) {
         // run timerCallback every now and then to see if there's a queued verification request
-        this.intervalTimer = setInterval(this.timerCallback.bind(this), 250);
+        //this.intervalTimer = setInterval(this.timerCallback.bind(this), 250);
     }
 
     private killServerProc(): void {
@@ -46,38 +46,17 @@ export class DafnyServer {
         }
         this.statusbar.changeServerStatus(Strings.Starting);
 
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(Strings.Dafny);
-        const useMono: boolean = config.get<boolean>("useMono") || os.platform() !== "win32"; // setting only relevant on windows
-        let monoPath: string = config.get<string>("monoPath");
-        const hasCustomMonoPath: boolean = monoPath !== "";
-        const dafnyServerPath: string = config.get<string>("dafnyServerPath");
+        const environment: Environment = new Environment();
+        const dafnyCommand: Command = environment.GetStartDafnyCommand();
 
-        let command: string;
-        let args: string[];
-
-        if (!useMono) {
-            command = dafnyServerPath;
-            args = [];
-        } else {
-            // see if mono is in PATH
-            const monoInSystemPath: boolean = Environment.TestCommand(Strings.Mono);
-
-            // now test specific path
-            const monoAtConfigPath: boolean = hasCustomMonoPath && Environment.TestCommand(monoPath);
-
-            if (monoInSystemPath && !monoAtConfigPath) {
-                if (hasCustomMonoPath) {
-                    vscode.window.showWarningMessage(Strings.MonoPathWrong);
-                }
-                monoPath = Strings.Mono;
-            } else if (!monoInSystemPath && !monoAtConfigPath) {
-                vscode.window.showErrorMessage(Strings.NoMono);
-                return false; // failed to start DafnyServer
-            }
-
-            command = monoPath;
-            args = [dafnyServerPath];
+        if(environment.usesMono && environment.hasCustomMonoPath) {
+            vscode.window.showWarningMessage(Strings.MonoPathWrong);
         }
+        if(dafnyCommand.notFound) {
+            vscode.window.showErrorMessage(Strings.NoMono);
+            return false;
+        }
+
 
         const options: cp.SpawnOptions = {};
         if (vscode.workspace.rootPath) {
@@ -88,9 +67,11 @@ export class DafnyServer {
             "pipe", // stdout
             0, // ignore stderr
         ];
+        return this.resetServerProc(dafnyCommand, options);
+    }
 
-
-        this.serverProc = cp.spawn(command, args, options);
+    private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {
+        this.serverProc = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
 
         if (this.serverProc.pid) {
             this.statusbar.pid = this.serverProc.pid;
@@ -128,7 +109,6 @@ export class DafnyServer {
             return false;
         }
     }
-
 
     public isRunning(): Boolean {
         // todo: better process handling
