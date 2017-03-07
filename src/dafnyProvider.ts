@@ -1,53 +1,41 @@
 /// <reference path="../typings/index.d.ts" />
 
-'use strict';
+"use strict";
 
-//node
-import * as os from 'os';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as cp from 'child_process';
-import ChildProcess = cp.ChildProcess;
-import * as querystring from 'querystring';
 
-//vscode
-import * as vscode from 'vscode';
+// vscode
+import * as vscode from "vscode";
 
-//external
-import * as b64 from 'base64-js';
-import * as utf8 from 'utf8';
-
-import {DafnyServer} from './dafnyServer';
-import {Statusbar} from './dafnyStatusbar';
-import {Context} from './Context';
+// external
+import {DafnyServer} from "./dafnyServer";
+import {Statusbar} from "./dafnyStatusbar";
+import {Context} from "./Context";
 
 class DocChangeTimerRecord {
     public active: boolean = false;
     constructor (
         public doc: vscode.TextDocument,
-        public lastChange: number //epoch ms (use Date.now())
+        public lastChange: number // epoch ms (use Date.now())
     ) {}
 }
 
 export class DafnyDiagnosticsProvider {
     private diagCol: vscode.DiagnosticCollection = null;
 
-    //onTextChanged events are sent on each character change,
-    //but we only want to send a verification request after a bunch of changes are done
+    // onTextChanged events are sent on each character change,
+    // but we only want to send a verification request after a bunch of changes are done
     private docChangeTimers: { [docPathName: string]: DocChangeTimerRecord } = {};
-    private docChangeVerify: boolean = false; //dafny.automaticVerification config param
-    private docChangeDelay: number = 0; //dafny.automaticVerificationDelayMS config param
+    private docChangeVerify: boolean = false; // dafny.automaticVerification config param
+    private docChangeDelay: number = 0; // dafny.automaticVerificationDelayMS config param
 
-    private currentEditor: vscode.TextEditor = null;
-    
     private dafnyStatusbar : Statusbar;
     private dafnyServer : DafnyServer;
     private context : Context;
 
     constructor() {
         this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
-        
-        let config = vscode.workspace.getConfiguration("dafny");
+
+        let config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("dafny");
         this.docChangeVerify = config.get<boolean>("automaticVerification");
         this.docChangeDelay = config.get<number>("automaticVerificationDelayMS");
 
@@ -58,30 +46,29 @@ export class DafnyDiagnosticsProvider {
         this.dafnyServer.reset();
     }
 
-    public resetServer() {
+    public resetServer(): void {
         this.dafnyServer.reset();
     }
 
-    
-    private doVerify(textDocument: vscode.TextDocument) {
-        if (textDocument.languageId === 'dafny') {
+
+    private doVerify(textDocument: vscode.TextDocument): void {
+        if (textDocument.languageId === "dafny") {
             this.dafnyStatusbar.update();
             this.dafnyServer.addDocument(textDocument);
-        } 
+        }
     }
 
-    private docChanged(change: vscode.TextDocumentChangeEvent) {
-        if (change.document.languageId === 'dafny') {
-            //TODO: check if this is too slow to be done every time
+    private docChanged(change: vscode.TextDocumentChangeEvent): void {
+        if (change.document.languageId === "dafny") {
+            // todo: check if this is too slow to be done every time
             if (this.docChangeVerify) {
-                let now = Date.now();
-                let docName = change.document.fileName;
+                let now: number = Date.now();
+                let docName: string = change.document.fileName;
 
                 let rec: DocChangeTimerRecord = null;
                 if (this.docChangeTimers[docName]) {
                     rec = this.docChangeTimers[docName];
-                }
-                else {
+                } else {
                     rec = new DocChangeTimerRecord(change.document, now);
                     this.docChangeTimers[docName] = rec;
                 }
@@ -93,14 +80,13 @@ export class DafnyDiagnosticsProvider {
                     this.currentDocStatucBarTxt.text = "$(clock)Typing..";
                 }*/
             }
-        } 
+        }
     }
 
-    
-    
-    public activate(subs: vscode.Disposable[]) {
+
+    public activate(subs: vscode.Disposable[]): void {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
-            if (editor) { //may be undefined
+            if (editor) { // may be undefined
                 this.dafnyStatusbar.update();
             }
         }, this);
@@ -112,12 +98,12 @@ export class DafnyDiagnosticsProvider {
 
         vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
-        vscode.workspace.textDocuments.forEach(this.doVerify, this); //verify each active document
+        vscode.workspace.textDocuments.forEach(this.doVerify, this); // verify each active document
     }
-    
-    public dispose() {
+
+    public dispose(): void {
         this.diagCol.clear();
         this.diagCol.dispose();
-        //vscode.window.showInformationMessage("DafnyProvder disposed");
+        // vscode.window.showInformationMessage("DafnyProvder disposed");
     }
 }

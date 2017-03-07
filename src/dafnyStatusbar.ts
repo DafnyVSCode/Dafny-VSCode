@@ -1,21 +1,19 @@
-'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+"use strict";
+import * as vscode from "vscode";
 
-import {VerificationResult, VerificationResults} from './verificationResults';
-import {ServerStatus} from './serverStatus';
-import {VerificationRequest} from './VerificationRequest';
-import {Context} from './Context';
+import {VerificationResult} from "./verificationResults";
+import {ServerStatus} from "./serverStatus";
+import {VerificationRequest} from "./VerificationRequest";
+import {Context} from "./Context";
 
 export class Statusbar {
 
     public pid : Number;
 
-    //used to display information about the progress of verification
+    // used to display information about the progress of verification
     private serverStatusBar: vscode.StatusBarItem = null;
 
-    //used to display typing/verifying/error count status
+    // used to display typing/verifying/error count status
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
     private static CurrentDocumentStatusBarVerified = "$(thumbsup) Verified";
@@ -23,7 +21,6 @@ export class Statusbar {
 
     public activeRequest : VerificationRequest;
     private serverStatus : string;
-    private queueSize : Number = 0;
 
     constructor(private context : Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
@@ -31,40 +28,35 @@ export class Statusbar {
     }
 
     private verificationResultToString (res: VerificationResult): string {
-        switch(res){
+        switch(res) {
             case VerificationResult.Verified: return Statusbar.CurrentDocumentStatusBarVerified;
             case VerificationResult.NotVerified: return Statusbar.CurrentDocumentStatusBarNotVerified;
         }
         return "$(x) Verification technical error";
     }
 
-    public hide() {
+    public hide(): void {
         this.serverStatusBar.hide();
         this.currentDocumentStatucBar.hide();
     }
 
-    public remainingRequests() : Number {
-        let inst = this;
-        /*return Object.keys(this.context.queuedRequests).filter((k) => {
-                return !!(inst.context.activeRequest[k]);
-            }).length;*/
+    public remainingRequests(): Number {
         return -1;
     }
 
 
-    public update()  {
+    public update(): void  {
 
-        let editor = vscode.window.activeTextEditor;
-        //editor.document is a get() that can try to resolve an undefined value
-        let editorsOpen = vscode.window.visibleTextEditors.length;
-        if (!editor || editorsOpen == 0 || editor.document.languageId !== 'dafny') {
-            //disable UI on other doc types or when vscode.window.activeTextEditor is undefined
+        let editor: vscode.TextEditor = vscode.window.activeTextEditor;
+        // editor.document is a get() that can try to resolve an undefined value
+        let editorsOpen: number = vscode.window.visibleTextEditors.length;
+        if (!editor || editorsOpen === 0 || editor.document.languageId !== "dafny") {
+            // disable UI on other doc types or when vscode.window.activeTextEditor is undefined
             this.serverStatusBar.hide();
             this.currentDocumentStatucBar.hide();
             return;
         }
 
-        
         if(this.pid) {
             this.serverStatusBar.text = "$(up) Server up";
             this.serverStatusBar.text += " (pid " + this.pid + ")";
@@ -73,7 +65,7 @@ export class Statusbar {
         } else {
             this.serverStatusBar.text = "$(x) Server down";
         }
-        
+
         if (this.activeRequest && editor.document === this.activeRequest.doc) {
             this.currentDocumentStatucBar.text = ServerStatus.StatusBarVerifying.message;
         } else if (this.context.queuedRequests[editor.document.fileName]) {
@@ -86,13 +78,11 @@ export class Statusbar {
                 this.currentDocumentStatucBar.text = "Error";
             }
         }
-        
         this.serverStatusBar.show();
         this.currentDocumentStatucBar.show();
-        
     }
 
-    public changeServerStatus(status : string) {
+    public changeServerStatus(status : string): void {
         this.serverStatus = status;
         this.update();
     }
