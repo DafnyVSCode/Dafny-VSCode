@@ -1,12 +1,6 @@
-/// <reference path="../typings/index.d.ts" />
-
 "use strict";
-
-
-// vscode
+import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
-
-// external
 import {DafnyServer} from "./dafnyServer";
 import {Statusbar} from "./dafnyStatusbar";
 import {Context} from "./Context";
@@ -33,9 +27,9 @@ export class DafnyDiagnosticsProvider {
     private context : Context;
 
     constructor() {
-        this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
+        this.diagCol = vscode.languages.createDiagnosticCollection(Strings.Dafny);
 
-        let config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("dafny");
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(Strings.Dafny);
         this.docChangeVerify = config.get<boolean>("automaticVerification");
         this.docChangeDelay = config.get<number>("automaticVerificationDelayMS");
 
@@ -52,33 +46,28 @@ export class DafnyDiagnosticsProvider {
 
 
     private doVerify(textDocument: vscode.TextDocument): void {
-        if (textDocument.languageId === "dafny") {
+        if (textDocument.languageId === Strings.Dafny) {
             this.dafnyStatusbar.update();
             this.dafnyServer.addDocument(textDocument);
         }
     }
 
     private docChanged(change: vscode.TextDocumentChangeEvent): void {
-        if (change.document.languageId === "dafny") {
+        if (change.document.languageId === Strings.Dafny) {
             // todo: check if this is too slow to be done every time
             if (this.docChangeVerify) {
-                let now: number = Date.now();
-                let docName: string = change.document.fileName;
+                const now: number = Date.now();
+                const docName: string = change.document.fileName;
 
-                let rec: DocChangeTimerRecord = null;
+                let changeRecord: DocChangeTimerRecord = null;
                 if (this.docChangeTimers[docName]) {
-                    rec = this.docChangeTimers[docName];
+                    changeRecord = this.docChangeTimers[docName];
                 } else {
-                    rec = new DocChangeTimerRecord(change.document, now);
-                    this.docChangeTimers[docName] = rec;
+                    changeRecord = new DocChangeTimerRecord(change.document, now);
+                    this.docChangeTimers[docName] = changeRecord;
                 }
-
-                rec.active = true;
-                rec.lastChange = now;
-
-                /*if (change.document === vscode.window.activeTextEditor.document) {
-                    this.currentDocStatucBarTxt.text = "$(clock)Typing..";
-                }*/
+                changeRecord.active = true;
+                changeRecord.lastChange = now;
             }
         }
     }

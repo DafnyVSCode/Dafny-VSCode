@@ -1,11 +1,17 @@
 "use strict";
+import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
 
-import {VerificationResult} from "./verificationResults";
+import {VerificationResult} from "./VerificationResults";
 import {ServerStatus} from "./serverStatus";
 import {VerificationRequest} from "./VerificationRequest";
 import {Context} from "./Context";
 
+class Priority {
+    static low: number = 1;
+    static medium: number = 5;
+    static high: number = 10;
+}
 export class Statusbar {
 
     public pid : Number;
@@ -16,23 +22,23 @@ export class Statusbar {
     // used to display typing/verifying/error count status
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
-    private static CurrentDocumentStatusBarVerified = "$(thumbsup) Verified";
-    private static CurrentDocumentStatusBarNotVerified = "$(thumbsdown) Not verified";
+    private static CurrentDocumentStatusBarVerified = Strings.NotVerified;
+    private static CurrentDocumentStatusBarNotVerified = Strings.NotVerified;
 
     public activeRequest : VerificationRequest;
     private serverStatus : string;
 
     constructor(private context : Context) {
-        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
-        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
+        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
+        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.low);
     }
 
-    private verificationResultToString (res: VerificationResult): string {
-        switch(res) {
+    private verificationResultToString (request: VerificationResult): string {
+        switch(request) {
             case VerificationResult.Verified: return Statusbar.CurrentDocumentStatusBarVerified;
             case VerificationResult.NotVerified: return Statusbar.CurrentDocumentStatusBarNotVerified;
         }
-        return "$(x) Verification technical error";
+        return Strings.TechnicalError;
     }
 
     public hide(): void {
@@ -47,9 +53,9 @@ export class Statusbar {
 
     public update(): void  {
 
-        let editor: vscode.TextEditor = vscode.window.activeTextEditor;
+        const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         // editor.document is a get() that can try to resolve an undefined value
-        let editorsOpen: number = vscode.window.visibleTextEditors.length;
+        const editorsOpen: number = vscode.window.visibleTextEditors.length;
         if (!editor || editorsOpen === 0 || editor.document.languageId !== "dafny") {
             // disable UI on other doc types or when vscode.window.activeTextEditor is undefined
             this.serverStatusBar.hide();
@@ -58,24 +64,24 @@ export class Statusbar {
         }
 
         if(this.pid) {
-            this.serverStatusBar.text = "$(up) Server up";
+            this.serverStatusBar.text = Strings.ServerUp;
             this.serverStatusBar.text += " (pid " + this.pid + ")";
             this.serverStatusBar.text += " | " + this.serverStatus + " | ";
             this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
         } else {
-            this.serverStatusBar.text = "$(x) Server down";
+            this.serverStatusBar.text = Strings.ServerDown;
         }
 
         if (this.activeRequest && editor.document === this.activeRequest.doc) {
             this.currentDocumentStatucBar.text = ServerStatus.StatusBarVerifying.message;
         } else if (this.context.queuedRequests[editor.document.fileName]) {
-            this.currentDocumentStatucBar.text = "$(watch) Queued";
+            this.currentDocumentStatucBar.text = Strings.Queued;
         } else {
             let res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
             if (res !== undefined) {
                 this.currentDocumentStatucBar.text = this.verificationResultToString(res);
             } else {
-                this.currentDocumentStatucBar.text = "Error";
+                this.currentDocumentStatucBar.text = Strings.Error;
             }
         }
         this.serverStatusBar.show();

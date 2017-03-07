@@ -1,7 +1,7 @@
 
 "use strict";
 
-import {VerificationResults} from "./verificationResults";
+import {VerificationResults} from "./VerificationResults";
 import {VerificationRequest} from "./VerificationRequest";
 
 

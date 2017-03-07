@@ -17,13 +17,13 @@ export class VerificationRequest {
         this.src = src;
         this.timeCreated = Date.now();
 
-        let lines: string[] = src.split("\n");
+        const lines: string[] = src.split("\n");
         this.srcEnds = new Array(lines.length);
 
          // tslint:disable-next-line:forin
-         for (var li in lines) {
-            var line: string = lines[li];
-            this.srcEnds[li] = line.length;
+         for (let index in lines) {
+            var line: string = lines[index];
+            this.srcEnds[index] = line.length;
         }
     }
 }
