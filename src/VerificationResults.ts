@@ -7,31 +7,28 @@ import { Strings } from "./stringRessources";
 export enum VerificationStatus {
     Verified = 0,
     NotVerified = 1,
-    Failed = 2
+    Failed = 2,
 };
 
 export class VerificationResult {
-    
-    public verificationStatus : VerificationStatus;
-    public proofObligations : Number;
-    public errorCount : Number;
-    public crashed : Boolean = false;
+    public verificationStatus: VerificationStatus;
+    public proofObligations: number;
+    public errorCount: number;
+    public crashed: boolean = false;
 };
 
 export class VerificationResults {
+    public latestResults: { [docPathName: string]: VerificationResult } = {};
 
     private logParseRegex = new RegExp(".*?\\((\\d+),(\\d+)\\):.*?(Error|Warning|Info)(\\w)?: (.*)");
     private numberOfProofObligations = new RegExp(".*?(\\d+).*?(proof).*?(obligations|obligation).*?(verified|error)");
-
-    public latestResults: { [docPathName: string]: VerificationResult } = {};
-
     private diagCol: vscode.DiagnosticCollection = null;
 
     constructor() {
         this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
     }
 
-    public collect(log: string, req : VerificationRequest): void {
+    public collect(log: string, req: VerificationRequest): void {
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
         const fileName: string = req.document.fileName;
         this.latestResults[fileName] = verificationResult;
@@ -46,17 +43,17 @@ export class VerificationResults {
 
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
-        let result = new VerificationResult();
+        const result = new VerificationResult();
         const lines: string[] = log.split("\n");
         const diags: vscode.Diagnostic[] = [];
         let errorCount: number = 0;
         let proofObligations: number = 0;
 
         // tslint:disable-next-line:forin
-        for (var index in lines) {
-            const line: string = lines[index];
-            const errors: RegExpExecArray = this.logParseRegex.exec(line);
-            const proofObligationLine: RegExpExecArray = this.numberOfProofObligations.exec(line);
+        for (let index in lines) {
+            const sourceLine: string = lines[index];
+            const errors: RegExpExecArray = this.logParseRegex.exec(sourceLine);
+            const proofObligationLine: RegExpExecArray = this.numberOfProofObligations.exec(sourceLine);
 
             if (errors) {
                 const lineNum: number = parseInt(errors[1], 10) - 1; // 1 based

@@ -25,32 +25,11 @@ export class DafnyServer {
     // ipc is done through stdin/stdout of the server process
     private serverProc: cp.ChildProcess = null;
     private outBuf: string = ""; // stdout accumulator
-    private intervalTimer: NodeJS.Timer = null;
-    private active : Boolean = false;
+    private active: boolean = false;
 
-    constructor(private statusbar : Statusbar, private context : Context) {
-        
-        this.intervalTimer = setTimeout(this.checkQueuePeriodically.bind(this), 2000);
-    }
+    constructor(private statusbar: Statusbar, private context: Context) {    }
 
-    private killServerProc(): void {
-        // detach old callback listeners - this is done to prevent a spurious 'end' event response
-        this.serverProc.stdout.removeAllListeners();
-        this.serverProc.removeAllListeners();
-        this.serverProc.kill();
-        // this.serverProc.disconnect(); //TODO: this fails, needs testing without //don't listen to messages any more
-        this.serverProc = null;
-
-        
-    }
-
-    private clearContext() : void {
-        this.context.queue.clear();
-        this.context.activeRequest = null;
-        this.context.serverpid = null;
-
-    }
-    public reset(): boolean {
+        public reset(): boolean {
         if (this.serverProc !== null) {
             this.killServerProc();
         }
@@ -82,6 +61,43 @@ export class DafnyServer {
         return this.resetServerProc(dafnyCommand, options);
     }
 
+    public isRunning(): boolean {
+        // todo: better process handling
+        return this.serverProc ? true : false;
+    }
+
+    public isActive(): boolean {
+        return this.context.activeRequest ? true : false;
+    }
+
+    public pid(): number {
+        return this.serverProc ? this.serverProc.pid : -1;
+    }
+
+    public addDocument(doc: vscode.TextDocument): void {
+
+        const docName: string = doc.fileName;
+        const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
+
+        this.context.queue.enqueue(request);
+        this.sendNextRequest();
+    }
+
+    private killServerProc(): void {
+        // detach old callback listeners - this is done to prevent a spurious 'end' event response
+        this.serverProc.stdout.removeAllListeners();
+        this.serverProc.removeAllListeners();
+        this.serverProc.kill();
+        // this.serverProc.disconnect(); //TODO: this fails, needs testing without //don't listen to messages any more
+        this.serverProc = null;        
+    }
+
+    private clearContext(): void {
+        this.context.queue.clear();
+        this.context.activeRequest = null;
+        this.context.serverpid = null;
+    }
+
     private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {
         this.serverProc = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
 
@@ -105,7 +121,6 @@ export class DafnyServer {
 
                 const crashedRequest = this.context.activeRequest;
                 this.clearContext();
-                //this.statusbar.setDocumentBar(Strings.Crashed);
                 this.context.verificationResults.addCrashed(crashedRequest);
 
                 setTimeout(() => {
@@ -125,28 +140,6 @@ export class DafnyServer {
             vscode.window.showErrorMessage(Strings.DafnyServerWrongPath);
             return false;
         }
-    }
-
-    public isRunning(): Boolean {
-        // todo: better process handling
-        return this.serverProc ? true : false;
-    }
-
-    public isActive(): Boolean {
-        return this.context.activeRequest ? true : false;
-    }
-
-    public pid(): Number {
-        return this.serverProc ? this.serverProc.pid : -1;
-    }
-
-    public addDocument(doc: vscode.TextDocument): void {
-
-        const docName: string = doc.fileName;
-        const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
-
-        this.context.queue.enqueue(request);
-        this.checkQueue();
     }
 
     private EncodeBase64(task: IVerificationTask): string {
@@ -174,12 +167,13 @@ export class DafnyServer {
 
         const encoded: string = this.EncodeBase64(task);
         this.outBuf = ""; // clear all output
-
+        
         this.WriteVerificationRequestToServer(encoded);
         request.timeSent = Date.now();
     }
 
     private WriteVerificationRequestToServer(request: string): void {
+    
         let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
             if (!good) {
                 throw "not good";
@@ -211,24 +205,12 @@ export class DafnyServer {
         }
         this.statusbar.changeServerStatus(Strings.Idle);
         this.active = false;
-        this.checkQueue();
-    }
-
-    private checkQueuePeriodically() {
-
-        this.intervalTimer = setTimeout(this.checkQueuePeriodically.bind(this), 2000);
         this.sendNextRequest();
     }
 
-    private checkQueue() {
-        clearTimeout(this.intervalTimer);
-        this.sendNextRequest();
-        this.intervalTimer = setTimeout(this.checkQueuePeriodically.bind(this), 2000);
-    }
+    private sendNextRequest(): void {
 
-    private sendNextRequest() : void {
-
-        if(!this.active && (this.context.activeRequest === null || this.context.activeRequest === null)) {
+        if(!this.active && (this.context.activeRequest === null)) {
             if(this.context.queue.peek() != null) {
                 this.active = true;
                 let request = this.context.queue.dequeue();
