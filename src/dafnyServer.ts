@@ -131,6 +131,7 @@ export class DafnyServer {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
 
         this.context.queue.enqueue(request);
+        this.checkQueue();
     }
 
     private EncodeBase64(task: IVerificationTask): string {
@@ -155,6 +156,7 @@ export class DafnyServer {
             source: request.source,
             sourceIsFile: false
         };
+
         const encoded: string = this.EncodeBase64(task);
         this.outBuf = ""; // clear all output
 
@@ -210,7 +212,7 @@ export class DafnyServer {
     }
 
     private sendNextRequest() : void {
-        
+
         if(!this.active && (this.context.activeRequest === null || this.context.activeRequest === null)) {
             if(this.context.queue.peek() != null) {
                 this.active = true;
@@ -219,7 +221,5 @@ export class DafnyServer {
                 this.sendVerificationRequest(request);
             }
         }
-
-        
     }
 }
