@@ -15,6 +15,7 @@ export class VerificationResult {
     public verificationStatus : VerificationStatus;
     public proofObligations : Number;
     public errorCount : Number;
+    public crashed : Boolean = false;
 };
 
 export class VerificationResults {
@@ -35,6 +36,14 @@ export class VerificationResults {
         const fileName: string = req.document.fileName;
         this.latestResults[fileName] = verificationResult;
     }
+
+    public addCrashed(req : VerificationRequest): void {
+        const verificationResult: VerificationResult = new VerificationResult();
+        verificationResult.crashed = true;
+        const fileName: string = req.document.fileName;
+        this.latestResults[fileName] = verificationResult;
+    }
+
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
         let result = new VerificationResult();

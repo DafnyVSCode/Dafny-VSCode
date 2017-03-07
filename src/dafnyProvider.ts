@@ -47,7 +47,6 @@ export class DafnyDiagnosticsProvider {
 
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === Strings.Dafny) {
-            this.dafnyStatusbar.update();
             this.dafnyServer.addDocument(textDocument);
         }
     }

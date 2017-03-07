@@ -19,4 +19,5 @@ export class Strings {
     public static DafnyServerWrongPath: string = "failed to start DafnyServer, check paths in config";
     public static Verifying: string = "$(beaker) Verifying";
     public static Starting: string = "Starting";
+    public static Crashed: string = "Crashed";
 }

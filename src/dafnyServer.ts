@@ -41,12 +41,22 @@ export class DafnyServer {
         // this.serverProc.disconnect(); //TODO: this fails, needs testing without //don't listen to messages any more
         this.serverProc = null;
 
+        
+    }
+
+    private clearContext() : void {
         this.context.queue.clear();
+        this.context.activeRequest = null;
+        this.context.serverpid = null;
+
     }
     public reset(): boolean {
         if (this.serverProc !== null) {
             this.killServerProc();
         }
+
+        this.clearContext();
+
         this.statusbar.changeServerStatus(Strings.Starting);
 
         const environment: Environment = new Environment();
@@ -92,7 +102,12 @@ export class DafnyServer {
             this.serverProc.on("exit", () => {
                 this.serverProc = null;
                 vscode.window.showErrorMessage(Strings.DafnyServerRestart);
-                this.context.serverpid = null;
+
+                const crashedRequest = this.context.activeRequest;
+                this.clearContext();
+                //this.statusbar.setDocumentBar(Strings.Crashed);
+                this.context.verificationResults.addCrashed(crashedRequest);
+
                 setTimeout(() => {
                     if (this.reset()) {
                         vscode.window.showInformationMessage(Strings.DafnyServerRestartSucceded);

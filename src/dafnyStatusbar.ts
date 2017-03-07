@@ -29,8 +29,10 @@ export class Statusbar {
         let response : string = "";
         if(result.errorCount == 0) {
             response = Strings.Verified;
-        } else {
+        } else if(!result.crashed) {
             response = Strings.NotVerified;
+        } else {
+            response = Strings.Crashed;
         }
         
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
@@ -74,7 +76,7 @@ export class Statusbar {
             if (res !== undefined) {
                 const displayText = this.verificationResultToString(res);
                 this.currentDocumentStatucBar.text = displayText;
-            }
+            } 
         }
         this.serverStatusBar.show();
         this.currentDocumentStatucBar.show();
@@ -94,5 +96,9 @@ export class Statusbar {
         });
         
         return found;
+    }
+
+    public setDocumentBar(text : string) : void {
+        this.currentDocumentStatucBar.text = text;
     }
 }
