@@ -11,5 +11,7 @@ export class ServerStatus {
     public static StatusBarVerifying : ServerStatus = new ServerStatus("$(sync) Verifying");
     public static StatusBarQueued : ServerStatus  = new ServerStatus("$(sync) Queued for verification");
     public static StatusBarServerOff : ServerStatus  = new ServerStatus( "$(x) Verification server off");
+    public static StatusBarIdle : ServerStatus  = new ServerStatus( "$(watch)DafnyServer idle");
+
 }
 

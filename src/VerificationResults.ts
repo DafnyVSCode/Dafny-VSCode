@@ -16,16 +16,14 @@ export enum VerificationResult {
 export class VerificationResults {
 
     private logParseRegex = new RegExp(".*?\\((\\d+),(\\d+)\\):.*?(Error|Warning|Info)(\\w)?: (.*)");
+    private numberOfProofObligations = new RegExp(".*?(\\d+).*?(proof).*?(obligations).*?(verified)");
 
-    //the latest results related to each file
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-
 
     private diagCol: vscode.DiagnosticCollection = null;
 
     constructor() {
         this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
-        
     }
 
     public collect(log: string, req : VerificationRequest) {
@@ -69,6 +67,8 @@ export class VerificationResults {
 
                 diags.push(new vscode.Diagnostic(range, msgStr, severity));
             }
+
+            //TODO: extract number of proof obligations
         }
 
         this.diagCol.set(req.doc.uri, diags);

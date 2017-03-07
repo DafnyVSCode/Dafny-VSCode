@@ -6,101 +6,93 @@ import * as vscode from 'vscode';
 import {VerificationResult, VerificationResults} from './verificationResults';
 import {ServerStatus} from './serverStatus';
 import {VerificationRequest} from './VerificationRequest';
+import {Context} from './Context';
 
 export class Statusbar {
 
     public pid : Number;
-    private results : VerificationResults;
 
     //used to display information about the progress of verification
-    private verificationStatusBarTxt: vscode.StatusBarItem = null;
+    private serverStatusBar: vscode.StatusBarItem = null;
 
     //used to display typing/verifying/error count status
-    private currentDocStatucBarTxt: vscode.StatusBarItem = null;
+    private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
-    private static StatusBarVerified = "$(thumbsup) Verified";
-    private static StatusBarNotVerified = "$(thumbsdown) Not verified";
+    private static CurrentDocumentStatusBarVerified = "$(thumbsup) Verified";
+    private static CurrentDocumentStatusBarNotVerified = "$(thumbsdown) Not verified";
 
     public activeRequest : VerificationRequest;
-    
-    private serverStatus : ServerStatus;
+    private serverStatus : string;
+    private queueSize : Number = 0;
 
-    private currentEditor: vscode.TextEditor = null;
-
-    constructor(currentEditor: vscode.TextEditor, results: VerificationResults) {
-        this.currentEditor = currentEditor;
-        this.results = results;
-        this.currentDocStatucBarTxt = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
-        this.verificationStatusBarTxt = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
-
-        this.serverStatus = ServerStatus.StatusBarServerOff;
+    constructor(private context : Context) {
+        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
+        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 1);
     }
 
     private verificationResultToString (res: VerificationResult): string {
         switch(res){
-            case VerificationResult.Verified: return Statusbar.StatusBarVerified;
-            case VerificationResult.NotVerified: return Statusbar.StatusBarNotVerified;
+            case VerificationResult.Verified: return Statusbar.CurrentDocumentStatusBarVerified;
+            case VerificationResult.NotVerified: return Statusbar.CurrentDocumentStatusBarNotVerified;
         }
         return "$(x) Verification technical error";
     }
 
     public hide() {
-        this.verificationStatusBarTxt.hide();
-        this.currentDocStatucBarTxt.hide();
+        this.serverStatusBar.hide();
+        this.currentDocumentStatucBar.hide();
     }
+
+    public remainingRequests() : Number {
+        let inst = this;
+        /*return Object.keys(this.context.queuedRequests).filter((k) => {
+                return !!(inst.context.activeRequest[k]);
+            }).length;*/
+        return -1;
+    }
+
 
     public update()  {
 
-        let editor = this.currentEditor;
+        let editor = vscode.window.activeTextEditor;
         //editor.document is a get() that can try to resolve an undefined value
         let editorsOpen = vscode.window.visibleTextEditors.length;
         if (!editor || editorsOpen == 0 || editor.document.languageId !== 'dafny') {
             //disable UI on other doc types or when vscode.window.activeTextEditor is undefined
-            this.verificationStatusBarTxt.hide();
-            this.currentDocStatucBarTxt.hide();
+            this.serverStatusBar.hide();
+            this.currentDocumentStatucBar.hide();
             return;
         }
 
-        this.verificationStatusBarTxt.text = "";
-
-        /*if (!this.dafnyServer.isRunning()) {
-            this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.StatusBarServerOff;
-            this.verificationStatusBarTxt.text = "$(x)DafnyServer not started";
-            return;
-        }*/
-       
-
-        /*if (this.dafnyServer.isActive()) {
-            let remaining = this.dafnyServer.remainingRequests();
-
-            //set status bar text
-            this.verificationStatusBarTxt.text = "$(beaker)Verifying " + this.activeRequest.doc.fileName;
-            if (remaining > 0) this.verificationStatusBarTxt.text += " (+ " + remaining.toString(10) + " queued)";
+        
+        if(this.pid) {
+            this.serverStatusBar.text = "$(up) Server up";
+            this.serverStatusBar.text += " (pid " + this.pid + ")";
+            this.serverStatusBar.text += " | " + this.serverStatus + " | ";
+            this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
+        } else {
+            this.serverStatusBar.text = "$(x) Server down";
         }
-        else {
-            this.verificationStatusBarTxt.text = "$(watch)DafnyServer idle";
-        }*/
-        this.verificationStatusBarTxt.text += " (pid " + this.pid + ")";
-
+        
         if (this.activeRequest && editor.document === this.activeRequest.doc) {
-            this.currentDocStatucBarTxt.text = ServerStatus.StatusBarVerifying.message;
-        }
-        /*else if (this.queuedRequests[editor.document.fileName]) {
-            this.currentDocStatucBarTxt.text = DafnyDiagnosticsProvider.StatusBarQueued;
-        }*/
-        else {
-            let res: undefined | VerificationResult = this.results.latestResults[editor.document.fileName];
+            this.currentDocumentStatucBar.text = ServerStatus.StatusBarVerifying.message;
+        } else if (this.context.queuedRequests[editor.document.fileName]) {
+            this.currentDocumentStatucBar.text = "$(watch) Queued";
+        } else {
+            let res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
             if (res !== undefined) {
-                this.currentDocStatucBarTxt.text = this.verificationResultToString(res);
+                this.currentDocumentStatucBar.text = this.verificationResultToString(res);
+            } else {
+                this.currentDocumentStatucBar.text = "Error";
             }
         }
         
-        this.verificationStatusBarTxt.show();
-        this.currentDocStatucBarTxt.show();
+        this.serverStatusBar.show();
+        this.currentDocumentStatucBar.show();
         
     }
 
-    public changeStatus(status : ServerStatus) {
+    public changeServerStatus(status : string) {
         this.serverStatus = status;
         this.update();
     }

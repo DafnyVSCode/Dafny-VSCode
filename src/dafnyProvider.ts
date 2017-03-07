@@ -19,8 +19,7 @@ import * as utf8 from 'utf8';
 
 import {DafnyServer} from './dafnyServer';
 import {Statusbar} from './dafnyStatusbar';
-import {VerificationResults} from './VerificationResults';
-
+import {Context} from './Context';
 
 class DocChangeTimerRecord {
     public active: boolean = false;
@@ -43,19 +42,18 @@ export class DafnyDiagnosticsProvider {
     
     private dafnyStatusbar : Statusbar;
     private dafnyServer : DafnyServer;
-    private verificationResults : VerificationResults;
+    private context : Context;
 
     constructor() {
-        this.currentEditor = vscode.window.activeTextEditor;
         this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
         
         let config = vscode.workspace.getConfiguration("dafny");
         this.docChangeVerify = config.get<boolean>("automaticVerification");
         this.docChangeDelay = config.get<number>("automaticVerificationDelayMS");
 
-        this.verificationResults = new VerificationResults();
-        this.dafnyStatusbar = new Statusbar(this.currentEditor, this.verificationResults);
-        this.dafnyServer = new DafnyServer(this.dafnyStatusbar, this.verificationResults);
+        this.context = new Context();
+        this.dafnyStatusbar = new Statusbar(this.context);
+        this.dafnyServer = new DafnyServer(this.dafnyStatusbar, this.context);
 
         this.dafnyServer.reset();
     }
@@ -103,7 +101,6 @@ export class DafnyDiagnosticsProvider {
     public activate(subs: vscode.Disposable[]) {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) { //may be undefined
-                this.currentEditor = editor;
                 this.dafnyStatusbar.update();
             }
         }, this);

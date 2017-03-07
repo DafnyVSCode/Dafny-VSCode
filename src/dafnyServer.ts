@@ -7,6 +7,7 @@ import {VerificationResult, VerificationResults} from './verificationResults';
 import {Statusbar} from './dafnyStatusbar';
 import {ServerStatus} from './serverStatus';
 import {VerificationRequest} from './VerificationRequest';
+import {Context} from './Context';
 
 import * as cp from 'child_process';
 import * as os from 'os';
@@ -26,26 +27,14 @@ export interface VerificationTask {
 
 export class DafnyServer {
 
-    //the task we last sent to the dafny server and are expecting a verification log for;
-    //becomes null when the log is received
-    private activeRequest: VerificationRequest = null;
-
-    //at most 1 waiting request for each opened TextDocument;
-    //gets deleted if it becomes the active request
-    private queuedRequests: { [docPathName: string]: VerificationRequest } = {};
-
     //The dafny server runs as a child process (either through mono or .net)
     //IPC is done through stdin/stdout of the server process
     private serverProc: cp.ChildProcess = null;
     private outBuf: string = ''; //stdout accumulator
 
     private intervalTimer: NodeJS.Timer = null;
-    private statusbar : Statusbar;
-    private results: VerificationResults;
-
-    constructor(statusbar : Statusbar, results: VerificationResults) {
-        this.statusbar = statusbar;
-        this.results = results;
+    
+    constructor(private statusbar : Statusbar, private context : Context) {
 
         //run timerCallback every now and then to see if there's a queued verification request
         this.intervalTimer = setInterval(this.timerCallback.bind(this), 250);
@@ -71,7 +60,7 @@ export class DafnyServer {
             this.serverProc = null;
         }
 
-        this.statusbar.changeStatus(ServerStatus.StatusBarServerStarting);
+        this.statusbar.changeServerStatus("Starting");
 
         let config = vscode.workspace.getConfiguration("dafny");
         let useMono = config.get<boolean>("useMono") || os.platform() !== "win32"; //setting only relevant on windows
@@ -125,7 +114,7 @@ export class DafnyServer {
 
         if (this.serverProc.pid) {
             this.statusbar.pid = this.serverProc.pid;
-            
+            this.statusbar.changeServerStatus("$(clock) Idle");
             /*on(event: "close", listener: () => void): this;
             on(event: "readable", listener: () => void): this;
             on(event: "error", listener: (err: Error) => void): this;*/
@@ -143,12 +132,13 @@ export class DafnyServer {
             this.serverProc.on('exit', () => {
                 inst.serverProc = null;
                 vscode.window.showErrorMessage("DafnyServer process quit unexpectedly; attempting restart");
+                inst.statusbar.pid = null;
                 setTimeout((inst) => {
-                    if (inst.resetServer()) {
-                        vscode.window.showInformationMessage("Restart succeeded");
+                    if (inst.reset()) {
+                        vscode.window.showInformationMessage("DafnyServer restart succeeded");
                     }
                     else {
-                        vscode.window.showErrorMessage("Restart failed");
+                        vscode.window.showErrorMessage("DafnyServer restart failed");
                     }
                 }, 1000, inst);
                 inst.statusbar.update();
@@ -172,43 +162,37 @@ export class DafnyServer {
     }
 
     public isActive() : Boolean {
-        return this.activeRequest ? true : false;
-    }
-
-    public remainingRequests() : Number {
-        return Object.keys(this.queuedRequests).filter((k) => {
-                return !!(this.activeRequest[k]);
-            }).length;
+        return this.context.activeRequest ? true : false;
     }
 
     public pid() : Number {
         return this.serverProc ? this.serverProc.pid : -1;
     }
 
-
     public addDocument(doc: vscode.TextDocument) {
 
         let docName = doc.fileName;
         let req = new VerificationRequest(doc.getText(), doc);
 
-        if (this.activeRequest !== null && this.queuedRequests[docName] === this.activeRequest) {
+        if (this.context.activeRequest !== null && this.context.queuedRequests[docName] === this.context.activeRequest) {
             throw "active document must not be also in queue";
         }
 
-        if (this.activeRequest === null && this.isRunning()) {
+        if (this.context.activeRequest === null && this.isRunning()) {
             //ignore the queued request (if any) and run the new request directly
-            this.activeRequest = req;
-            this.statusbar.activeRequest = req;
-            this.queuedRequests[docName] = null;
-            this.sendVerificationRequest(this.activeRequest);
+            this.context.activeRequest = req;
+            this.context.queuedRequests[docName] = null;
+            this.sendVerificationRequest(this.context.activeRequest);
         } else {
             //overwrite any older requests as this is more up to date
-            this.queuedRequests[docName] = req;
+            this.context.queuedRequests[docName] = req;
         }
+        //this.statusbar.changeQueueSize(this.remainingRequests());   
     }
 
 
     private sendVerificationRequest(req: VerificationRequest) {
+        this.statusbar.changeServerStatus("$(beaker) Verifying");
         //base64 encode a json encoded DafnyServer.VerificationTask object
         let task: VerificationTask = {
             args: [],
@@ -249,28 +233,29 @@ export class DafnyServer {
     private gotData(): void {
         let endId = this.outBuf.search(/\[\[DAFNY-SERVER: EOM\]\]/);
         if (endId != -1) {
-            this.activeRequest.timeFinished = Date.now();
-            let elapsed = this.activeRequest.timeFinished - this.activeRequest.timeSent;
+            this.context.activeRequest.timeFinished = Date.now();
+            let elapsed = this.context.activeRequest.timeFinished - this.context.activeRequest.timeSent;
 
             //parse output
             let log = this.outBuf.substr(0, endId);
             console.log(log);
 
-            this.results.collect(log, this.activeRequest);
+            this.context.verificationResults.collect(log, this.context.activeRequest);
 
-            this.activeRequest = null;
-            this.statusbar.activeRequest = null;
+            this.context.activeRequest = null;
             this.outBuf = '';
 
             this.statusbar.update();
         }
+
+        this.statusbar.changeServerStatus("$(clock) Idle");
     }
 
 
 
     private timerCallback() {
         let now = Date.now();
-        if (this.activeRequest === null && this.isRunning()) {
+        if (this.context.activeRequest === null && this.isRunning()) {
             //see if there are documents that were recently modified
             
             
@@ -289,8 +274,8 @@ export class DafnyServer {
             //schedule the oldest request first
             let oldest: VerificationRequest = null;
             let oldestName: string = null;
-            for (var ni in this.queuedRequests) {
-                var req = this.queuedRequests[ni];
+            for (var ni in this.context.queuedRequests) {
+                var req = this.context.queuedRequests[ni];
                 if (req) {
                     if (!oldest || oldest.timeCreated > req.timeCreated) {
                         oldest = req;
@@ -302,17 +287,16 @@ export class DafnyServer {
             if (oldest) {
                 if (oldest.doc === vscode.window.activeTextEditor.document) {
                     //this.currentDocStatucBarTxt.text = "$(beaker)Verifying..";
-                    this.statusbar.changeStatus(ServerStatus.StatusBarVerifying);
                 }
 
-                this.queuedRequests[oldestName] = null;
-                this.activeRequest = oldest;
-                this.statusbar.activeRequest = oldest;
+                this.context.queuedRequests[oldestName] = null;
+                //this.statusbar.changeQueueSize(this.remainingRequests());
+                this.context.activeRequest = oldest;
                 this.sendVerificationRequest(oldest);
             }
         }
 
-        //this.updateStatusBars();
+        this.statusbar.update();
     }
 
     
