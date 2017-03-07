@@ -3,7 +3,6 @@ import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
 
 import {VerificationResult} from "./VerificationResults";
-import {ServerStatus} from "./serverStatus";
 import {VerificationRequest} from "./VerificationRequest";
 import {Context} from "./Context";
 
@@ -25,7 +24,6 @@ export class Statusbar {
     private static CurrentDocumentStatusBarVerified = Strings.Verified;
     private static CurrentDocumentStatusBarNotVerified = Strings.NotVerified;
 
-    public activeRequest : VerificationRequest;
     private serverStatus : string;
 
     constructor(private context : Context) {
@@ -33,12 +31,17 @@ export class Statusbar {
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.low);
     }
 
-    private verificationResultToString (request: VerificationResult): string {
-        switch(request) {
-            case VerificationResult.Verified: return Statusbar.CurrentDocumentStatusBarVerified;
-            case VerificationResult.NotVerified: return Statusbar.CurrentDocumentStatusBarNotVerified;
+    private verificationResultToString (result: VerificationResult): string {
+        let response : string = "";
+        if(result.errorCount == 0) {
+            response = Strings.Verified;
+        } else {
+            response = Strings.NotVerified;
         }
-        return Strings.TechnicalError;
+        
+        response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
+
+        return response;    
     }
 
     public hide(): void {
@@ -72,8 +75,8 @@ export class Statusbar {
             this.serverStatusBar.text = Strings.ServerDown;
         }
 
-        if (this.activeRequest && editor.document === this.activeRequest.doc) {
-            this.currentDocumentStatucBar.text = ServerStatus.StatusBarVerifying.message;
+        if (this.context.activeRequest && editor.document === this.context.activeRequest.doc) {
+            this.currentDocumentStatucBar.text = Strings.Verifying;
         } else if (this.context.queuedRequests[editor.document.fileName]) {
             this.currentDocumentStatucBar.text = Strings.Queued;
         } else {
