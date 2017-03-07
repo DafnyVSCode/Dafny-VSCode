@@ -32,12 +32,10 @@ export class VerificationResults {
 
     public collect(log: string, req : VerificationRequest): void {
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
-        const fileName: string = req.doc.fileName;
+        const fileName: string = req.document.fileName;
         this.latestResults[fileName] = verificationResult;
     }
 
-
-    // returns number of errors (that is, excluding warnings, infos, etc)
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
         let result = new VerificationResult();
         const lines: string[] = log.split("\n");
@@ -58,7 +56,7 @@ export class VerificationResults {
                 const msgStr: string = errors[4] !== undefined? errors[4] + ": " + errors[5] : errors[5];
 
                 const start: vscode.Position = new vscode.Position(lineNum, colNum);
-                const line: vscode.TextLine = req.doc.lineAt(start);
+                const line: vscode.TextLine = req.document.lineAt(start);
                 // let rangeOnWord = req.doc.getWordRangeAtPosition(start);
                 // let range = rangeOnWord || line.range; //sometimes rangeOnWord in undefined
                 const range: vscode.Range = line.range;
@@ -76,9 +74,8 @@ export class VerificationResults {
             } else if(proofObligationLine) {
                 proofObligations += parseInt(proofObligationLine[1]);
             }
-            // todo: extract number of proof obligations
         }
-        this.diagCol.set(req.doc.uri, diags);
+        this.diagCol.set(req.document.uri, diags);
         result.errorCount = errorCount;
         result.proofObligations = proofObligations;
         return result;

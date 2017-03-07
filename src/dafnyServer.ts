@@ -130,20 +130,6 @@ export class DafnyServer {
         const docName: string = doc.fileName;
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
 
-        /*if (this.context.activeRequest !== null && this.context.queuedRequests[docName] === this.context.activeRequest) {
-            throw "active document must not be also in queue";
-        }*/
-
-        /*if (this.context.activeRequest === null && this.isRunning()) {
-            // ignore the queued request (if any) and run the new request directly
-            this.context.activeRequest = request;
-            this.context.queuedRequests[docName] = null;
-            this.sendVerificationRequest(this.context.activeRequest);
-        } else {
-            // overwrite any older requests as this is more up to date
-            this.context.queuedRequests[docName] = request;
-        }*/
-
         this.context.queue.enqueue(request);
     }
 
@@ -165,8 +151,8 @@ export class DafnyServer {
         this.statusbar.changeServerStatus(Strings.Verifying);
         const task: IVerificationTask = {
             args: [],
-            filename: request.doc.fileName,
-            source: request.src,
+            filename: request.document.fileName,
+            source: request.source,
             sourceIsFile: false
         };
         const encoded: string = this.EncodeBase64(task);
