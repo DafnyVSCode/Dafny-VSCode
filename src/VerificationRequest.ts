@@ -10,8 +10,7 @@ export class VerificationRequest {
     public timeCreated: number;
     public timeSent: number = 0; // not known yet
     public timeFinished: number = 0; // not known yet
-    public logParseRegex: RegExp = null;
-
+    
     constructor (src: string, doc: vscode.TextDocument) {
         this.doc = doc;
         this.src = src;

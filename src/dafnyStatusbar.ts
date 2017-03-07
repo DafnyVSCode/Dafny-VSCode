@@ -13,8 +13,6 @@ class Priority {
 }
 export class Statusbar {
 
-    public pid : Number;
-
     // used to display information about the progress of verification
     private serverStatusBar: vscode.StatusBarItem = null;
 
@@ -25,7 +23,6 @@ export class Statusbar {
     private static CurrentDocumentStatusBarNotVerified = Strings.NotVerified;
 
     private serverStatus : string;
-
     constructor(private context : Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.low);
@@ -50,12 +47,10 @@ export class Statusbar {
     }
 
     public remainingRequests(): Number {
-        return -1;
+        return this.context.queue.size();
     }
 
-
     public update(): void  {
-
         const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         // editor.document is a get() that can try to resolve an undefined value
         const editorsOpen: number = vscode.window.visibleTextEditors.length;
@@ -66,9 +61,9 @@ export class Statusbar {
             return;
         }
 
-        if(this.pid) {
+        if(this.context.serverpid) {
             this.serverStatusBar.text = Strings.ServerUp;
-            this.serverStatusBar.text += " (pid " + this.pid + ")";
+            this.serverStatusBar.text += " (pid " + this.context.serverpid + ")";
             this.serverStatusBar.text += " | " + this.serverStatus + " | ";
             this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
         } else {
@@ -77,7 +72,7 @@ export class Statusbar {
 
         if (this.context.activeRequest && editor.document === this.context.activeRequest.doc) {
             this.currentDocumentStatucBar.text = Strings.Verifying;
-        } else if (this.context.queuedRequests[editor.document.fileName]) {
+        } else if (this.queueContains(editor.document.fileName)) {
             this.currentDocumentStatucBar.text = Strings.Queued;
         } else {
             let res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
@@ -95,5 +90,17 @@ export class Statusbar {
     public changeServerStatus(status : string): void {
         this.serverStatus = status;
         this.update();
+    }
+
+    private queueContains(filename : string) : Boolean {
+        let found = false;
+        this.context.queue.forEach(function(request : VerificationRequest) {
+            if(request.doc.fileName === filename) {
+                found = true;
+            }
+                
+        });
+        
+        return found;
     }
 }
