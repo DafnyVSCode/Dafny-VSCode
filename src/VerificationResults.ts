@@ -50,7 +50,7 @@ export class VerificationResults {
         let proofObligations: number = 0;
 
         // tslint:disable-next-line:forin
-        for (let index in lines) {
+        for (const index in lines) {
             const sourceLine: string = lines[index];
             const errors: RegExpExecArray = this.logParseRegex.exec(sourceLine);
             const proofObligationLine: RegExpExecArray = this.numberOfProofObligations.exec(sourceLine);

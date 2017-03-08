@@ -10,7 +10,8 @@ import {Context} from "./Context";
 import * as cp from "child_process";
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
-
+import {VericationCommandFailedException, VericationRequestFailedException,
+    CommandEndFailedException, ByteOutOfRangeException} from "./errors";
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
@@ -147,7 +148,7 @@ export class DafnyServer {
         for (let bi: number = 0; bi < bytesString.length; bi++) {
             const byte: number = bytesString.charCodeAt(bi);
             if (byte < 0 || byte > 255) {
-                throw "should be in single byte range";
+                throw new ByteOutOfRangeException();
             }
             bytes[bi] = byte;
         }
@@ -173,15 +174,15 @@ export class DafnyServer {
     private WriteVerificationRequestToServer(request: string): void {
         let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
             if (!good) {
-                throw "not good";
+                throw new VericationCommandFailedException("Verification command failed of request: ${request}");
             }
             good = this.serverProc.stdin.write(request + "\n", () => { // the base64 encoded task
                 if (!good) {
-                    throw "not good";
+                    throw new VericationRequestFailedException("Verification request failed of task: ${request}");
                 }
                 good = this.serverProc.stdin.write("[[DAFNY-CLIENT: EOM]]\n", () => { // the client end of message marker
                     if (!good) {
-                        throw "not good";
+                        throw new CommandEndFailedException("Verification command end failed of task: ${request}");
                     }
                 });
             });

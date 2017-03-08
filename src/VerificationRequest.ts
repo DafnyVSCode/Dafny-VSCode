@@ -16,7 +16,7 @@ export class VerificationRequest {
         this.srcEnds = new Array(lines.length);
 
          // tslint:disable-next-line:forin
-        for (let index in lines) {
+        for (const index in lines) {
             const line: string = lines[index];
             this.srcEnds[index] = line.length;
         }
