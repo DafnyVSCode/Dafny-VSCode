@@ -34,13 +34,12 @@ export class VerificationResults {
         this.latestResults[fileName] = verificationResult;
     }
 
-    public addCrashed(req : VerificationRequest): void {
+    public addCrashed(req: VerificationRequest): void {
         const verificationResult: VerificationResult = new VerificationResult();
         verificationResult.crashed = true;
         const fileName: string = req.document.fileName;
         this.latestResults[fileName] = verificationResult;
     }
-
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
         const result: VerificationResult = new VerificationResult();

@@ -1,4 +1,5 @@
 "use strict";
+
 import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
 import {DafnyServer} from "./dafnyServer";
@@ -40,11 +41,6 @@ export class DafnyDiagnosticsProvider {
         this.dafnyServer.reset();
     }
 
-    public resetServer(): void {
-        this.dafnyServer.reset();
-    }
-
-
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === Strings.Dafny) {
             this.dafnyServer.addDocument(textDocument);
@@ -71,7 +67,6 @@ export class DafnyDiagnosticsProvider {
         }
     }
 
-
     public activate(subs: vscode.Disposable[]): void {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) { // may be undefined
@@ -92,6 +87,9 @@ export class DafnyDiagnosticsProvider {
     public dispose(): void {
         this.diagCol.clear();
         this.diagCol.dispose();
-        // vscode.window.showInformationMessage("DafnyProvder disposed");
+    }
+
+    public resetServer(): void {
+        this.dafnyServer.reset();
     }
 }

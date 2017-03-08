@@ -10,8 +10,8 @@ import {Context} from "./Context";
 import * as cp from "child_process";
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
-import {VericationCommandFailedException, VericationRequestFailedException,
-    CommandEndFailedException, ByteOutOfRangeException} from "./errors";
+import {ByteOutOfRangeException, CommandEndFailedException,
+    VericationCommandFailedException, VericationRequestFailedException} from "./errors";
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {

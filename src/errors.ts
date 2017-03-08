@@ -1,3 +1,4 @@
+"use strict";
 
 export class VericationCommandFailedException extends Error {
     constructor(message: string) {
@@ -5,7 +6,6 @@ export class VericationCommandFailedException extends Error {
         Object.setPrototypeOf(this, VericationCommandFailedException.prototype);
     }
 }
-
 
 export class VericationRequestFailedException extends Error {
     constructor(message: string) {

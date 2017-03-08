@@ -1,20 +1,21 @@
+"use strict";
+
 import * as cp from "child_process";
 import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
 import * as os from "os";
 
-
 export class Command {
+    public notFound: boolean = false;
     // tslint:disable-next-line:no-empty
     public constructor(public command: string = null, public args: string[]= null) {};
-    public notFound: boolean = false;
 }
 
 export class Environment {
 
     private config: vscode.WorkspaceConfiguration;
-    public usesMono: boolean;
     private dafnyServerPath: string;
+    public usesMono: boolean;
     public hasCustomMonoPath: boolean;
 
     public constructor() {
@@ -23,7 +24,6 @@ export class Environment {
         this.dafnyServerPath = this.config.get<string>("dafnyServerPath");
         const monoPath: string = this.config.get<string>("monoPath");
         this.hasCustomMonoPath = monoPath !== "";
-
     }
     public TestCommand(path: string): boolean {
         const process: cp.ChildProcess = cp.exec(path);

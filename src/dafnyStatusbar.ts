@@ -15,8 +15,8 @@ export class Statusbar {
 
     private serverStatusBar: vscode.StatusBarItem = null;
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
-
     private serverStatus: string;
+
     constructor(private context: Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.low);
@@ -37,6 +37,16 @@ export class Statusbar {
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
 
         return response;
+    }
+
+    private queueContains(filename: string): boolean {
+        let found: boolean = false;
+        this.context.queue.forEach((request: VerificationRequest): void => {
+            if(request.document.fileName === filename) {
+                found = true;
+            }
+        });
+        return found;
     }
 
     public hide(): void {
@@ -89,15 +99,4 @@ export class Statusbar {
     public setDocumentBar(text: string): void {
         this.currentDocumentStatucBar.text = text;
     }
-
-    private queueContains(filename: string): boolean {
-        let found: boolean = false;
-        this.context.queue.forEach((request: VerificationRequest): void => {
-            if(request.document.fileName === filename) {
-                found = true;
-            }
-        });
-        return found;
-    }
-
 }
