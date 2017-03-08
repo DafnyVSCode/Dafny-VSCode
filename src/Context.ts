@@ -3,7 +3,7 @@
 
 import {VerificationResults} from "./VerificationResults";
 import {VerificationRequest} from "./VerificationRequest";
-import * as Collections from 'typescript-collections';
+import * as Collections from "typescript-collections";
 
 export class Context {
 
@@ -14,5 +14,5 @@ export class Context {
     public activeRequest: VerificationRequest = null;
 
     public serverpid : number;
-    
+
 }

@@ -75,8 +75,6 @@ export class DafnyServer {
     }
 
     public addDocument(doc: vscode.TextDocument): void {
-
-        const docName: string = doc.fileName;
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
 
         this.context.queue.enqueue(request);
@@ -89,7 +87,7 @@ export class DafnyServer {
         this.serverProc.removeAllListeners();
         this.serverProc.kill();
         // this.serverProc.disconnect(); //TODO: this fails, needs testing without //don't listen to messages any more
-        this.serverProc = null;        
+        this.serverProc = null;
     }
 
     private clearContext(): void {
@@ -119,7 +117,7 @@ export class DafnyServer {
                 this.serverProc = null;
                 vscode.window.showErrorMessage(Strings.DafnyServerRestart);
 
-                const crashedRequest = this.context.activeRequest;
+                const crashedRequest: VerificationRequest = this.context.activeRequest;
                 this.clearContext();
                 this.context.verificationResults.addCrashed(crashedRequest);
 
@@ -167,13 +165,12 @@ export class DafnyServer {
 
         const encoded: string = this.EncodeBase64(task);
         this.outBuf = ""; // clear all output
-        
+
         this.WriteVerificationRequestToServer(encoded);
         request.timeSent = Date.now();
     }
 
     private WriteVerificationRequestToServer(request: string): void {
-    
         let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
             if (!good) {
                 throw "not good";
@@ -213,7 +210,7 @@ export class DafnyServer {
         if(!this.active && (this.context.activeRequest === null)) {
             if(this.context.queue.peek() != null) {
                 this.active = true;
-                let request = this.context.queue.dequeue();
+                let request: VerificationRequest = this.context.queue.dequeue();
                 this.context.activeRequest = request;
                 this.sendVerificationRequest(request);
             }

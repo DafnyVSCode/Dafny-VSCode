@@ -29,15 +29,14 @@ export class Statusbar {
             return Strings.Crashed;
         }
 
-        if(result.errorCount == 0) {
+        if(result.errorCount === 0) {
             response = Strings.Verified;
         } else {
             response = Strings.NotVerified;
         }
-        
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
 
-        return response;    
+        return response;
     }
 
     public hide(): void {
@@ -74,9 +73,9 @@ export class Statusbar {
         } else {
             const res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
             if (res !== undefined) {
-                const displayText = this.verificationResultToString(res);
+                const displayText: string = this.verificationResultToString(res);
                 this.currentDocumentStatucBar.text = displayText;
-            } 
+            }
         }
         this.serverStatusBar.show();
         this.currentDocumentStatucBar.show();
@@ -87,18 +86,17 @@ export class Statusbar {
         this.update();
     }
 
-    public setDocumentBar(text: string) : void {
+    public setDocumentBar(text: string): void {
         this.currentDocumentStatucBar.text = text;
     }
 
-    private queueContains(filename: string) : boolean {
-        let found = false;
-        this.context.queue.forEach(function(request: VerificationRequest) {
+    private queueContains(filename: string): boolean {
+        let found: boolean = false;
+        this.context.queue.forEach(function(request: VerificationRequest): void {
             if(request.document.fileName === filename) {
                 found = true;
             }
         });
-        
         return found;
     }
 

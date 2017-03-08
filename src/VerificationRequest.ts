@@ -6,9 +6,9 @@ import * as vscode from "vscode";
 export class VerificationRequest {
     public srcEnds: number[];
     public timeCreated: number;
-    public timeSent: number = 0; 
-    public timeFinished: number = 0; 
-    
+    public timeSent: number = 0;
+    public timeFinished: number = 0;
+
     constructor(public source: string, public document: vscode.TextDocument) {
         this.timeCreated = Date.now();
 

@@ -43,7 +43,7 @@ export class VerificationResults {
 
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
-        const result = new VerificationResult();
+        const result: VerificationResult = new VerificationResult();
         const lines: string[] = log.split("\n");
         const diags: vscode.Diagnostic[] = [];
         let errorCount: number = 0;
@@ -78,7 +78,7 @@ export class VerificationResults {
 
                 diags.push(new vscode.Diagnostic(range, msgStr, severity));
             } else if(proofObligationLine) {
-                proofObligations += parseInt(proofObligationLine[1]);
+                proofObligations += parseInt(proofObligationLine[1], 10);
             }
         }
         this.diagCol.set(req.document.uri, diags);
