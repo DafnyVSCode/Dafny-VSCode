@@ -21,7 +21,7 @@ export class Environment {
         this.config = vscode.workspace.getConfiguration(Strings.Dafny);
         this.usesMono = this.config.get<boolean>("useMono") || os.platform() !== "win32"; // setting only relevant on windows
         this.dafnyServerPath = this.config.get<string>("dafnyServerPath");
-        let monoPath: string = this.config.get<string>("monoPath");
+        const monoPath: string = this.config.get<string>("monoPath");
         this.hasCustomMonoPath = monoPath !== "";
 
     }
@@ -35,13 +35,13 @@ export class Environment {
     }
 
     public GetStartDafnyCommand(): Command {
-        let command: string;
+        let serverPath: string;
         let args: string[];
         let monoPath: string = this.config.get<string>("monoPath");
         if (!this.usesMono) {
-            command = this.dafnyServerPath;
+            serverPath = this.dafnyServerPath;
             args = [];
-            return new Command(command, args);
+            return new Command(serverPath, args);
         } else {
             const monoInSystemPath: boolean = this.TestCommand(Strings.Mono);
             const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
@@ -56,9 +56,9 @@ export class Environment {
                 command.notFound = true;
                 return command;
             }
-            command = monoPath;
+            serverPath = monoPath;
             args = [this.dafnyServerPath];
-            return new Command(command, args);
+            return new Command(serverPath, args);
         }
     }
 }
