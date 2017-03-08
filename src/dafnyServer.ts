@@ -211,7 +211,7 @@ export class DafnyServer {
         if(!this.active && (this.context.activeRequest === null)) {
             if(this.context.queue.peek() != null) {
                 this.active = true;
-                let request: VerificationRequest = this.context.queue.dequeue();
+                const request: VerificationRequest = this.context.queue.dequeue();
                 this.context.activeRequest = request;
                 this.sendVerificationRequest(request);
             }

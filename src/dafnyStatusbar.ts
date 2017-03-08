@@ -92,7 +92,7 @@ export class Statusbar {
 
     private queueContains(filename: string): boolean {
         let found: boolean = false;
-        this.context.queue.forEach(function(request: VerificationRequest): void {
+        this.context.queue.forEach((request: VerificationRequest): void => {
             if(request.document.fileName === filename) {
                 found = true;
             }
