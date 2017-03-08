@@ -1,9 +1,9 @@
 "use strict";
 
 import * as cp from "child_process";
-import { Strings } from "./stringRessources";
-import * as vscode from "vscode";
 import * as os from "os";
+import * as vscode from "vscode";
+import { Strings } from "./stringRessources";
 
 export class Command {
     public notFound: boolean = false;
@@ -13,12 +13,12 @@ export class Command {
 
 export class Environment {
 
-    private config: vscode.WorkspaceConfiguration;
-    private dafnyServerPath: string;
     public usesMono: boolean;
     public hasCustomMonoPath: boolean;
+    private config: vscode.WorkspaceConfiguration;
+    private dafnyServerPath: string;
 
-    public constructor() {
+    constructor() {
         this.config = vscode.workspace.getConfiguration(Strings.Dafny);
         this.usesMono = this.config.get<boolean>("useMono") || os.platform() !== "win32"; // setting only relevant on windows
         this.dafnyServerPath = this.config.get<string>("dafnyServerPath");

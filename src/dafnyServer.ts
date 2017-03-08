@@ -1,17 +1,16 @@
 "use strict";
+import * as b64 from "base64-js";
+import * as cp from "child_process";
+import * as utf8 from "utf8";
+import * as vscode from "vscode";
+import {Context} from "./Context";
+import {Statusbar} from "./dafnyStatusbar";
 import { Command } from "./Environment";
 import { Environment } from "./Environment";
-import { Strings } from "./stringRessources";
-
-import * as vscode from "vscode";
-import {Statusbar} from "./dafnyStatusbar";
-import {VerificationRequest} from "./VerificationRequest";
-import {Context} from "./Context";
-import * as cp from "child_process";
-import * as b64 from "base64-js";
-import * as utf8 from "utf8";
 import {ByteOutOfRangeException, CommandEndFailedException,
     VericationCommandFailedException, VericationRequestFailedException} from "./errors";
+import { Strings } from "./stringRessources";
+import {VerificationRequest} from "./VerificationRequest";
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
@@ -42,10 +41,10 @@ export class DafnyServer {
         const environment: Environment = new Environment();
         const dafnyCommand: Command = environment.GetStartDafnyCommand();
 
-        if(environment.usesMono && environment.hasCustomMonoPath) {
+        if (environment.usesMono && environment.hasCustomMonoPath) {
             vscode.window.showWarningMessage(Strings.MonoPathWrong);
         }
-        if(dafnyCommand.notFound) {
+        if (dafnyCommand.notFound) {
             vscode.window.showErrorMessage(Strings.NoMono);
             return false;
         }

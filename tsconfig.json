@@ -6,6 +6,8 @@
         "lib": [
             "es6"
         ],
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "sourceMap": true,
         "rootDir": "."
     },

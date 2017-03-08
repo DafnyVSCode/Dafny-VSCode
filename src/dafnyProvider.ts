@@ -1,14 +1,14 @@
 "use strict";
 
-import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
+import {Context} from "./Context";
 import {DafnyServer} from "./dafnyServer";
 import {Statusbar} from "./dafnyStatusbar";
-import {Context} from "./Context";
+import { Strings } from "./stringRessources";
 
 class DocChangeTimerRecord {
     public active: boolean = false;
-    constructor (
+    constructor(
         public doc: vscode.TextDocument,
         public lastChange: number // epoch ms (use Date.now())
     ) {}
@@ -22,10 +22,10 @@ export class DafnyDiagnosticsProvider {
     private docChangeTimers: { [docPathName: string]: DocChangeTimerRecord } = {};
     private docChangeVerify: boolean = false; // dafny.automaticVerification config param
     private docChangeDelay: number = 0; // dafny.automaticVerificationDelayMS config param
-
-    private dafnyStatusbar : Statusbar;
-    private dafnyServer : DafnyServer;
-    private context : Context;
+    private subscriptions: vscode.Disposable[];
+    private dafnyStatusbar: Statusbar;
+    private dafnyServer: DafnyServer;
+    private context: Context;
 
     constructor() {
         this.diagCol = vscode.languages.createDiagnosticCollection(Strings.Dafny);
@@ -38,6 +38,37 @@ export class DafnyDiagnosticsProvider {
         this.dafnyStatusbar = new Statusbar(this.context);
         this.dafnyServer = new DafnyServer(this.dafnyStatusbar, this.context);
 
+        this.dafnyServer.reset();
+    }
+
+public activate(subs: vscode.Disposable[]): void {
+        vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
+            if (editor) { // may be undefined
+                this.dafnyStatusbar.update();
+            }
+        }, this);
+        this.subscriptions = subs;
+        vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
+        vscode.workspace.onDidCloseTextDocument((textDocument) => {
+            this.diagCol.delete(textDocument.uri);
+        }, this);
+
+        vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
+        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+        vscode.workspace.textDocuments.forEach(this.doVerify, this); // verify each active document
+    }
+
+    public dispose(): void {
+        this.diagCol.clear();
+        this.diagCol.dispose();
+        if(this.subscriptions && this.subscriptions.length > 0) {
+            for(let i: number = 0; i < this.subscriptions.length; i++) {
+                this.subscriptions[i].dispose();
+            }
+        }
+    }
+
+    public resetServer(): void {
         this.dafnyServer.reset();
     }
 
@@ -67,29 +98,4 @@ export class DafnyDiagnosticsProvider {
         }
     }
 
-    public activate(subs: vscode.Disposable[]): void {
-        vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
-            if (editor) { // may be undefined
-                this.dafnyStatusbar.update();
-            }
-        }, this);
-
-        vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
-        vscode.workspace.onDidCloseTextDocument((textDocument)=> {
-            this.diagCol.delete(textDocument.uri);
-        }, this);
-
-        vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
-        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
-        vscode.workspace.textDocuments.forEach(this.doVerify, this); // verify each active document
-    }
-
-    public dispose(): void {
-        this.diagCol.clear();
-        this.diagCol.dispose();
-    }
-
-    public resetServer(): void {
-        this.dafnyServer.reset();
-    }
 }

@@ -1,9 +1,9 @@
 
 "use strict";
 
-import {VerificationResults} from "./VerificationResults";
-import {VerificationRequest} from "./VerificationRequest";
 import * as Collections from "typescript-collections";
+import {VerificationRequest} from "./VerificationRequest";
+import {VerificationResults} from "./VerificationResults";
 
 export class Context {
     public queue: Collections.Queue<VerificationRequest> = new Collections.Queue<VerificationRequest>();
