@@ -1,10 +1,9 @@
 "use strict";
-import { Strings } from "./stringRessources";
 import * as vscode from "vscode";
-
-import {VerificationResult} from "./VerificationResults";
-import {VerificationRequest} from "./VerificationRequest";
 import {Context} from "./Context";
+import { Strings } from "./stringRessources";
+import {VerificationRequest} from "./VerificationRequest";
+import {VerificationResult} from "./VerificationResults";
 
 class Priority {
     public static low: number = 1;
@@ -15,28 +14,11 @@ export class Statusbar {
 
     private serverStatusBar: vscode.StatusBarItem = null;
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
-
     private serverStatus: string;
+
     constructor(private context: Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.low);
-    }
-
-    private verificationResultToString(result: VerificationResult): string {
-        let response: string = "";
-
-        if(result.crashed) {
-            return Strings.Crashed;
-        }
-
-        if(result.errorCount === 0) {
-            response = Strings.Verified;
-        } else {
-            response = Strings.NotVerified;
-        }
-        response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
-
-        return response;
     }
 
     public hide(): void {
@@ -90,14 +72,30 @@ export class Statusbar {
         this.currentDocumentStatucBar.text = text;
     }
 
+    private verificationResultToString(result: VerificationResult): string {
+        let response: string = "";
+
+        if(result.crashed) {
+            return Strings.Crashed;
+        }
+
+        if(result.errorCount === 0) {
+            response = Strings.Verified;
+        } else {
+            response = Strings.NotVerified;
+        }
+        response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
+
+        return response;
+    }
+
     private queueContains(filename: string): boolean {
         let found: boolean = false;
-        this.context.queue.forEach(function(request: VerificationRequest): void {
+        this.context.queue.forEach((request: VerificationRequest): void => {
             if(request.document.fileName === filename) {
                 found = true;
             }
         });
         return found;
     }
-
 }

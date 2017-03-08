@@ -1,12 +1,13 @@
 "use strict";
-import { Strings } from "./stringRessources";
+
 import * as vscode from "vscode";
 import {DafnyDiagnosticsProvider} from "./dafnyProvider";
+import { Strings } from "./stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
     const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("dafny");
     const dafnyServerPath: string = config.get<string>("dafnyServerPath");
-    var verifier: DafnyDiagnosticsProvider = null;
+    let verifier: DafnyDiagnosticsProvider = null;
 
     if (!dafnyServerPath) {
         vscode.window.showErrorMessage(Strings.ServerPathNotSet);
@@ -22,7 +23,6 @@ export function activate(context: vscode.ExtensionContext): void {
         }
         return false;
     });
-
     context.subscriptions.push(restartServerCommand);
 }
 
@@ -30,4 +30,3 @@ export function activate(context: vscode.ExtensionContext): void {
 export function deactivate(): void {
     // todo maybe deinstall dafny server
 }
-

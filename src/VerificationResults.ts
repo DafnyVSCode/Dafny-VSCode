@@ -2,8 +2,9 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {VerificationRequest} from "./VerificationRequest";
 import { Strings } from "./stringRessources";
+import {VerificationRequest} from "./VerificationRequest";
+
 export enum VerificationStatus {
     Verified = 0,
     NotVerified = 1,
@@ -34,13 +35,12 @@ export class VerificationResults {
         this.latestResults[fileName] = verificationResult;
     }
 
-    public addCrashed(req : VerificationRequest): void {
+    public addCrashed(req: VerificationRequest): void {
         const verificationResult: VerificationResult = new VerificationResult();
         verificationResult.crashed = true;
         const fileName: string = req.document.fileName;
         this.latestResults[fileName] = verificationResult;
     }
-
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
         const result: VerificationResult = new VerificationResult();
@@ -50,7 +50,7 @@ export class VerificationResults {
         let proofObligations: number = 0;
 
         // tslint:disable-next-line:forin
-        for (let index in lines) {
+        for (const index in lines) {
             const sourceLine: string = lines[index];
             const errors: RegExpExecArray = this.logParseRegex.exec(sourceLine);
             const proofObligationLine: RegExpExecArray = this.numberOfProofObligations.exec(sourceLine);
@@ -59,7 +59,7 @@ export class VerificationResults {
                 const lineNum: number = parseInt(errors[1], 10) - 1; // 1 based
                 const colNum: number = Math.max(0, parseInt(errors[2], 10) - 1); // ditto, but 0 can appear in some cases
                 const typeStr: string = errors[3];
-                const msgStr: string = errors[4] !== undefined? errors[4] + ": " + errors[5] : errors[5];
+                const msgStr: string = errors[4] !== undefined ? errors[4] + ": " + errors[5] : errors[5];
 
                 const start: vscode.Position = new vscode.Position(lineNum, colNum);
                 const line: vscode.TextLine = req.document.lineAt(start);
@@ -68,7 +68,7 @@ export class VerificationResults {
                 const range: vscode.Range = line.range;
 
                 const severity: vscode.DiagnosticSeverity = (typeStr === Strings.Error) ?
-                    vscode.DiagnosticSeverity.Error : (typeStr === Strings.Warning)?
+                    vscode.DiagnosticSeverity.Error : (typeStr === Strings.Warning) ?
                     vscode.DiagnosticSeverity.Warning :
                     vscode.DiagnosticSeverity.Information;
 
