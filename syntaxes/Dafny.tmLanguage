@@ -14,6 +14,27 @@
 	<string>Dafny</string>
 	<key>patterns</key>
 	<array>
+			<dict>
+			<key>begin</key>
+			<string>(class)\s*(\w+)\s*</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.control.dafny</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>entity.name.function.dafny</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>\{</string>
+			<key>name</key>
+			<string>meta.class.identifier.dafny</string>
+		</dict>
 		<dict>
 			<key>match</key>
 			<string>\b(class|datatype|codatatype|type|function|ghost|var|method|constructor|comethod|abstract|module|import|default|as|opened|static|refines|returns|break|then|else|if|label|return|while|print|where|new|parallel|in|fresh|choose|match|case|assert|assume|predicate|copredicate|forall|exists|false|true|null|old|calc|iterator|yields|yield)\b</string>
@@ -26,6 +47,7 @@
 			<key>name</key>
 			<string>storage.type.dafny</string>
 		</dict>
+
 		<dict>
 			<key>begin</key>
 			<string>(\w+)\s*\(</string>
@@ -231,11 +253,22 @@
 		<dict>
 			<key>patterns</key>
 			<array>
+
 				<dict>
-					<key>match</key>
-					<string>&lt;.+?&gt;</string>
+					<key>begin</key>
+					<string>:\s*(\w+)</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>entity.name.function.dafny</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>\s*|,|\)|\}|requires|ensures|modifies</string>
 					<key>name</key>
-					<string>storage.type.dafny</string>
+					<string>meta.type.identifier.dafny</string>
 				</dict>
 			</array>
 		</dict>
