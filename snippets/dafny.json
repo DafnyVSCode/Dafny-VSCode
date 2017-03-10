@@ -1,0 +1,14 @@
+{
+    "insert method body": {
+        "prefix": "nm",
+        "body": [
+            "method ${name}(${params})",
+            "\trequires ${pred}",
+            "\tensures ${pred2}",
+            "\tmodifies ${what} {",
+            "\t${body}",
+            "}"
+        ],
+        "description": "insert method body"
+    }
+}
