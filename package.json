@@ -21,6 +21,12 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "snippets": [
+            {
+                "language": "dafny",
+                "path": "./snippets/dafny.json"
+            }
+        ],
         "languages": [
             {
                 "id": "dafny",
@@ -30,7 +36,8 @@
                 ],
                 "extensions": [
                     ".dfy"
-                ]
+                ],
+                "configuration": "./language-configuration.json"
             }
         ],
         "grammars": [
