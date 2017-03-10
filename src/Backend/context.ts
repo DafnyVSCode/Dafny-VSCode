@@ -16,4 +16,18 @@ export class Context {
         this.serverpid = null;
     }
 
+    public enqueueRequest(request: VerificationRequest): void {
+        this.queue.enqueue(request);
+    }
+
+    public collectRequest(serverReturn: string): void {
+        this.activeRequest.timeFinished = Date.now();
+        this.verificationResults.collect(serverReturn, this.activeRequest);
+        this.activeRequest = null;
+    }
+
+    public addCrashedRequest(request: VerificationRequest): void {
+        this.verificationResults.addCrashed(request);
+    }
+
 }

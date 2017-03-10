@@ -46,7 +46,7 @@ export class DafnyServer {
 
     public addDocument(doc: vscode.TextDocument): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
-        this.context.queue.enqueue(request);
+        this.context.enqueueRequest(request);
         this.sendNextRequest();
     }
 
@@ -72,12 +72,10 @@ export class DafnyServer {
 
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
-            this.context.activeRequest.timeFinished = Date.now();
             // parse output
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
             console.log(log);
-            this.context.verificationResults.collect(log, this.context.activeRequest);
-            this.context.activeRequest = null;
+            this.context.collectRequest(log);
             this.serverProc.clearBuffer();
             this.statusbar.update();
         }
@@ -92,7 +90,7 @@ export class DafnyServer {
 
         const crashedRequest: VerificationRequest = this.context.activeRequest;
         this.context.clear();
-        this.context.verificationResults.addCrashed(crashedRequest);
+        this.context.addCrashedRequest(crashedRequest);
 
         setTimeout(() => {
             if (this.reset()) {
