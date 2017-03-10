@@ -63,8 +63,6 @@ export class VerificationResults {
 
                 const start: vscode.Position = new vscode.Position(lineNum, colNum);
                 const line: vscode.TextLine = req.document.lineAt(start);
-                // let rangeOnWord = req.doc.getWordRangeAtPosition(start);
-                // let range = rangeOnWord || line.range; //sometimes rangeOnWord in undefined
                 const range: vscode.Range = line.range;
 
                 const severity: vscode.DiagnosticSeverity = (typeStr === Strings.Error) ?

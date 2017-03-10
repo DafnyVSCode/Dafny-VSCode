@@ -25,6 +25,7 @@ export class Environment {
         const monoPath: string = this.config.get<string>("monoPath");
         this.hasCustomMonoPath = monoPath !== "";
     }
+
     public TestCommand(path: string): boolean {
         const process: cp.ChildProcess = cp.exec(path);
         const commandSuccessful: boolean = process.pid !== 0;
@@ -60,5 +61,22 @@ export class Environment {
             args = [this.dafnyServerPath];
             return new Command(serverPath, args);
         }
+    }
+
+    public GetStandardSpawnOptions(): cp.SpawnOptions {
+        const options: cp.SpawnOptions = {};
+        if (vscode.workspace.rootPath) {
+            options.cwd = vscode.workspace.rootPath;
+        }
+        options.stdio = [
+            "pipe", // stdin
+            "pipe", // stdout
+            0, // ignore stderr
+        ];
+        return options;
+    }
+
+    public UsesNonStandardMonoPath(): boolean {
+        return this.usesMono && this.hasCustomMonoPath;
     }
 }
