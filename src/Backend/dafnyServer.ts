@@ -40,10 +40,6 @@ export class DafnyServer {
         return this.serverProc && this.serverProc.isAlive();
     }
 
-    public isActive(): boolean {
-        return this.context.activeRequest ? true : false;
-    }
-
     public pid(): number {
         return this.isRunning() ? this.serverProc.pid : -1;
     }
