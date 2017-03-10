@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
 import {Context} from "./Context";
-import {EnvironmentConfig, StatusString} from "./stringRessources";
+import {EnvironmentConfig, StatusString} from "./Strings/stringRessources";
 import {VerificationRequest} from "./VerificationRequest";
 import {VerificationResult} from "./VerificationResults";
 

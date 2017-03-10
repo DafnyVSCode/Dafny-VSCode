@@ -1,8 +1,8 @@
 "use strict";
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
-import { IVerificationTask } from "./../dafnyServer";
-import {ByteOutOfRangeException} from "./../errors";
+import { IVerificationTask } from "../Backend/dafnyServer";
+import {ByteOutOfRangeException} from "../ErrorHandling/errors";
 
 export function EncodeBase64(task: IVerificationTask): string {
     const jsonString: string = JSON.stringify(task);

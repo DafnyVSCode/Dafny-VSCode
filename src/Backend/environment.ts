@@ -3,7 +3,7 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
-import {EnvironmentConfig, ErrorMsg, WarningMsg } from "./stringRessources";
+import {Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "./Strings/stringRessources";
 
 export class Command {
     public notFound: boolean = false;
@@ -20,9 +20,9 @@ export class Environment {
 
     constructor() {
         this.config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-        this.usesMono = this.config.get<boolean>("useMono") || os.platform() !== "win32"; // setting only relevant on windows
-        this.dafnyServerPath = this.config.get<string>("dafnyServerPath");
-        const monoPath: string = this.config.get<string>("monoPath");
+        this.usesMono = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;
+        this.dafnyServerPath = this.config.get<string>(Config.DafnyServerPath);
+        const monoPath: string = this.config.get<string>(Config.MonoPath);
         this.hasCustomMonoPath = monoPath !== "";
     }
 
@@ -38,7 +38,7 @@ export class Environment {
     public GetStartDafnyCommand(): Command {
         let serverPath: string;
         let args: string[];
-        let monoPath: string = this.config.get<string>("monoPath");
+        let monoPath: string = this.config.get<string>(Config.MonoPath);
         if (!this.usesMono) {
             serverPath = this.dafnyServerPath;
             args = [];

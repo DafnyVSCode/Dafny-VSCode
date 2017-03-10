@@ -15,6 +15,18 @@ export class ErrorMsg {
     public static ServerPathNotSet: string = "Dafny Verifier error: dafnyServerPath not set";
 }
 
+export class Config {
+    public static DafnyServerPath: string = "dafnyServerPath";
+    public static MonoPath: string = "monoPath";
+    public static UseMono: string = "useMono";
+    public static AutomaticVerification: string = "automaticVerification";
+    public static AutomaticVerificationDelay: string = "automaticVerificationDelayMS";
+}
+
+export class Commands {
+    public static RestartServer: string = "dafny.restartDafnyServer";
+}
+
 export class InfoMsg {
     public static DafnyServerRestartSucceded: string = "DafnyServer restart succeeded";
 }
@@ -25,6 +37,8 @@ export class ServerStatus {
 export class EnvironmentConfig {
     public static Dafny: string = "dafny";
     public static Mono: string = "mono";
+    public static NewLine: string = "\n";
+    public static Win32: string = "win32";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";

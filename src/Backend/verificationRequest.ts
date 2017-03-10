@@ -2,7 +2,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-
+import { EnvironmentConfig } from "./Strings/stringRessources";
 export class VerificationRequest {
     public srcEnds: number[];
     public timeCreated: number;
@@ -12,7 +12,7 @@ export class VerificationRequest {
     constructor(public source: string, public document: vscode.TextDocument) {
         this.timeCreated = Date.now();
 
-        const lines: string[] = source.split("\n");
+        const lines: string[] = source.split(EnvironmentConfig.NewLine);
         this.srcEnds = new Array(lines.length);
 
          // tslint:disable-next-line:forin

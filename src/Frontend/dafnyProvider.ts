@@ -1,10 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {Context} from "./Context";
-import {DafnyServer} from "./dafnyServer";
+import {Context} from "../Backend/Context";
+import {DafnyServer} from "../Backend/dafnyServer";
+import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
-import { EnvironmentConfig } from "./stringRessources";
 
 class DocChangeTimerRecord {
     public active: boolean = false;
@@ -31,8 +31,8 @@ export class DafnyDiagnosticsProvider {
         this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-        this.docChangeVerify = config.get<boolean>("automaticVerification");
-        this.docChangeDelay = config.get<number>("automaticVerificationDelayMS");
+        this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
+        this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
 
         this.context = new Context();
         this.dafnyStatusbar = new Statusbar(this.context);
