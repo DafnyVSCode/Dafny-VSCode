@@ -1,4 +1,3 @@
-
 "use strict";
 
 import * as Collections from "typescript-collections";
@@ -10,4 +9,10 @@ export class Context {
     public verificationResults: VerificationResults = new VerificationResults();
     public activeRequest: VerificationRequest = null;
     public serverpid: number;
+
+    public clear(): void {
+        this.queue.clear();
+        this.activeRequest = null;
+        this.serverpid = null;
+    }
 }

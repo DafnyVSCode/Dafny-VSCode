@@ -1,8 +1,8 @@
-
 "use strict";
 
 import * as vscode from "vscode";
-import { Strings } from "./stringRessources";
+import { Verification } from "./Strings/regexRessources";
+import { EnvironmentConfig, Severity } from "./Strings/stringRessources";
 import {VerificationRequest} from "./VerificationRequest";
 
 export enum VerificationStatus {
@@ -20,13 +20,10 @@ export class VerificationResult {
 
 export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-
-    private logParseRegex = new RegExp(".*?\\((\\d+),(\\d+)\\):.*?(Error|Warning|Info)(\\w)?: (.*)");
-    private numberOfProofObligations = new RegExp(".*?(\\d+).*?(proof).*?(obligations|obligation).*?(verified|error)");
     private diagCol: vscode.DiagnosticCollection = null;
 
     constructor() {
-        this.diagCol = vscode.languages.createDiagnosticCollection("dafny");
+        this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
     }
 
     public collect(log: string, req: VerificationRequest): void {
@@ -44,7 +41,7 @@ export class VerificationResults {
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {
         const result: VerificationResult = new VerificationResult();
-        const lines: string[] = log.split("\n");
+        const lines: string[] = log.split(EnvironmentConfig.NewLine);
         const diags: vscode.Diagnostic[] = [];
         let errorCount: number = 0;
         let proofObligations: number = 0;
@@ -52,8 +49,8 @@ export class VerificationResults {
         // tslint:disable-next-line:forin
         for (const index in lines) {
             const sourceLine: string = lines[index];
-            const errors: RegExpExecArray = this.logParseRegex.exec(sourceLine);
-            const proofObligationLine: RegExpExecArray = this.numberOfProofObligations.exec(sourceLine);
+            const errors: RegExpExecArray = Verification.LogParseRegex.exec(sourceLine);
+            const proofObligationLine: RegExpExecArray = Verification.NumberOfProofObligations.exec(sourceLine);
 
             if (errors) {
                 const lineNum: number = parseInt(errors[1], 10) - 1; // 1 based
@@ -63,12 +60,10 @@ export class VerificationResults {
 
                 const start: vscode.Position = new vscode.Position(lineNum, colNum);
                 const line: vscode.TextLine = req.document.lineAt(start);
-                // let rangeOnWord = req.doc.getWordRangeAtPosition(start);
-                // let range = rangeOnWord || line.range; //sometimes rangeOnWord in undefined
                 const range: vscode.Range = line.range;
 
-                const severity: vscode.DiagnosticSeverity = (typeStr === Strings.Error) ?
-                    vscode.DiagnosticSeverity.Error : (typeStr === Strings.Warning) ?
+                const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Error) ?
+                    vscode.DiagnosticSeverity.Error : (typeStr === Severity.Warning) ?
                     vscode.DiagnosticSeverity.Warning :
                     vscode.DiagnosticSeverity.Information;
 
