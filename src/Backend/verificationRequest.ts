@@ -2,7 +2,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { EnvironmentConfig } from "./Strings/stringRessources";
+import { EnvironmentConfig } from "../Strings/stringRessources";
 export class VerificationRequest {
     public srcEnds: number[];
     public timeCreated: number;

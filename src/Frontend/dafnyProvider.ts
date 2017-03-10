@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {Context} from "../Backend/Context";
+import {Context} from "../Backend/context";
 import {DafnyServer} from "../Backend/dafnyServer";
 import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";

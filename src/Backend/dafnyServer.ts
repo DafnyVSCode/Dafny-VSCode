@@ -1,14 +1,14 @@
 "use strict";
 import * as cp from "child_process";
 import * as vscode from "vscode";
-import {Context} from "./Context";
-import {Statusbar} from "./dafnyStatusbar";
-import { Command } from "./Environment";
-import { Environment } from "./Environment";
-import { ProcessWrapper } from "./Process/process";
-import { EncodeBase64 } from "./Strings/stringEncoding";
-import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "./Strings/stringRessources";
-import {VerificationRequest} from "./VerificationRequest";
+import {Statusbar} from "../Frontend/dafnyStatusbar";
+import { ProcessWrapper } from "../Process/process";
+import { EncodeBase64 } from "../Strings/stringEncoding";
+import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
+import {Context} from "./context";
+import { Command } from "./environment";
+import { Environment } from "./environment";
+import {VerificationRequest} from "./verificationRequest";
 
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized

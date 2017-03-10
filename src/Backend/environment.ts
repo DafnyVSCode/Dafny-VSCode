@@ -3,7 +3,7 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
-import {Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "./Strings/stringRessources";
+import {Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../Strings/stringRessources";
 
 export class Command {
     public notFound: boolean = false;
