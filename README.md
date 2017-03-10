@@ -33,6 +33,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.2.0: Full refactoring of the plugin. issues/3 from ferry~ fixed. 
 * 0.1.2: Refactored/tweaked UI code, Added `dafny.restartDafnyServer` ("Restart Dafny Server") command.
 * 0.1.0: Added syntax highlighting, tested on Ubuntu and OSX.
 * 0.0.3: Getting `mono` from PATH when `monoPath` isn't set.
@@ -43,6 +44,9 @@ The following are optional:
 ## TODO
 * add restart server action.
 * atomatic verification as one types (with 'deboucing' waiting period).
-* syntax highlighting (see if you can adapt sublime-dafny).
+* (DONE) syntax highlighting (see if you can adapt sublime-dafny).
 * context aware suggestiions.
 * full context awareness, code completion.
+
+## COMING SOON
+* automatic download of dafny executables and configuration
