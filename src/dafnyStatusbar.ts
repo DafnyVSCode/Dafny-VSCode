@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
 import {Context} from "./Context";
-import { Strings } from "./stringRessources";
+import {EnvironmentConfig, StatusString} from "./stringRessources";
 import {VerificationRequest} from "./VerificationRequest";
 import {VerificationResult} from "./VerificationResults";
 
@@ -10,6 +10,7 @@ class Priority {
     public static medium: number = 5;
     public static high: number = 10;
 }
+
 export class Statusbar {
 
     private serverStatusBar: vscode.StatusBarItem = null;
@@ -33,25 +34,25 @@ export class Statusbar {
     public update(): void  {
         const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         const editorsOpen: number = vscode.window.visibleTextEditors.length;
-        if (!editor || editorsOpen === 0 || editor.document.languageId !== "dafny") {
+        if (!editor || editorsOpen === 0 || editor.document.languageId !== EnvironmentConfig.Dafny) {
             this.serverStatusBar.hide();
             this.currentDocumentStatucBar.hide();
             return;
         }
 
         if(this.context.serverpid) {
-            this.serverStatusBar.text = Strings.ServerUp;
+            this.serverStatusBar.text = StatusString.ServerUp;
             this.serverStatusBar.text += " (pid " + this.context.serverpid + ")";
             this.serverStatusBar.text += " | " + this.serverStatus + " | ";
             this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
         } else {
-            this.serverStatusBar.text = Strings.ServerDown;
+            this.serverStatusBar.text = StatusString.ServerDown;
         }
 
         if (this.context.activeRequest && editor.document === this.context.activeRequest.document) {
-            this.currentDocumentStatucBar.text = Strings.Verifying;
+            this.currentDocumentStatucBar.text = StatusString.Verifying;
         } else if (this.queueContains(editor.document.fileName)) {
-            this.currentDocumentStatucBar.text = Strings.Queued;
+            this.currentDocumentStatucBar.text = StatusString.Queued;
         } else {
             const res: undefined | VerificationResult = this.context.verificationResults.latestResults[editor.document.fileName];
             if (res !== undefined) {
@@ -76,13 +77,13 @@ export class Statusbar {
         let response: string = "";
 
         if(result.crashed) {
-            return Strings.Crashed;
+            return StatusString.Crashed;
         }
 
         if(result.errorCount === 0) {
-            response = Strings.Verified;
+            response = StatusString.Verified;
         } else {
-            response = Strings.NotVerified;
+            response = StatusString.NotVerified;
         }
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
 

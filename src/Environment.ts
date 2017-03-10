@@ -3,7 +3,7 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
-import { Strings } from "./stringRessources";
+import {EnvironmentConfig, ErrorMsg, WarningMsg } from "./stringRessources";
 
 export class Command {
     public notFound: boolean = false;
@@ -19,7 +19,7 @@ export class Environment {
     private dafnyServerPath: string;
 
     constructor() {
-        this.config = vscode.workspace.getConfiguration(Strings.Dafny);
+        this.config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.usesMono = this.config.get<boolean>("useMono") || os.platform() !== "win32"; // setting only relevant on windows
         this.dafnyServerPath = this.config.get<string>("dafnyServerPath");
         const monoPath: string = this.config.get<string>("monoPath");
@@ -44,15 +44,15 @@ export class Environment {
             args = [];
             return new Command(serverPath, args);
         } else {
-            const monoInSystemPath: boolean = this.TestCommand(Strings.Mono);
+            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
             const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
             if (monoInSystemPath && !monoAtConfigPath) {
                 if (this.hasCustomMonoPath) {
-                    vscode.window.showWarningMessage(Strings.MonoPathWrong);
+                    vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
                 }
-                monoPath = Strings.Mono;
+                monoPath = EnvironmentConfig.Mono;
             } else if (!monoInSystemPath && !monoAtConfigPath) {
-                vscode.window.showErrorMessage(Strings.NoMono);
+                vscode.window.showErrorMessage(ErrorMsg.NoMono);
                 const command: Command = new Command();
                 command.notFound = true;
                 return command;

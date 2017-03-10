@@ -1,8 +1,7 @@
-
 "use strict";
 
 import * as vscode from "vscode";
-import { Strings } from "./stringRessources";
+import { Severity } from "./stringRessources";
 import {VerificationRequest} from "./VerificationRequest";
 
 export enum VerificationStatus {
@@ -20,7 +19,6 @@ export class VerificationResult {
 
 export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-
     private logParseRegex = new RegExp(".*?\\((\\d+),(\\d+)\\):.*?(Error|Warning|Info)(\\w)?: (.*)");
     private numberOfProofObligations = new RegExp(".*?(\\d+).*?(proof).*?(obligations|obligation).*?(verified|error)");
     private diagCol: vscode.DiagnosticCollection = null;
@@ -65,8 +63,8 @@ export class VerificationResults {
                 const line: vscode.TextLine = req.document.lineAt(start);
                 const range: vscode.Range = line.range;
 
-                const severity: vscode.DiagnosticSeverity = (typeStr === Strings.Error) ?
-                    vscode.DiagnosticSeverity.Error : (typeStr === Strings.Warning) ?
+                const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Error) ?
+                    vscode.DiagnosticSeverity.Error : (typeStr === Severity.Warning) ?
                     vscode.DiagnosticSeverity.Warning :
                     vscode.DiagnosticSeverity.Information;
 

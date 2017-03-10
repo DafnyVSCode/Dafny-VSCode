@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import {DafnyDiagnosticsProvider} from "./dafnyProvider";
-import { Strings } from "./stringRessources";
+import {ErrorMsg} from "./stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
     const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("dafny");
@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext): void {
     let verifier: DafnyDiagnosticsProvider = null;
 
     if (!dafnyServerPath) {
-        vscode.window.showErrorMessage(Strings.ServerPathNotSet);
+        vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);
     } else {
         verifier = new DafnyDiagnosticsProvider();
         verifier.activate(context.subscriptions);

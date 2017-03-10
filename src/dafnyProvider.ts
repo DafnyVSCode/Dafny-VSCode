@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import {Context} from "./Context";
 import {DafnyServer} from "./dafnyServer";
 import {Statusbar} from "./dafnyStatusbar";
-import { Strings } from "./stringRessources";
+import { EnvironmentConfig } from "./stringRessources";
 
 class DocChangeTimerRecord {
     public active: boolean = false;
@@ -28,9 +28,9 @@ export class DafnyDiagnosticsProvider {
     private context: Context;
 
     constructor() {
-        this.diagCol = vscode.languages.createDiagnosticCollection(Strings.Dafny);
+        this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(Strings.Dafny);
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.docChangeVerify = config.get<boolean>("automaticVerification");
         this.docChangeDelay = config.get<number>("automaticVerificationDelayMS");
 
@@ -73,13 +73,13 @@ public activate(subs: vscode.Disposable[]): void {
     }
 
     private doVerify(textDocument: vscode.TextDocument): void {
-        if (textDocument.languageId === Strings.Dafny) {
+        if (textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument);
         }
     }
 
     private docChanged(change: vscode.TextDocumentChangeEvent): void {
-        if (change.document.languageId === Strings.Dafny) {
+        if (change.document.languageId === EnvironmentConfig.Dafny) {
             // todo: check if this is too slow to be done every time
             if (this.docChangeVerify) {
                 const now: number = Date.now();

@@ -7,8 +7,9 @@ import { EncodeBase64 } from "./Encoding/stringEncoding";
 import { Command } from "./Environment";
 import { Environment } from "./Environment";
 import { ProcessWrapper } from "./Process/process";
-import { Strings } from "./stringRessources";
+import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "./stringRessources";
 import {VerificationRequest} from "./VerificationRequest";
+
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
@@ -26,31 +27,16 @@ export class DafnyServer {
     constructor(private statusbar: Statusbar, private context: Context) {    }
 
     public reset(): boolean {
-        if(this.serverProc && this.serverProc.isAlive()) {
+        if(this.isRunning()) {
             this.serverProc.killServerProc();
             this.serverProc = null;
         }
-
-        this.clearContext();
-
-        this.statusbar.changeServerStatus(Strings.Starting);
-
-        const environment: Environment = new Environment();
-        const dafnyCommand: Command = environment.GetStartDafnyCommand();
-
-        if (environment.UsesNonStandardMonoPath()) {
-            vscode.window.showWarningMessage(Strings.MonoPathWrong);
-        }
-
-        if (dafnyCommand.notFound) {
-            vscode.window.showErrorMessage(Strings.NoMono);
-            return false;
-        }
-        return this.resetServerProc(dafnyCommand, environment.GetStandardSpawnOptions());
+        this.context.clear();
+        this.statusbar.changeServerStatus(ServerStatus.Starting);
+        return this.resetProcess();
     }
 
     public isRunning(): boolean {
-        // todo: better process handling
         return this.serverProc && this.serverProc.isAlive();
     }
 
@@ -59,62 +45,92 @@ export class DafnyServer {
     }
 
     public pid(): number {
-        return this.serverProc ? this.serverProc.pid : -1;
+        return this.isRunning() ? this.serverProc.pid : -1;
     }
 
     public addDocument(doc: vscode.TextDocument): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
-
         this.context.queue.enqueue(request);
         this.sendNextRequest();
     }
 
-    private clearContext(): void {
-        this.context.queue.clear();
-        this.context.activeRequest = null;
-        this.context.serverpid = null;
+    private resetProcess(): boolean {
+        const environment: Environment = new Environment();
+        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+
+        if (environment.UsesNonStandardMonoPath()) {
+            vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
+        }
+
+        if (dafnyCommand.notFound) {
+            vscode.window.showErrorMessage(ErrorMsg.NoMono);
+            return false;
+        }
+        return this.resetServerProc(dafnyCommand, environment.GetStandardSpawnOptions());
     }
+
     private handleProcessError(err: Error): void {
         vscode.window.showErrorMessage("DafnyServer process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
     }
+
+    private handleProcessData(): void {
+        if (this.isRunning() && this.serverProc.commandFinished()) {
+            this.context.activeRequest.timeFinished = Date.now();
+            // parse output
+            const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
+            console.log(log);
+            this.context.verificationResults.collect(log, this.context.activeRequest);
+            this.context.activeRequest = null;
+            this.serverProc.clearBuffer();
+            this.statusbar.update();
+        }
+        this.statusbar.changeServerStatus(StatusString.Idle);
+        this.active = false;
+        this.sendNextRequest();
+    }
+
     private handleProcessExit() {
         this.serverProc = null;
-        vscode.window.showErrorMessage(Strings.DafnyServerRestart);
+        vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestart);
 
         const crashedRequest: VerificationRequest = this.context.activeRequest;
-        this.clearContext();
+        this.context.clear();
         this.context.verificationResults.addCrashed(crashedRequest);
 
         setTimeout(() => {
             if (this.reset()) {
-                vscode.window.showInformationMessage(Strings.DafnyServerRestartSucceded);
+                vscode.window.showInformationMessage(InfoMsg.DafnyServerRestartSucceded);
             } else {
-                vscode.window.showErrorMessage(Strings.DafnyServerRestartFailed);
+                vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestartFailed);
             }
         }, 1000);
         this.statusbar.update();
     }
     private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {
         try {
-            const spawnOptions = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
-            this.serverProc = new ProcessWrapper(spawnOptions,
-                (err: Error) => { this.handleProcessError(err); },
-                () => {this.gotData(); },
-                () => { this.handleProcessExit(); });
+            this.serverProc = this.spawnNewProcess(dafnyCommand, options);
             this.context.serverpid = this.serverProc.pid;
-            this.statusbar.changeServerStatus(Strings.Idle);
+            this.statusbar.changeServerStatus(StatusString.Idle);
             this.statusbar.update();
             return true;
         } catch(e) {
             this.statusbar.update();
-            vscode.window.showErrorMessage(Strings.DafnyServerWrongPath);
+            vscode.window.showErrorMessage(ErrorMsg.DafnyServerWrongPath);
             return false;
         }
     }
 
+    private spawnNewProcess(dafnyCommand: Command, options: cp.SpawnOptions): ProcessWrapper {
+        const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
+        return new ProcessWrapper(process,
+            (err: Error) => { this.handleProcessError(err); },
+            () => {this.handleProcessData(); },
+            () => { this.handleProcessExit(); });
+    }
+
     private sendVerificationRequest(request: VerificationRequest): void {
-        this.statusbar.changeServerStatus(Strings.Verifying);
+        this.statusbar.changeServerStatus(StatusString.Verifying);
         const task: IVerificationTask = {
             args: [],
             filename: request.document.fileName,
@@ -122,36 +138,14 @@ export class DafnyServer {
             sourceIsFile: false
         };
         const encoded: string = EncodeBase64(task);
-        if(this.serverProc && this.serverProc.isAlive()) {
-            this.serverProc.outBuf = "";
+        if(this.isRunning()) {
+            this.serverProc.clearBuffer();
+            this.serverProc.WriteVerificationRequestToServer(encoded);
         }
-        this.WriteVerificationRequestToServer(encoded);
         request.timeSent = Date.now();
     }
 
-    private WriteVerificationRequestToServer(request: string): void {
-        this.serverProc.WriteVerificationRequestToServer(request);
-    }
-
-    private gotData(): void {
-        const endId: number = this.serverProc ? this.serverProc.outBuf.search(/\[\[DAFNY-SERVER: EOM\]\]/) : -1;
-        if (endId !== -1) {
-            this.context.activeRequest.timeFinished = Date.now();
-            // parse output
-            const log: string = this.serverProc.outBuf.substr(0, endId);
-            console.log(log);
-            this.context.verificationResults.collect(log, this.context.activeRequest);
-            this.context.activeRequest = null;
-            this.serverProc.outBuf = "";
-            this.statusbar.update();
-        }
-        this.statusbar.changeServerStatus(Strings.Idle);
-        this.active = false;
-        this.sendNextRequest();
-    }
-
     private sendNextRequest(): void {
-
         if(!this.active && (this.context.activeRequest === null)) {
             if(this.context.queue.peek() != null) {
                 this.active = true;

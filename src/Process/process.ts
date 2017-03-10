@@ -1,12 +1,12 @@
 import * as cp from "child_process";
-import {CommandEndFailedException,
+import {CommandEndFailedException, DafnyServerExeption,
     VericationCommandFailedException, VericationRequestFailedException} from "../errors";
-import { DafnyServerExeption } from "./../errors";
 
 export class ProcessWrapper {
     public pid: number;
     public outBuf: string = "";
     private serverProc: cp.ChildProcess = null;
+    private commandEndRegex: RegExp = /\[\[DAFNY-SERVER: EOM\]\]/;
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
@@ -35,6 +35,9 @@ export class ProcessWrapper {
         return this.serverProc !== null;
     }
 
+    public clearBuffer(): void {
+        this.outBuf = "";
+    }
     public WriteVerificationRequestToServer(request: string): void {
         let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
             if (!good) {
@@ -51,5 +54,13 @@ export class ProcessWrapper {
                 });
             });
         });
+    }
+
+    public commandFinished(): boolean {
+        return this.outBuf.search(this.commandEndRegex) > -1;
+    }
+
+    public positionCommandEnd(): number {
+        return this.outBuf.search(this.commandEndRegex);
     }
 }
