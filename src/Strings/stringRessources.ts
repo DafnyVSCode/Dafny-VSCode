@@ -11,8 +11,9 @@ export class ErrorMsg {
     public static NoMono: string = "Could not find mono, neither in system PATH nor at dafny.monoPath";
     public static DafnyServerRestart: string = "DafnyServer process quit unexpectedly; attempting restart";
     public static DafnyServerRestartFailed: string = "DafnyServer restart failed";
-    public static DafnyServerWrongPath: string = "failed to start DafnyServer, check paths in config";
+    public static DafnyServerWrongPath: string = "Failed to start DafnyServer, check paths in config";
     public static ServerPathNotSet: string = "Dafny Verifier error: dafnyServerPath not set";
+    public static DafnyInstallationFailed: string = "Automatic installation failed";
 }
 
 export class Config {
@@ -25,10 +26,12 @@ export class Config {
 
 export class Commands {
     public static RestartServer: string = "dafny.restartDafnyServer";
+    public static InstallDafny: string = "dafny.installDafny";
 }
 
 export class InfoMsg {
     public static DafnyServerRestartSucceded: string = "DafnyServer restart succeeded";
+    public static DafnyInstallationSucceeded: string = "Automatic installation complete";
 }
 export class ServerStatus {
     public static Starting: string = "Starting";
@@ -49,5 +52,6 @@ export class StatusString {
     public static TechnicalError: string = "$(x) Verification technical error";
     public static ServerUp: string = "$(up) Server up";
     public static ServerDown: string = "$(x) Server down";
-    public static Queued: string =  "$(watch) Queued";
+    public static Queued: string = "$(watch) Queued";
+    public static Pending: string = "$(issue-opened) Pending";
 }

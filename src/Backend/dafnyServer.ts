@@ -36,6 +36,17 @@ export class DafnyServer {
         return this.resetProcess();
     }
 
+    public verify(): boolean {
+        const environment: Environment = new Environment();
+        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+        try {
+            this.serverProc = this.spawnNewProcess(dafnyCommand, environment.GetStandardSpawnOptions());
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
     public isRunning(): boolean {
         return this.serverProc && this.serverProc.isAlive();
     }

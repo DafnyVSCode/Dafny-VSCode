@@ -49,7 +49,9 @@ export class Statusbar {
             this.serverStatusBar.text = StatusString.ServerDown;
         }
 
-        if (this.context.activeRequest && editor.document === this.context.activeRequest.document) {
+        if(!this.context.serverpid) {
+            this.currentDocumentStatucBar.text = StatusString.Pending;
+        } else if (this.context.activeRequest && editor.document === this.context.activeRequest.document) {
             this.currentDocumentStatucBar.text = StatusString.Verifying;
         } else if (this.queueContains(editor.document.fileName)) {
             this.currentDocumentStatucBar.text = StatusString.Queued;
