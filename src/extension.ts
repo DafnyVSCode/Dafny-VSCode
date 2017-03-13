@@ -37,7 +37,6 @@ export function activate(context: vscode.ExtensionContext): void {
     });
     context.subscriptions.push(uninstallDafnyCommand);
 
-
     function init() {
         if (!dafnyServerPath) {
             vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);

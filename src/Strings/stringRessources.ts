@@ -44,6 +44,8 @@ export class EnvironmentConfig {
     public static Mono: string = "mono";
     public static NewLine: string = "\n";
     public static Win32: string = "win32";
+    public static OSX: string = "darwin";
+    public static Ubuntu: string = "linux";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";
