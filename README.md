@@ -3,7 +3,7 @@ Dafny support for Visual Studio Code.
 
 
 ## Features
-* Provides .dfy language id to vscode.
+* Provides .dfy language support to vscode.
 * Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
 * Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
 * Syntax highlighting thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
@@ -13,10 +13,10 @@ Dafny support for Visual Studio Code.
 ![assertions animation](example.gif)
 
 ## Requirements - Installation guide
+* `NEW:` On windows you can use the task Install DafnyServer, which downloads, extracts and sets the path correctly. Requires PowerShell V5. 
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you may also use .net - see config below.
 * [Binary dafny distribution](https://github.com/Microsoft/dafny/releases), which contains `DafnyServer.exe` and its dependencies - path must be specified in config.
 * The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
-
 ## Extension Settings
 
 The following are necessary:
@@ -33,6 +33,8 @@ The following are optional:
 
 
 ## Release Notes
+* 0.4.4: Uninstall task of dafny on windows. 
+* 0.4.0: Automatic download and installation task on windows. 
 * 0.2.0: Full refactoring of the plugin. issues/3 from ferry~ fixed. 
 * 0.1.2: Refactored/tweaked UI code, Added `dafny.restartDafnyServer` ("Restart Dafny Server") command.
 * 0.1.0: Added syntax highlighting, tested on Ubuntu and OSX.
@@ -42,11 +44,9 @@ The following are optional:
 
 
 ## TODO
-* add restart server action.
 * atomatic verification as one types (with 'deboucing' waiting period).
-* (DONE) syntax highlighting (see if you can adapt sublime-dafny).
 * context aware suggestiions.
 * full context awareness, code completion.
 
 ## COMING SOON
-* automatic download of dafny executables and configuration
+* automatic download of dafny executables and configuration on ubuntu and osx

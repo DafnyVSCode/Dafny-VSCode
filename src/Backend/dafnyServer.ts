@@ -24,6 +24,7 @@ export class DafnyServer {
     // ipc is done through stdin/stdout of the server process
     private active: boolean = false;
     private serverProc: ProcessWrapper;
+    private restart: boolean = true;
     constructor(private statusbar: Statusbar, private context: Context) {    }
 
     public reset(): boolean {
@@ -33,7 +34,11 @@ export class DafnyServer {
         }
         this.context.clear();
         this.statusbar.changeServerStatus(ServerStatus.Starting);
-        return this.resetProcess();
+        if(this.restart) {
+            return this.resetProcess();
+        } else {
+            return true;
+        }
     }
 
     public verify(): boolean {
@@ -59,6 +64,11 @@ export class DafnyServer {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
         this.context.enqueueRequest(request);
         this.sendNextRequest();
+    }
+
+    public stop(): void {
+        this.restart = false;
+        this.reset();
     }
 
     private resetProcess(): boolean {

@@ -72,6 +72,10 @@ public activate(subs: vscode.Disposable[]): void {
         this.dafnyServer.reset();
     }
 
+    public stop(): void {
+        this.dafnyServer.stop();
+    }
+
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument);

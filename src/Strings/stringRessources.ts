@@ -27,11 +27,13 @@ export class Config {
 export class Commands {
     public static RestartServer: string = "dafny.restartDafnyServer";
     public static InstallDafny: string = "dafny.installDafny";
+    public static UninstallDafny: string = "dafny.uninstallDafny";
 }
 
 export class InfoMsg {
     public static DafnyServerRestartSucceded: string = "DafnyServer restart succeeded";
     public static DafnyInstallationSucceeded: string = "Automatic installation complete";
+    public static DafnyUninstallationSucceeded: string = "Uninstallation complete";
 }
 export class ServerStatus {
     public static Starting: string = "Starting";
