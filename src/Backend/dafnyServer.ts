@@ -115,15 +115,15 @@ export class DafnyServer {
         const crashedRequest: VerificationRequest = this.context.activeRequest;
         this.context.clear();
         this.context.addCrashedRequest(crashedRequest);
+        this.retries++;
+        this.active = false;
 
         if(this.retries < this.MAX_RETRIES) {
             setTimeout(() => {
                 if (this.reset()) {
                     vscode.window.showInformationMessage(InfoMsg.DafnyServerRestartSucceded);
-                    this.retries = 0;
                 } else {
                     vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestartFailed);
-                    this.retries++;
                 }
             }, 1000);
         } else {
@@ -137,6 +137,7 @@ export class DafnyServer {
         try {
             this.serverProc = this.spawnNewProcess(dafnyCommand, options);
             this.context.serverpid = this.serverProc.pid;
+            this.retries = 0;
             this.statusbar.changeServerStatus(StatusString.Idle);
             this.statusbar.update();
             return true;

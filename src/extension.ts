@@ -41,9 +41,13 @@ export function activate(context: vscode.ExtensionContext): void {
         if (!dafnyServerPath) {
             vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);
         } else {
-            verifier = new DafnyDiagnosticsProvider();
-            verifier.activate(context.subscriptions);
-            context.subscriptions.push(verifier);
+            if (!verifier) {
+                verifier = new DafnyDiagnosticsProvider();
+                verifier.activate(context.subscriptions);
+                context.subscriptions.push(verifier);
+            } else {
+                verifier.resetServer();
+            }
         }
 
     }
