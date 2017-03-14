@@ -34,3 +34,10 @@ export class DafnyServerExeption extends Error {
         Object.setPrototypeOf(this, DafnyServerExeption.prototype);
     }
 }
+
+export class DafnyUnsupportedPlatform extends Error {
+    constructor(msg: string) {
+        super(msg);
+        Object.setPrototypeOf(this, DafnyServerExeption.prototype);
+    }
+}

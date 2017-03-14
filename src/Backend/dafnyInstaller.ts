@@ -3,6 +3,7 @@
 import * as os from "os";
 import * as vscode from "vscode";
 import {DafnyServer} from "../Backend/dafnyServer";
+import {DafnyUnsupportedPlatform} from "../ErrorHandling/errors";
 import {Config, EnvironmentConfig, ErrorMsg, InfoMsg } from "../Strings/stringRessources";
 
 export class DafnyInstaller {
@@ -14,46 +15,37 @@ export class DafnyInstaller {
 
         const terminal = vscode.window.createTerminal("Install Dafny");
         terminal.show(true);
+        let installPath = "";
+        let downloadScript = "";
 
         if(os.platform() === EnvironmentConfig.Win32) {
-            vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
-                if(e.name === terminal.name) {
-                    const appdata = process.env.APPDATA;
-                    const installPath = appdata + "\\Dafny\\Windows\\dafny\\DafnyServer.exe";
-                    this.finishInstallation(installPath);
-                }
-            });
-
-            const downloadScript = this.extensionPath + "\\scripts\\windows\\download.ps1";
-            terminal.sendText(downloadScript);
+            const appdata = process.env.APPDATA;
+            installPath = appdata + "\\Dafny\\Windows\\dafny\\DafnyServer.exe";
+            downloadScript = this.extensionPath + "\\scripts\\windows\\download.ps1";
 
         } else if(os.platform() === EnvironmentConfig.OSX) {
-            vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
-                if(e.name === terminal.name) {
-                    const home = process.env.HOME;
-                    const installPath = home + "/.Dafny/dafny/DafnyServer.exe";
-                    this.finishInstallation(installPath);
-                }
-            });
-
-            const downloadScript = this.extensionPath + "/scripts/osx/download.sh";
+            const home = process.env.HOME;
+            installPath = home + "/.Dafny/dafny/DafnyServer.exe";
+            downloadScript = this.extensionPath + "/scripts/osx/download.sh";
             terminal.sendText("chmod +x " + downloadScript);
-            terminal.sendText(downloadScript);
 
         } else if(os.platform() === EnvironmentConfig.Ubuntu) {
-            vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
-                if(e.name === terminal.name) {
-                    const home = process.env.HOME;
-                    const installPath = home + "/.Dafny/dafny/DafnyServer.exe";
-                    this.finishInstallation(installPath);
-                }
-            });
-
-            const downloadScript = this.extensionPath + "/scripts/ubuntu/download.sh";
+            const home = process.env.HOME;
+            installPath = home + "/.Dafny/dafny/DafnyServer.exe";
+            downloadScript = this.extensionPath + "/scripts/ubuntu/download.sh";
             terminal.sendText("chmod +x " + downloadScript);
-            terminal.sendText(downloadScript);
+
+        } else {
+            throw new DafnyUnsupportedPlatform("Unsupported platform: " + os.platform());
         }
 
+        vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
+            if(e.name === terminal.name) {
+                this.finishInstallation(installPath);
+            }
+        });
+
+        terminal.sendText(downloadScript);
     }
 
      public uninstall(): void {
@@ -70,6 +62,8 @@ export class DafnyInstaller {
         } else if(os.platform() === EnvironmentConfig.Ubuntu) {
             uninstallScript = this.extensionPath + "/scripts/ubuntu/uninstall.sh";
             terminal.sendText("chmod +x " + uninstallScript);
+        } else {
+            throw new DafnyUnsupportedPlatform("Unsupported platform: " + os.platform());
         }
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
@@ -78,8 +72,8 @@ export class DafnyInstaller {
                 vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
             }
         });
-        terminal.sendText(uninstallScript);
 
+        terminal.sendText(uninstallScript);
     }
 
     private finishInstallation(dafnyServerPath: string): void {
