@@ -13,7 +13,7 @@ Dafny support for Visual Studio Code.
 ![assertions animation](example.gif)
 
 ## Requirements - Installation guide
-* `NEW:` On windows you can use the task Install DafnyServer, which downloads, extracts and sets the path correctly. Requires PowerShell V5. 
+* `NEW:` On windows, osx and ubuntu you can use the task Install DafnyServer, which downloads, extracts and sets the path correctly. Requires PowerShell V5. 
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you may also use .net - see config below.
 * [Binary dafny distribution](https://github.com/Microsoft/dafny/releases), which contains `DafnyServer.exe` and its dependencies - path must be specified in config.
 * The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
@@ -33,6 +33,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.5.0: Automatic download and installation task on osx and ubuntu `dafny.installDafny`. Also added uninstaller `dafny.uninstallDafny`. 
 * 0.4.4: Uninstall task of dafny on windows. 
 * 0.4.0: Automatic download and installation task on windows. 
 * 0.2.0: Full refactoring of the plugin. issues/3 from ferry~ fixed. 
@@ -47,6 +48,3 @@ The following are optional:
 * atomatic verification as one types (with 'deboucing' waiting period).
 * context aware suggestiions.
 * full context awareness, code completion.
-
-## COMING SOON
-* automatic download of dafny executables and configuration on ubuntu and osx
