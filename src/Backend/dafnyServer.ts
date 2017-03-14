@@ -137,7 +137,6 @@ export class DafnyServer {
         try {
             this.serverProc = this.spawnNewProcess(dafnyCommand, options);
             this.context.serverpid = this.serverProc.pid;
-            this.retries = 0;
             this.statusbar.changeServerStatus(StatusString.Idle);
             this.statusbar.update();
             return true;
