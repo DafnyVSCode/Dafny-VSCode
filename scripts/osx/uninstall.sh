@@ -3,4 +3,4 @@
 cd ~
 rm -rf .Dafny
 
-exit
+kill -9 $PPID
