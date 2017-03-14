@@ -14,4 +14,4 @@ curl -L -o "DafnyUbuntu.zip" $dafny_url
 
 unzip "DafnyUbuntu.zip"
 
-exit
+kill -9 $PPID

@@ -14,4 +14,4 @@ curl -L -o "DafnyOSX.zip" $dafny_url
 
 unzip "DafnyOSX.zip"
 
-exit
+kill -9 $PPID
