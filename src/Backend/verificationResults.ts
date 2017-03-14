@@ -33,10 +33,12 @@ export class VerificationResults {
     }
 
     public addCrashed(req: VerificationRequest): void {
-        const verificationResult: VerificationResult = new VerificationResult();
-        verificationResult.crashed = true;
-        const fileName: string = req.document.fileName;
-        this.latestResults[fileName] = verificationResult;
+        if(req != null) {
+            const verificationResult: VerificationResult = new VerificationResult();
+            verificationResult.crashed = true;
+            const fileName: string = req.document.fileName;
+            this.latestResults[fileName] = verificationResult;
+        }
     }
 
     private parseVerifierLog(log: string, req: VerificationRequest): VerificationResult {

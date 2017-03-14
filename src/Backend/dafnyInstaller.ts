@@ -31,23 +31,26 @@ export class DafnyInstaller {
             vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
                 if(e.name === terminal.name) {
                     const home = process.env.HOME;
-                    const installPath = home + "/Downloads/Dafny/dafny/DafnyServer.exe";
+                    const installPath = home + "/.Dafny/dafny/DafnyServer.exe";
                     this.finishInstallation(installPath);
                 }
             });
 
-            const downloadScript = this.extensionPath + "\\scripts\\osx\\download.ps1";
+            const downloadScript = this.extensionPath + "/scripts/osx/download.sh";
+            terminal.sendText("chmod +x " + downloadScript);
             terminal.sendText(downloadScript);
+
         } else if(os.platform() === EnvironmentConfig.Ubuntu) {
             vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
                 if(e.name === terminal.name) {
                     const home = process.env.HOME;
-                    const installPath = home + "/Downloads/Dafny/Ubuntu/dafny/DafnyServer.exe";
+                    const installPath = home + "/.Dafny/dafny/DafnyServer.exe";
                     this.finishInstallation(installPath);
                 }
             });
 
-            const downloadScript = this.extensionPath + "\\scripts\\ubuntu\\download.ps1";
+            const downloadScript = this.extensionPath + "/scripts/ubuntu/download.sh";
+            terminal.sendText("chmod +x " + downloadScript);
             terminal.sendText(downloadScript);
         }
 

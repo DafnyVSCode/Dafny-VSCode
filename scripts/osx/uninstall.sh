@@ -1,4 +1,6 @@
 #!/bin/bash
 
 cd ~
-rm -rf Downloads/Dafny
+rm -rf .Dafny
+
+exit

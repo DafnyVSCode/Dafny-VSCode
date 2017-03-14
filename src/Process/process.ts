@@ -21,6 +21,9 @@ export class ProcessWrapper {
             this.outBuf += data.toString();
             dataCallback();
         });
+        this.serverProc.stderr.on("error", (error: any ) => {
+            console.log("ERROR: " + error);
+        });
         this.serverProc.on("exit", exitCallback);
     }
 

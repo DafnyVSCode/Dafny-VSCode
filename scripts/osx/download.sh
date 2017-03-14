@@ -8,8 +8,10 @@ dafny_url=$(curl $dafny_osx_url)
 echo $dafny_url
 
 cd ~
-mkdir -p "Downloads/Dafny"
-cd Downloads/Dafny
+mkdir -p ".Dafny"
+cd .Dafny
 curl -L -o "DafnyOSX.zip" $dafny_url
 
 unzip "DafnyOSX.zip"
+
+exit

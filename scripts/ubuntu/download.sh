@@ -4,11 +4,14 @@ version_url="https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/maste
 
 dafny_ubuntu_url="https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/master/ubuntu.txt"
 
-dafny_url="`wget -qO- $dafny_ubuntu_url`"
+dafny_url=$(curl $dafny_ubuntu_url)
 echo $dafny_url
 
 cd ~
-mkdir -p "Downloads/Dafny"
-wget -O "Downloads/Dafny/DafnyUbuntu.zip" $dafny_url
+mkdir -p ".Dafny"
+cd .Dafny
+curl -L -o "DafnyUbuntu.zip" $dafny_url
 
-unzip "Downloads/Dafny/DafnyUbuntu.zip" -d "Downloads/Dafny/Ubuntu"
+unzip "DafnyUbuntu.zip"
+
+exit
