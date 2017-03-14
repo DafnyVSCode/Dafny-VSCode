@@ -65,9 +65,11 @@ export class DafnyInstaller {
         if(os.platform() === EnvironmentConfig.Win32) {
             uninstallScript = this.extensionPath + "\\scripts\\windows\\uninstall.ps1";
         } else if(os.platform() === EnvironmentConfig.OSX) {
-            uninstallScript = this.extensionPath + "\\scripts\\osx\\uninstall.sh";
+            uninstallScript = this.extensionPath + "/scripts/osx/uninstall.sh";
+            terminal.sendText("chmod +x " + uninstallScript);
         } else if(os.platform() === EnvironmentConfig.Ubuntu) {
-            uninstallScript = this.extensionPath + "\\scripts\\ubuntu\\uninstall.sh";
+            uninstallScript = this.extensionPath + "/scripts/ubuntu/uninstall.sh";
+            terminal.sendText("chmod +x " + uninstallScript);
         }
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
