@@ -26,6 +26,29 @@ export class DafnyInstaller {
 
             const downloadScript = this.extensionPath + "\\scripts\\windows\\download.ps1";
             terminal.sendText(downloadScript);
+
+        } else if(os.platform() === EnvironmentConfig.OSX) {
+            vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
+                if(e.name === terminal.name) {
+                    const home = process.env.HOME;
+                    const installPath = home + "/Downloads/Dafny/dafny/DafnyServer.exe";
+                    this.finishInstallation(installPath);
+                }
+            });
+
+            const downloadScript = this.extensionPath + "\\scripts\\osx\\download.ps1";
+            terminal.sendText(downloadScript);
+        } else if(os.platform() === EnvironmentConfig.Ubuntu) {
+            vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
+                if(e.name === terminal.name) {
+                    const home = process.env.HOME;
+                    const installPath = home + "/Downloads/Dafny/Ubuntu/dafny/DafnyServer.exe";
+                    this.finishInstallation(installPath);
+                }
+            });
+
+            const downloadScript = this.extensionPath + "\\scripts\\ubuntu\\download.ps1";
+            terminal.sendText(downloadScript);
         }
 
     }
