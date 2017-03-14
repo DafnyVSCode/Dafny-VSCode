@@ -1,5 +1,4 @@
 "use strict";
-
 import * as Collections from "typescript-collections";
 import {VerificationRequest} from "./verificationRequest";
 import {VerificationResults} from "./verificationResults";
@@ -29,5 +28,4 @@ export class Context {
     public addCrashedRequest(request: VerificationRequest): void {
         this.verificationResults.addCrashed(request);
     }
-
 }
