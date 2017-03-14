@@ -37,11 +37,9 @@ export class DafnyDiagnosticsProvider {
         this.context = new Context();
         this.dafnyStatusbar = new Statusbar(this.context);
         this.dafnyServer = new DafnyServer(this.dafnyStatusbar, this.context);
-
-        this.dafnyServer.reset();
     }
 
-public activate(subs: vscode.Disposable[]): void {
+    public activate(subs: vscode.Disposable[]): void {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) { // may be undefined
                 this.dafnyStatusbar.update();
@@ -59,6 +57,7 @@ public activate(subs: vscode.Disposable[]): void {
     }
 
     public dispose(): void {
+        this.dafnyStatusbar.hide();
         this.diagCol.clear();
         this.diagCol.dispose();
         if(this.subscriptions && this.subscriptions.length > 0) {

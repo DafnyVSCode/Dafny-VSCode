@@ -1,6 +1,7 @@
 "use strict";
 import * as cp from "child_process";
 import * as vscode from "vscode";
+import {IncorrectPathExeption} from "../ErrorHandling/errors";
 import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
 import { EncodeBase64 } from "../Strings/stringEncoding";
@@ -71,6 +72,7 @@ export class DafnyServer {
 
     public stop(): void {
         this.restart = false;
+        this.active = false;
         this.reset();
     }
 
@@ -143,7 +145,7 @@ export class DafnyServer {
         } catch(e) {
             this.statusbar.update();
             vscode.window.showErrorMessage(ErrorMsg.DafnyServerWrongPath);
-            return false;
+            throw new IncorrectPathExeption();
         }
     }
 

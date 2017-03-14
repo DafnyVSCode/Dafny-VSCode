@@ -30,6 +30,13 @@ export class ByteOutOfRangeException extends Error {
 
 export class DafnyServerExeption extends Error {
     constructor() {
+        super("Unknown server exception");
+        Object.setPrototypeOf(this, DafnyServerExeption.prototype);
+    }
+}
+
+export class IncorrectPathExeption extends Error {
+    constructor() {
         super("Wrong path set for Dafny Server");
         Object.setPrototypeOf(this, DafnyServerExeption.prototype);
     }

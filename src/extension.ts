@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext): void {
     const dafnyServerPath: string = config.get<string>(Config.DafnyServerPath);
     let verifier: DafnyDiagnosticsProvider = null;
 
-    init();
+    startCheck();
 
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
         if (verifier) {
@@ -21,10 +21,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(restartServerCommand);
 
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
-        const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
-            init();
-        });
-        installer.install();
+        install();
     });
     context.subscriptions.push(installDafnyCommand);
 
@@ -38,18 +35,47 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(uninstallDafnyCommand);
 
     function init() {
-        if (!dafnyServerPath) {
-            vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);
-        } else {
+        try {
             if (!verifier) {
                 verifier = new DafnyDiagnosticsProvider();
+                verifier.resetServer();
                 verifier.activate(context.subscriptions);
                 context.subscriptions.push(verifier);
             } else {
                 verifier.resetServer();
             }
-        }
+        }catch(e) {
 
+            if(verifier) {
+                verifier.dispose();
+            }
+            askToInstall();
+        }
+    }
+
+    function startCheck() {
+        if (dafnyServerPath) {
+            init();
+        } else {
+            verifier.dispose();
+            vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);
+            askToInstall();
+        }
+    }
+
+    function askToInstall() {
+        vscode.window.showInformationMessage("Would you like to install dafny?", "Yes", "No").then((value: string) => {
+            if("Yes" === value) {
+                install();
+            }
+        });
+    }
+
+    function install() {
+        const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
+            init();
+        });
+        installer.install();
     }
 
 }
