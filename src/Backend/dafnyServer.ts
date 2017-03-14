@@ -22,9 +22,12 @@ export interface IVerificationTask {
 export class DafnyServer {
     // the dafny server runs as a child process (either through mono or .net)
     // ipc is done through stdin/stdout of the server process
+    private MAX_RETRIES: number = 5;
     private active: boolean = false;
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
+    private retries: number = 0;
+
     constructor(private statusbar: Statusbar, private context: Context) {    }
 
     public reset(): boolean {
@@ -113,13 +116,21 @@ export class DafnyServer {
         this.context.clear();
         this.context.addCrashedRequest(crashedRequest);
 
-        setTimeout(() => {
-            if (this.reset()) {
-                vscode.window.showInformationMessage(InfoMsg.DafnyServerRestartSucceded);
-            } else {
-                vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestartFailed);
-            }
-        }, 1000);
+        if(this.retries < this.MAX_RETRIES) {
+            setTimeout(() => {
+                if (this.reset()) {
+                    vscode.window.showInformationMessage(InfoMsg.DafnyServerRestartSucceded);
+                    this.retries = 0;
+                } else {
+                    vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestartFailed);
+                    this.retries++;
+                }
+            }, 1000);
+        } else {
+            this.retries = 0;
+            vscode.window.showErrorMessage(ErrorMsg.MaxRetriesReached);
+        }
+
         this.statusbar.update();
     }
     private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {

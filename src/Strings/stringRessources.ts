@@ -14,6 +14,7 @@ export class ErrorMsg {
     public static DafnyServerWrongPath: string = "Failed to start DafnyServer, check paths in config";
     public static ServerPathNotSet: string = "Dafny Verifier error: dafnyServerPath not set";
     public static DafnyInstallationFailed: string = "Automatic installation failed";
+    public static MaxRetriesReached: string = "Maximum retries to start the server reached. Please restart the server manually";
 }
 
 export class Config {
