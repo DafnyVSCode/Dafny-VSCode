@@ -60,6 +60,8 @@ export class Statusbar {
             if (res !== undefined) {
                 const displayText: string = this.verificationResultToString(res);
                 this.currentDocumentStatucBar.text = displayText;
+            } else {
+                this.currentDocumentStatucBar.text = "";
             }
         }
         this.serverStatusBar.show();

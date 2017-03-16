@@ -3,14 +3,12 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
-import {Commands, Config, EnvironmentConfig, ErrorMsg} from "./Strings/stringRessources";
+import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
-    const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-    const dafnyServerPath: string = config.get<string>(Config.DafnyServerPath);
     let verifier: DafnyDiagnosticsProvider = null;
 
-    startCheck();
+    init();
 
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
         if (verifier) {
@@ -36,29 +34,15 @@ export function activate(context: vscode.ExtensionContext): void {
 
     function init() {
         try {
-            if (!verifier) {
+            if(!verifier) {
                 verifier = new DafnyDiagnosticsProvider();
-                verifier.resetServer();
                 verifier.activate(context.subscriptions);
                 context.subscriptions.push(verifier);
+                verifier.resetServer();
             } else {
                 verifier.resetServer();
             }
-        }catch(e) {
-
-            if(verifier) {
-                verifier.dispose();
-            }
-            askToInstall();
-        }
-    }
-
-    function startCheck() {
-        if (dafnyServerPath) {
-            init();
-        } else {
-            verifier.dispose();
-            vscode.window.showErrorMessage(ErrorMsg.ServerPathNotSet);
+        } catch(e) {
             askToInstall();
         }
     }

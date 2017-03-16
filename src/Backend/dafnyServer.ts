@@ -70,6 +70,10 @@ export class DafnyServer {
         this.sendNextRequest();
     }
 
+    public setInactive(): void {
+        this.active = false;
+    }
+
     public stop(): void {
         this.restart = false;
         this.active = false;
@@ -144,6 +148,7 @@ export class DafnyServer {
             return true;
         } catch(e) {
             this.statusbar.update();
+            this.active = false;
             vscode.window.showErrorMessage(ErrorMsg.DafnyServerWrongPath);
             throw new IncorrectPathExeption();
         }

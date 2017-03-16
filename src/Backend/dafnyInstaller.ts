@@ -44,7 +44,6 @@ export class DafnyInstaller {
                 this.finishInstallation(installPath);
             }
         });
-
         terminal.sendText(downloadScript);
     }
 
