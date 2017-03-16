@@ -3,6 +3,7 @@ Dafny support for Visual Studio Code.
 
 
 ## Features
+* **NEW** Automatic installation of DafnyServer (windows, osx and ubuntu)
 * Provides .dfy language support to vscode.
 * Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
 * Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
@@ -10,13 +11,21 @@ Dafny support for Visual Studio Code.
 * Left hand side status bar item provides information about the current file.
 * Right hand size status bar item relates to the state of the DafnyServer.
 
+
 ![assertions animation](example.gif)
 
+## Tasks
+* `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
+* `Uninstall DafnyServer` Uninstalls the dafnyserver
+* `Restart DafnyServer` Restart the dafnyserver
+
 ## Requirements - Installation guide
-* `NEW:` On windows, osx and ubuntu you can use the task Install DafnyServer, which downloads, extracts and sets the path correctly. Requires PowerShell V5. 
+* Automatic Installation Requirements: `curl` on osx and ubuntu. `PowerShell V5` on Windows
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you may also use .net - see config below.
 * [Binary dafny distribution](https://github.com/Microsoft/dafny/releases), which contains `DafnyServer.exe` and its dependencies - path must be specified in config.
 * The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
+
+
 ## Extension Settings
 
 The following are necessary:
@@ -33,6 +42,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.5.1 Smaller bugfixes. 
 * 0.5.0: Automatic download and installation task on osx and ubuntu `dafny.installDafny`. Also added uninstaller `dafny.uninstallDafny`. 
 * 0.4.4: Uninstall task of dafny on windows. 
 * 0.4.0: Automatic download and installation task on windows. 
