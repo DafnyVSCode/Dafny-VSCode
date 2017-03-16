@@ -67,6 +67,7 @@ export class DafnyServer {
     public addDocument(doc: vscode.TextDocument): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
         this.context.enqueueRequest(request);
+        this.statusbar.update();
         this.sendNextRequest();
     }
 

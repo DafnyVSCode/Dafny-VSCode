@@ -3,7 +3,7 @@ Try
 {
     
     $appdata = $env:APPDATA
-    $outputdir = "$appdata\Dafny\Windows"
+    $outputdir = "$appdata\Dafny\"
     Remove-Item -Recurse -Force $outputdir
 }
 Finally
