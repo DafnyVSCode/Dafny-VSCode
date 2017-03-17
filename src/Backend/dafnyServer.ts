@@ -6,6 +6,7 @@ import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
 import { EncodeBase64 } from "../Strings/stringEncoding";
 import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
+import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
 import { Command } from "./environment";
 import { Environment } from "./environment";
@@ -154,7 +155,7 @@ export class DafnyServer {
         return new ProcessWrapper(process,
             (err: Error) => { this.handleProcessError(err); },
             () => {this.handleProcessData(); },
-            () => { this.handleProcessExit(); });
+            () => { this.handleProcessExit(); }, Verification.commandEndRegexDafnyServer);
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {

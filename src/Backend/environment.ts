@@ -17,11 +17,12 @@ export class Environment {
     public hasCustomMonoPath: boolean;
     private config: vscode.WorkspaceConfiguration;
     private dafnyServerPath: string;
-
+    private dafnyDefPath: string;
     constructor() {
         this.config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.usesMono = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;
         this.dafnyServerPath = this.config.get<string>(Config.DafnyServerPath);
+        this.dafnyDefPath = this.config.get<string>(Config.DafnyDefPath);
         const monoPath: string = this.config.get<string>(Config.MonoPath);
         this.hasCustomMonoPath = monoPath !== "";
     }
@@ -60,6 +61,34 @@ export class Environment {
             serverPath = monoPath;
             args = [this.dafnyServerPath];
             return new Command(serverPath, args);
+        }
+    }
+
+    public GetStartDafnyDefCommand(): Command {
+        let dafnyDefPath: string;
+        let args: string[];
+        let monoPath: string = this.config.get<string>(Config.MonoPath);
+        if (!this.usesMono) {
+            dafnyDefPath = this.dafnyDefPath;
+            args = [];
+            return new Command(dafnyDefPath, args);
+        } else {
+            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
+            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
+            if (monoInSystemPath && !monoAtConfigPath) {
+                if (this.hasCustomMonoPath) {
+                    vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
+                }
+                monoPath = EnvironmentConfig.Mono;
+            } else if (!monoInSystemPath && !monoAtConfigPath) {
+                vscode.window.showErrorMessage(ErrorMsg.NoMono);
+                const command: Command = new Command();
+                command.notFound = true;
+                return command;
+            }
+            dafnyDefPath = monoPath;
+            args = [this.dafnyDefPath];
+            return new Command(dafnyDefPath, args);
         }
     }
 

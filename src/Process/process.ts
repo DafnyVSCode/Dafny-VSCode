@@ -10,11 +10,13 @@ export class ProcessWrapper {
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
-        dataCallback: () => void, exitCallback: () => void) {
+        dataCallback: () => void, exitCallback: () => void, 
+        commandEndRegex: RegExp) {
         if(!process.pid) {
             throw new DafnyServerExeption();
         }
         this.pid = process.pid;
+        this.commandEndRegex = commandEndRegex;
         this.serverProc = process;
         this.serverProc.stdout.on("error", errorCallback);
         this.serverProc.stdout.on("data", (data: Buffer) => {
@@ -48,6 +50,24 @@ export class ProcessWrapper {
                     throw new VericationRequestFailedException("Verification request failed of task: ${request}");
                 }
                 good = this.serverProc.stdin.write("[[DAFNY-CLIENT: EOM]]\n", () => { // the client end of message marker
+                    if (!good) {
+                        throw new CommandEndFailedException("Verification command end failed of task: ${request}");
+                    }
+                });
+            });
+        });
+    }
+
+    public WriteDefinitionRequestToDafnyDef(request: string): void {
+        let good: boolean = this.serverProc.stdin.write("findDefinition\n", () => { // the verify command
+            if (!good) {
+                throw new VericationCommandFailedException("Verification command failed of request: ${request}");
+            }
+            good = this.serverProc.stdin.write(request + "\n", () => { // the base64 encoded task
+                if (!good) {
+                    throw new VericationRequestFailedException("Verification request failed of task: ${request}");
+                }
+                good = this.serverProc.stdin.write("[[DafnyDef-CLIENT: EOM]]\n", () => { // the client end of message marker
                     if (!good) {
                         throw new CommandEndFailedException("Verification command end failed of task: ${request}");
                     }

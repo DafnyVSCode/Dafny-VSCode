@@ -2,9 +2,9 @@
 
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
+import { GO_MODE, GoDefinitionProvider } from "./Backend/definitionProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import {Commands, Config, EnvironmentConfig, ErrorMsg} from "./Strings/stringRessources";
-
 export function activate(context: vscode.ExtensionContext): void {
     const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
     const dafnyServerPath: string = config.get<string>(Config.DafnyServerPath);
@@ -19,7 +19,9 @@ export function activate(context: vscode.ExtensionContext): void {
         return false;
     });
     context.subscriptions.push(restartServerCommand);
-
+    context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(
+            GO_MODE, new GoDefinitionProvider()));
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
     });

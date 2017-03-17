@@ -25,6 +25,7 @@ suite("Extension Tests", () => {
     test("Something 3", () => {
         assert.equal(true, true);
     });
+
 });
 
 // Defines a Mocha test suite to group tests of similar kind together

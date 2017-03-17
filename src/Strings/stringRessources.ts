@@ -23,6 +23,7 @@ export class Config {
     public static UseMono: string = "useMono";
     public static AutomaticVerification: string = "automaticVerification";
     public static AutomaticVerificationDelay: string = "automaticVerificationDelayMS";
+    public static DafnyDefPath: string = "dafnyDefPath";
 }
 
 export class Commands {
