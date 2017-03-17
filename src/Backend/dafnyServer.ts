@@ -68,7 +68,12 @@ export class DafnyServer {
     public addDocument(doc: vscode.TextDocument): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
         this.context.enqueueRequest(request);
+        this.statusbar.update();
         this.sendNextRequest();
+    }
+
+    public setInactive(): void {
+        this.active = false;
     }
 
     public stop(): void {
@@ -145,6 +150,7 @@ export class DafnyServer {
             return true;
         } catch(e) {
             this.statusbar.update();
+            this.active = false;
             vscode.window.showErrorMessage(ErrorMsg.DafnyServerWrongPath);
             throw new IncorrectPathExeption();
         }

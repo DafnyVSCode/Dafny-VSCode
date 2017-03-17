@@ -3,6 +3,7 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
+import {IncorrectPathExeption} from "../ErrorHandling/errors";
 import {Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../Strings/stringRessources";
 
 export class Command {
@@ -40,6 +41,9 @@ export class Environment {
         let serverPath: string;
         let args: string[];
         let monoPath: string = this.config.get<string>(Config.MonoPath);
+        if(this.dafnyServerPath === undefined || this.dafnyServerPath === "") {
+            throw new IncorrectPathExeption();
+        }
         if (!this.usesMono) {
             serverPath = this.dafnyServerPath;
             args = [];

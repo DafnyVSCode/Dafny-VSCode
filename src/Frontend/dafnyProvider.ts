@@ -68,7 +68,9 @@ export class DafnyDiagnosticsProvider {
     }
 
     public resetServer(): void {
+        this.dafnyServer.setInactive();
         this.dafnyServer.reset();
+        this.doVerify(vscode.window.activeTextEditor.document);
     }
 
     public stop(): void {
