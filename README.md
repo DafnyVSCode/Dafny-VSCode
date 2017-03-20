@@ -16,8 +16,8 @@ Dafny support for Visual Studio Code.
 
 ## Tasks
 * `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
-* `Uninstall DafnyServer` Uninstalls the dafnyserver
-* `Restart DafnyServer` Restart the dafnyserver
+* `Uninstall DafnyServer` Uninstalls the DafnyServer
+* `Restart DafnyServer` Restart the DafnyServer
 
 ## Requirements - Installation guide
 * Automatic Installation Requirements: `curl` on osx and ubuntu. `PowerShell V5` on Windows

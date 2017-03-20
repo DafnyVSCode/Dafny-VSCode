@@ -44,6 +44,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 context.subscriptions.push(verifier);
                 verifier.resetServer();
             } else {
+                verifier.init();
                 verifier.resetServer();
             }
         } catch(e) {

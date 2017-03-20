@@ -76,6 +76,10 @@ export class DafnyServer {
         this.active = false;
     }
 
+    public init(): void {
+        this.restart = true;
+    }
+
     public stop(): void {
         this.restart = false;
         this.active = false;

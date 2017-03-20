@@ -77,6 +77,10 @@ export class DafnyDiagnosticsProvider {
         this.dafnyServer.stop();
     }
 
+    public init(): void {
+        this.dafnyServer.init();
+    }
+
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument);
