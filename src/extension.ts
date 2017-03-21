@@ -3,21 +3,30 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import { GO_MODE, GoDefinitionProvider } from "./Backend/definitionProvider";
-import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
+import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
+import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 
 import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
-    let verifier: DafnyDiagnosticsProvider = null;
-    const dependencyVerifier: DependencyVerifier = new DependencyVerifier(() => {}, ()=> {});
-    dependencyVerifier.verifyDafnyServer();
-
-    init();
+    let provider: DafnyDiagnosticsProvider = null;
+    const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
+    dependencyVerifier.verifyDafnyServer(() => {
+        dependencyVerifier.verifyDafnyDef(() => {
+            init();
+        }, () => {
+            vscode.window.showErrorMessage(ErrorMsg.DafnyDefMissing);
+            askToInstall();
+        });
+    }, () => {
+        vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
+        askToInstall();
+    });
 
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
-        if (verifier) {
-            return verifier.resetServer();
+        if (provider) {
+            return provider.resetServer();
         }
         return false;
     });
@@ -32,8 +41,8 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const uninstallDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.UninstallDafny, () => {
         const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath);
-        if (verifier) {
-            verifier.stop();
+        if (provider) {
+            provider.stop();
         }
         installer.uninstall();
     });
@@ -41,22 +50,22 @@ export function activate(context: vscode.ExtensionContext): void {
 
     function init() {
         try {
-            if(!verifier) {
-                verifier = new DafnyDiagnosticsProvider();
-                verifier.activate(context.subscriptions);
-                context.subscriptions.push(verifier);
-                verifier.resetServer();
+            if(!provider) {
+                provider = new DafnyDiagnosticsProvider();
+                provider.activate(context.subscriptions);
+                context.subscriptions.push(provider);
+                provider.resetServer();
             } else {
-                verifier.init();
-                verifier.resetServer();
+                provider.init();
+                provider.resetServer();
             }
         } catch(e) {
-            askToInstall();
+            vscode.window.showErrorMessage("Exception occured: " + e);
         }
     }
 
     function askToInstall() {
-        vscode.window.showInformationMessage("Would you like to install dafny?", "Yes", "No").then((value: string) => {
+        vscode.window.showInformationMessage("Would you like to install Dafny?", "Yes", "No").then((value: string) => {
             if("Yes" === value) {
                 install();
             }
@@ -65,8 +74,23 @@ export function activate(context: vscode.ExtensionContext): void {
 
     function install() {
         const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
-            init();
+
+            const verifier: DependencyVerifier = new DependencyVerifier();
+            verifier.verifyDafnyServer(() => {
+                verifier.verifyDafnyDef(() => {
+                    vscode.window.showInformationMessage(InfoMsg.DafnyInstallationSucceeded);
+                    init();
+                }, () => {
+                    vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
+                });
+            }, () => {
+                vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
+            });
         });
+        if (provider) {
+            provider.stop();
+        }
+        installer.uninstall();
         installer.install();
     }
 

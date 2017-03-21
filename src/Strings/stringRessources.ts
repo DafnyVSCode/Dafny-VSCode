@@ -13,8 +13,10 @@ export class ErrorMsg {
     public static DafnyServerRestartFailed: string = "DafnyServer restart failed";
     public static DafnyServerWrongPath: string = "Failed to start DafnyServer, check paths in config";
     public static ServerPathNotSet: string = "Dafny Verifier error: dafnyServerPath not set";
-    public static DafnyInstallationFailed: string = "Automatic installation failed";
+    public static DafnyInstallationFailed: string = "Automatic installation failed. Please install manually.";
     public static MaxRetriesReached: string = "Maximum retries to start the server reached. Please restart the server manually";
+    public static DafnyCantBeStarted: string = "DafnyServer.exe can not be started. Either it is not installed or the basepath is wrong";
+    public static DafnyDefMissing: string = "DafnyDef.exe can not be started. Either it is not installed or the basepath is wrong";
 }
 
 export class Config {

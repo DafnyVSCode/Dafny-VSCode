@@ -7,16 +7,25 @@ import { Environment } from "./environment";
 
 export class DependencyVerifier {
 
+    private environment: Environment = new Environment();
     private serverProc: ProcessWrapper;
+    private callbackSuccess: (data: any) => any;
+    private callbackError: (error: any) => any;
 
-    constructor(private callbackSuccess: (data: any) => any, private callbackError: (error: any) => any) {
+    public verifyDafnyServer(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+        const spawnOptions = this.environment.GetStandardSpawnOptions();
+        const dafnyCommand: Command = this.environment.GetStartDafnyCommand();
+        this.callbackError = callbackError;
+        this.callbackSuccess = callbackSuccess;
 
+        this.verify(dafnyCommand, spawnOptions);
     }
 
-    public verifyDafnyServer() {
-        const environment: Environment = new Environment();
-        const spawnOptions = environment.GetStandardSpawnOptions();
-        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+    public verifyDafnyDef(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+        const spawnOptions = this.environment.GetStandardSpawnOptions();
+        const dafnyCommand: Command = this.environment.GetStartDafnyDefCommand();
+        this.callbackError = callbackError;
+        this.callbackSuccess = callbackSuccess;
 
         this.verify(dafnyCommand, spawnOptions);
     }
