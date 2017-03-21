@@ -1,13 +1,13 @@
 import * as cp from "child_process";
 import * as vscode from "vscode";
-import { dafnyKeywords } from "./../LanguageDefinition/keywords";
-import { ProcessWrapper } from "./../Process/process";
-import { Verification } from "./../Strings/regexRessources";
-import { encodeBase64 } from "./../Strings/stringEncoding";
-import { decodeBase64 } from "./../Strings/stringEncoding";
-import { EnvironmentConfig } from "./../Strings/stringRessources";
-import { isPositionInString } from "./../Strings/StringUtils";
-import { Environment } from "./environment";
+import { dafnyKeywords } from "./../../LanguageDefinition/keywords";
+import { ProcessWrapper } from "./../../Process/process";
+import { Verification } from "./../../Strings/regexRessources";
+import { encodeBase64 } from "./../../Strings/stringEncoding";
+import { decodeBase64 } from "./../../Strings/stringEncoding";
+import { EnvironmentConfig } from "./../../Strings/stringRessources";
+import { isPositionInString } from "./../../Strings/StringUtils";
+import { Environment } from "./../environment";
 
 export const GO_MODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class GoDefinitionInformtation {
@@ -76,12 +76,16 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
                     || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
                     return Promise.resolve(null);
                 }
-                return this.askDafnyDef(resolve, reject, document, word);
+                return this.askDafnyDef(resolve, reject, document.fileName, word);
         });
     }
-
-    private askDafnyDef(resolve: any, reject: any, document: any, symbol: any) {
-        if(!this.serverIsAlive()) {
+    public provideDefinitionInternalDirectly(fileName: string, symbol: string, restartServer: boolean) {
+        return new Promise<GoDefinitionInformtation>((resolve, reject) => {
+                return this.askDafnyDef(resolve, reject, fileName, symbol, restartServer);
+        });
+    }
+    private askDafnyDef(resolve: any, reject: any, file: string, symbol: any, restartServer: boolean = false) {
+        if(restartServer || !this.serverIsAlive()) {
             const environment = new Environment();
             const command = environment.getStartDafnyDefCommand();
             const options = environment.getStandardSpawnOptions();
@@ -112,7 +116,7 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
         const task: DefinitionTask = {
             args: [],
             baseDir: vscode.workspace.rootPath,
-            fileName: document.fileName,
+            fileName: file,
             word: symbol,
         };
         if(this.environment.usesMono) {

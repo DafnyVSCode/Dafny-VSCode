@@ -2,13 +2,12 @@
 
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
-import { GO_MODE, GoDefinitionProvider } from "./Backend/definitionProvider";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
+import { GO_MODE, GoDefinitionProvider } from "./Backend/features/definitionProvider";
+import { DafnyImplementationsCodeLensProvider } from "./Backend/Features/implementationsCodeLensProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
-
 import {Commands} from "./Strings/stringRessources";
-
 export function activate(context: vscode.ExtensionContext): void {
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
@@ -34,6 +33,9 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             GO_MODE, new GoDefinitionProvider()));
+    context.subscriptions.push(
+        vscode.languages.registerCodeLensProvider(GO_MODE, new DafnyImplementationsCodeLensProvider()));
+
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
     });

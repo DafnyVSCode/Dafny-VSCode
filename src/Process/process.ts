@@ -62,6 +62,11 @@ export class ProcessWrapper {
         "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
     }
 
+    public writeGetDefinitionsRequestToDafnyDef(request: string): void {
+        this.writeRequestToServer(request, "getDefinitions", "[[DafnyDef-CLIENT: EOM]]",
+        "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
+    }
+
     public sendQuit(): void {
         const good: boolean = this.serverProc.stdin.write("quit\n", () => {
             if (!good) {
