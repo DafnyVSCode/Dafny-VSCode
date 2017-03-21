@@ -9,7 +9,7 @@ import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { isPositionInString } from "./../../Strings/StringUtils";
 import { Environment } from "./../environment";
 
-export const GO_MODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
+export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class GoDefinitionInformtation {
     public file: string;
     public line: number;
