@@ -97,6 +97,16 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
                 () => { this.handleProcessExit(); },
                 Verification.commandEndRegexDafnyDef
             );
+        } else {
+            this.serverProc.reasignCallbacks(
+                (err: Error) => { this.handleProcessError(err); },
+                () => {this.handleProcessData((data) => {
+                    if(!data) {
+                        return reject(null);
+                    }
+                    return resolve(data);
+                }); },
+                () => { this.handleProcessExit(); });
         }
 
         const task: DefinitionTask = {

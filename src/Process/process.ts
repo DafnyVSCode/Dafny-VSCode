@@ -10,7 +10,8 @@ export class ProcessWrapper {
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
-        dataCallback: () => void, exitCallback: (code: number) => void,
+        dataCallback: () => void,
+        exitCallback: (code: number) => void,
         commandEndRegex: RegExp) {
         if(!process.pid) {
             throw new DafnyServerExeption();
@@ -26,6 +27,18 @@ export class ProcessWrapper {
         this.serverProc.on("exit", exitCallback);
     }
 
+    public reasignCallbacks(errorCallback: (error: Error) => void,
+                           dataCallback: () => void,
+                           exitCallback: (code: number) => void): void {
+        this.serverProc.stdout.removeAllListeners();
+        this.serverProc.removeAllListeners();
+        this.serverProc.stdout.on("error", errorCallback);
+        this.serverProc.stdout.on("data", (data: Buffer) => {
+            this.outBuf += data.toString();
+            dataCallback();
+        });
+        this.serverProc.on("exit", exitCallback);
+    }
     public killServerProc(): void {
         // detach old callback listeners - this is done to prevent a spurious 'end' event response
         this.serverProc.stdout.removeAllListeners();
