@@ -92,7 +92,7 @@ export function activate(context: vscode.ExtensionContext): void {
         if (provider) {
             provider.stop();
         }
-        installer.uninstall();
+        installer.uninstall(false);
         installer.install();
     }
 

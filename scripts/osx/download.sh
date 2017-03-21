@@ -16,6 +16,7 @@ else
     echo $dafny_url
     wget -O "DafnyOSX.zip" $dafny_url
 fi
-unzip "DafnyOSX.zip"
 
+unzip "DafnyOSX.zip"
+chmod +x dafny/z3/bin/z3
 kill -9 $PPID

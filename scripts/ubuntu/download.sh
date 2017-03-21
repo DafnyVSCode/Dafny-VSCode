@@ -17,7 +17,6 @@ else
     wget -O "DafnyUbuntu.zip" $dafny_url
 fi
 
-
 unzip "DafnyUbuntu.zip"
-
+chmod +x dafny/z3/bin/z3
 kill -9 $PPID
