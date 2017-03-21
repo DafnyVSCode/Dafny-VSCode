@@ -68,7 +68,7 @@
                 },
                 "dafny.automaticVerification": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "Verify as soon as the document is changed (default). When false, only verify on save."
                 },
                 "dafny.automaticVerificationDelayMS": {
