@@ -50,6 +50,8 @@ export class EnvironmentConfig {
     public static Win32: string = "win32";
     public static OSX: string = "darwin";
     public static Ubuntu: string = "linux";
+    public static DafnyDefSuccess: string = "[SUCCESS]";
+    public static DafnyDefFailure: string = "[FAILURE]";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";

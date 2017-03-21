@@ -10,7 +10,8 @@ export class ProcessWrapper {
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
-        dataCallback: () => void, exitCallback: (code: number) => void,
+        dataCallback: () => void,
+        exitCallback: (code: number) => void,
         commandEndRegex: RegExp) {
         if(!process.pid) {
             throw new DafnyServerExeption();
@@ -26,6 +27,18 @@ export class ProcessWrapper {
         this.serverProc.on("exit", exitCallback);
     }
 
+    public reasignCallbacks(errorCallback: (error: Error) => void,
+                            dataCallback: () => void,
+                            exitCallback: (code: number) => void): void {
+        this.serverProc.stdout.removeAllListeners();
+        this.serverProc.removeAllListeners();
+        this.serverProc.stdout.on("error", errorCallback);
+        this.serverProc.stdout.on("data", (data: Buffer) => {
+            this.outBuf += data.toString();
+            dataCallback();
+        });
+        this.serverProc.on("exit", exitCallback);
+    }
     public killServerProc(): void {
         // detach old callback listeners - this is done to prevent a spurious 'end' event response
         this.serverProc.stdout.removeAllListeners();
@@ -40,7 +53,7 @@ export class ProcessWrapper {
     public clearBuffer(): void {
         this.outBuf = "";
     }
-    public WriteVerificationRequestToServer(request: string): void {
+    public writeVerificationRequestToServer(request: string): void {
         let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
             if (!good) {
                 throw new VericationCommandFailedException("Verification command failed of request: ${request}");
@@ -58,7 +71,7 @@ export class ProcessWrapper {
         });
     }
 
-    public WriteDefinitionRequestToDafnyDef(request: string): void {
+    public writeDefinitionRequestToDafnyDef(request: string): void {
         let good: boolean = this.serverProc.stdin.write("findDefinition\n", () => { // the verify command
             if (!good) {
                 throw new VericationCommandFailedException("Verification command failed of request: ${request}");
@@ -77,7 +90,7 @@ export class ProcessWrapper {
     }
 
     public sendQuit(): void {
-        let good: boolean = this.serverProc.stdin.write("quit\n", () => { // the verify command
+        const good: boolean = this.serverProc.stdin.write("quit\n", () => { // the verify command
             if (!good) {
                 throw new VericationCommandFailedException("Sending of quit failed");
             }

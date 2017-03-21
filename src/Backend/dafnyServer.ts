@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import {IncorrectPathExeption} from "../ErrorHandling/errors";
 import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
-import { EncodeBase64 } from "../Strings/stringEncoding";
+import { encodeBase64 } from "../Strings/stringEncoding";
 import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
 import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
@@ -48,9 +48,9 @@ export class DafnyServer {
 
     public verify(): boolean {
         const environment: Environment = new Environment();
-        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+        const dafnyCommand: Command = environment.getStartDafnyCommand();
         try {
-            this.serverProc = this.spawnNewProcess(dafnyCommand, environment.GetStandardSpawnOptions());
+            this.serverProc = this.spawnNewProcess(dafnyCommand, environment.getStandardSpawnOptions());
             return true;
         } catch(e) {
             return false;
@@ -88,9 +88,9 @@ export class DafnyServer {
 
     private resetProcess(): boolean {
         const environment: Environment = new Environment();
-        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+        const dafnyCommand: Command = environment.getStartDafnyCommand();
 
-        if (environment.UsesNonStandardMonoPath()) {
+        if (environment.usesNonStandardMonoPath()) {
             vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
         }
 
@@ -98,7 +98,7 @@ export class DafnyServer {
             vscode.window.showErrorMessage(ErrorMsg.NoMono);
             return false;
         }
-        return this.resetServerProc(dafnyCommand, environment.GetStandardSpawnOptions());
+        return this.resetServerProc(dafnyCommand, environment.getStandardSpawnOptions());
     }
 
     private handleProcessError(err: Error): void {
@@ -179,10 +179,10 @@ export class DafnyServer {
             source: request.source,
             sourceIsFile: false
         };
-        const encoded: string = EncodeBase64(task);
+        const encoded: string = encodeBase64(task);
         if(this.isRunning()) {
             this.serverProc.clearBuffer();
-            this.serverProc.WriteVerificationRequestToServer(encoded);
+            this.serverProc.writeVerificationRequestToServer(encoded);
         }
         request.timeSent = Date.now();
     }
