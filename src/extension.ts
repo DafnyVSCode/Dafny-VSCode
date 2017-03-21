@@ -3,14 +3,13 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import { GO_MODE, GoDefinitionProvider } from "./Backend/definitionProvider";
-import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
-
+import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
     let verifier: DafnyDiagnosticsProvider = null;
-    const dependencyVerifier: DependencyVerifier = new DependencyVerifier(() => {}, ()=> {});
+    const dependencyVerifier: DependencyVerifier = new DependencyVerifier(() => {}, () => {});
     dependencyVerifier.verifyDafnyServer();
 
     init();

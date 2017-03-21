@@ -3,8 +3,8 @@ import * as vscode from "vscode";
 import { dafnyKeywords } from "./../LanguageDefinition/keywords";
 import { ProcessWrapper } from "./../Process/process";
 import { Verification } from "./../Strings/regexRessources";
-import { EncodeBase64 } from "./../Strings/stringEncoding";
-import { DecodeBase64 } from "./../Strings/stringEncoding";
+import { encodeBase64 } from "./../Strings/stringEncoding";
+import { decodeBase64 } from "./../Strings/stringEncoding";
 import { EnvironmentConfig } from "./../Strings/stringRessources";
 import { isPositionInString } from "./../Strings/StringUtils";
 import { Environment } from "./environment";
@@ -18,7 +18,7 @@ export class GoDefinitionInformtation {
     public declarationlines: string[];
     public name: string;
     public toolUsed: string;
-    public IsValid(): boolean {
+    public isValid(): boolean {
         return this.column > 0 && this.file !== "" && this.line > 0 && this.name !== "";
     }
     constructor(dafnyDefResponse: any) {
@@ -83,8 +83,8 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
     private askDafnyDef(resolve: any, reject: any, document: any, symbol: any) {
         if(!this.serverIsAlive()) {
             const environment = new Environment();
-            const command = environment.GetStartDafnyDefCommand();
-            const options = environment.GetStandardSpawnOptions();
+            const command = environment.getStartDafnyDefCommand();
+            const options = environment.getStandardSpawnOptions();
             const process = cp.spawn(command.command, command.args, options);
             this.serverProc = new ProcessWrapper(process,
                 (err: Error) => { this.handleProcessError(err); },
@@ -116,11 +116,11 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
             word: symbol,
         };
         if(this.environment.usesMono) {
-            task.monoPath = this.environment.GetMonoPath();
+            task.monoPath = this.environment.getMonoPath();
         }
-        const encoded = EncodeBase64(task);
+        const encoded = encodeBase64(task);
         this.serverProc.clearBuffer();
-        this.serverProc.WriteDefinitionRequestToDafnyDef(encoded);
+        this.serverProc.writeDefinitionRequestToDafnyDef(encoded);
     }
 
     private handleProcessError(err: Error): void {
@@ -132,7 +132,7 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
         const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
         if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
             const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-            if(definitionInfo.IsValid()) {
+            if(definitionInfo.isValid()) {
                 callback(definitionInfo);
             } else {
                 callback(null);
@@ -143,7 +143,7 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     private parseResponse(response: string): GoDefinitionInformtation {
-        const responseJson =  DecodeBase64(response);
+        const responseJson =  decodeBase64(response);
         return new GoDefinitionInformtation(responseJson);
     }
     private handleProcessExit() {

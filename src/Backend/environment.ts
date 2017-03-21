@@ -28,7 +28,7 @@ export class Environment {
         this.hasCustomMonoPath = monoPath !== "";
     }
 
-    public TestCommand(path: string): boolean {
+    public testCommand(path: string): boolean {
         const process: cp.ChildProcess = cp.exec(path);
         const commandSuccessful: boolean = process.pid !== 0;
         if (commandSuccessful) {
@@ -37,15 +37,15 @@ export class Environment {
         return commandSuccessful;
     }
 
-    public GetStartDafnyCommand(): Command {
-        return this.GetCommand(this.dafnyServerPath);
+    public getStartDafnyCommand(): Command {
+        return this.getCommand(this.dafnyServerPath);
     }
 
-    public GetStartDafnyDefCommand(): Command {
-       return this.GetCommand(this.dafnyDefPath);
+    public getStartDafnyDefCommand(): Command {
+       return this.getCommand(this.dafnyDefPath);
     }
 
-    public GetStandardSpawnOptions(): cp.SpawnOptions {
+    public getStandardSpawnOptions(): cp.SpawnOptions {
         const options: cp.SpawnOptions = {};
         if (vscode.workspace.rootPath) {
             options.cwd = vscode.workspace.rootPath;
@@ -58,14 +58,14 @@ export class Environment {
         return options;
     }
 
-    public UsesNonStandardMonoPath(): boolean {
+    public usesNonStandardMonoPath(): boolean {
         return this.usesMono && this.hasCustomMonoPath;
     }
 
-    public GetMonoPath(): string {
+    public getMonoPath(): string {
         let monoPath: string = this.config.get<string>(Config.MonoPath);
-        const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
-        const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
+        const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
+        const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.testCommand(monoPath);
         if (monoInSystemPath && !monoAtConfigPath) {
             monoPath = EnvironmentConfig.Mono;
         } else if (!monoInSystemPath && !monoAtConfigPath) {
@@ -73,7 +73,7 @@ export class Environment {
         }
         return monoPath;
     }
-    private GetCommand(commandName: string): Command {
+    private getCommand(commandName: string): Command {
         let baseCommand: string;
         let args: string[];
         let monoPath: string = this.config.get<string>(Config.MonoPath);
@@ -85,8 +85,8 @@ export class Environment {
             args = [];
             return new Command(baseCommand, args);
         } else {
-            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
-            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
+            const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
+            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.testCommand(monoPath);
             if (monoInSystemPath && !monoAtConfigPath) {
                 if (this.hasCustomMonoPath) {
                     vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);

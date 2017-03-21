@@ -15,8 +15,8 @@ export class DependencyVerifier {
 
     public verifyDafnyServer() {
         const environment: Environment = new Environment();
-        const spawnOptions = environment.GetStandardSpawnOptions();
-        const dafnyCommand: Command = environment.GetStartDafnyCommand();
+        const spawnOptions = environment.getStandardSpawnOptions();
+        const dafnyCommand: Command = environment.getStartDafnyCommand();
 
         this.verify(dafnyCommand, spawnOptions);
     }
