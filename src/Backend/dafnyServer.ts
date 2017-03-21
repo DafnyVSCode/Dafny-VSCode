@@ -76,6 +76,10 @@ export class DafnyServer {
         this.active = false;
     }
 
+    public init(): void {
+        this.restart = true;
+    }
+
     public stop(): void {
         this.restart = false;
         this.active = false;
@@ -119,10 +123,13 @@ export class DafnyServer {
     private handleProcessExit() {
         this.serverProc = null;
         vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestart);
-
-        const crashedRequest: VerificationRequest = this.context.activeRequest;
-        this.context.clear();
-        this.context.addCrashedRequest(crashedRequest);
+        if(this.context != null) {
+            const crashedRequest: VerificationRequest = this.context.activeRequest;
+            this.context.clear();
+            this.context.addCrashedRequest(crashedRequest);
+        } else {
+            throw new IncorrectPathExeption();
+        }
         this.retries++;
         this.active = false;
 

@@ -15,12 +15,9 @@ Try
     $outputdir = "$appdata\Dafny\Windows"
     $output = "$outputdir\DafnyWindows.zip"
 
-    if(!(Test-Path -Path $outputdir )){
-
-        New-Item -ItemType Directory -Force -Path $outputdir
-        Invoke-WebRequest -Uri $dafny_url -OutFile $output
-        Expand-Archive $output -DestinationPath $outputdir 
-    }
+    New-Item -ItemType Directory -Force -Path $outputdir
+    Invoke-WebRequest -Uri $dafny_url -OutFile $output
+    Expand-Archive $output -DestinationPath $outputdir 
 }
 Finally
 {

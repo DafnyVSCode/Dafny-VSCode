@@ -10,7 +10,7 @@ export class ProcessWrapper {
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
-        dataCallback: () => void, exitCallback: () => void,
+        dataCallback: () => void, exitCallback: (code: number) => void,
         commandEndRegex: RegExp) {
         if(!process.pid) {
             throw new DafnyServerExeption();
@@ -73,6 +73,14 @@ export class ProcessWrapper {
                     }
                 });
             });
+        });
+    }
+
+    public sendQuit(): void {
+        let good: boolean = this.serverProc.stdin.write("quit\n", () => { // the verify command
+            if (!good) {
+                throw new VericationCommandFailedException("Sending of quit failed");
+            }
         });
     }
 

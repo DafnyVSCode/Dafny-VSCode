@@ -6,20 +6,10 @@ import {DafnyServer} from "../Backend/dafnyServer";
 import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
-class DocChangeTimerRecord {
-    public active: boolean = false;
-    constructor(
-        public doc: vscode.TextDocument,
-        public lastChange: number // epoch ms (use Date.now())
-    ) {}
-}
-
 export class DafnyDiagnosticsProvider {
     private diagCol: vscode.DiagnosticCollection = null;
 
-    // onTextChanged events are sent on each character change,
-    // but we only want to send a verification request after a bunch of changes are done
-    private docChangeTimers: { [docPathName: string]: DocChangeTimerRecord } = {};
+    private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
     private docChangeVerify: boolean = false; // dafny.automaticVerification config param
     private docChangeDelay: number = 0; // dafny.automaticVerificationDelayMS config param
     private subscriptions: vscode.Disposable[];
@@ -51,7 +41,9 @@ export class DafnyDiagnosticsProvider {
             this.diagCol.delete(textDocument.uri);
         }, this);
 
-        vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
+        if(this.docChangeVerify) {
+            vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
+        }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.textDocuments.forEach(this.doVerify, this); // verify each active document
     }
@@ -77,6 +69,10 @@ export class DafnyDiagnosticsProvider {
         this.dafnyServer.stop();
     }
 
+    public init(): void {
+        this.dafnyServer.init();
+    }
+
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument);
@@ -85,22 +81,16 @@ export class DafnyDiagnosticsProvider {
 
     private docChanged(change: vscode.TextDocumentChangeEvent): void {
         if (change.document.languageId === EnvironmentConfig.Dafny) {
-            // todo: check if this is too slow to be done every time
-            if (this.docChangeVerify) {
-                const now: number = Date.now();
-                const docName: string = change.document.fileName;
 
-                let changeRecord: DocChangeTimerRecord = null;
-                if (this.docChangeTimers[docName]) {
-                    changeRecord = this.docChangeTimers[docName];
-                } else {
-                    changeRecord = new DocChangeTimerRecord(change.document, now);
-                    this.docChangeTimers[docName] = changeRecord;
-                }
-                changeRecord.active = true;
-                changeRecord.lastChange = now;
+            const docName: string = change.document.fileName;
+
+            if (this.docChangeTimers[docName]) {
+                clearTimeout(this.docChangeTimers[docName]);
             }
+
+            this.docChangeTimers[docName] = setTimeout(() => {
+                this.doVerify(change.document);
+            }, this.docChangeDelay);
         }
     }
-
 }
