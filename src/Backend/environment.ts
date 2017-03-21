@@ -38,62 +38,11 @@ export class Environment {
     }
 
     public GetStartDafnyCommand(): Command {
-        let serverPath: string;
-        let args: string[];
-        let monoPath: string = this.config.get<string>(Config.MonoPath);
-        if(this.dafnyServerPath === undefined || this.dafnyServerPath === "") {
-            throw new IncorrectPathExeption();
-        }
-        if (!this.usesMono) {
-            serverPath = this.dafnyServerPath;
-            args = [];
-            return new Command(serverPath, args);
-        } else {
-            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
-            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
-            if (monoInSystemPath && !monoAtConfigPath) {
-                if (this.hasCustomMonoPath) {
-                    vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
-                }
-                monoPath = EnvironmentConfig.Mono;
-            } else if (!monoInSystemPath && !monoAtConfigPath) {
-                vscode.window.showErrorMessage(ErrorMsg.NoMono);
-                const command: Command = new Command();
-                command.notFound = true;
-                return command;
-            }
-            serverPath = monoPath;
-            args = [this.dafnyServerPath];
-            return new Command(serverPath, args);
-        }
+        return this.GetCommand(this.dafnyServerPath);
     }
 
     public GetStartDafnyDefCommand(): Command {
-        let dafnyDefPath: string;
-        let args: string[];
-        let monoPath: string = this.config.get<string>(Config.MonoPath);
-        if (!this.usesMono) {
-            dafnyDefPath = this.dafnyDefPath;
-            args = [];
-            return new Command(dafnyDefPath, args);
-        } else {
-            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
-            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
-            if (monoInSystemPath && !monoAtConfigPath) {
-                if (this.hasCustomMonoPath) {
-                    vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
-                }
-                monoPath = EnvironmentConfig.Mono;
-            } else if (!monoInSystemPath && !monoAtConfigPath) {
-                vscode.window.showErrorMessage(ErrorMsg.NoMono);
-                const command: Command = new Command();
-                command.notFound = true;
-                return command;
-            }
-            dafnyDefPath = monoPath;
-            args = [this.dafnyDefPath];
-            return new Command(dafnyDefPath, args);
-        }
+       return this.GetCommand(this.dafnyDefPath);
     }
 
     public GetStandardSpawnOptions(): cp.SpawnOptions {
@@ -111,5 +60,47 @@ export class Environment {
 
     public UsesNonStandardMonoPath(): boolean {
         return this.usesMono && this.hasCustomMonoPath;
+    }
+
+    public GetMonoPath(): string {
+        let monoPath: string = this.config.get<string>(Config.MonoPath);
+        const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
+        const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
+        if (monoInSystemPath && !monoAtConfigPath) {
+            monoPath = EnvironmentConfig.Mono;
+        } else if (!monoInSystemPath && !monoAtConfigPath) {
+            return "";
+        }
+        return monoPath;
+    }
+    private GetCommand(commandName: string): Command {
+        let baseCommand: string;
+        let args: string[];
+        let monoPath: string = this.config.get<string>(Config.MonoPath);
+        if(commandName === undefined || commandName === "") {
+            throw new IncorrectPathExeption();
+        }
+        if (!this.usesMono) {
+            baseCommand = commandName;
+            args = [];
+            return new Command(baseCommand, args);
+        } else {
+            const monoInSystemPath: boolean = this.TestCommand(EnvironmentConfig.Mono);
+            const monoAtConfigPath: boolean = this.hasCustomMonoPath && this.TestCommand(monoPath);
+            if (monoInSystemPath && !monoAtConfigPath) {
+                if (this.hasCustomMonoPath) {
+                    vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
+                }
+                monoPath = EnvironmentConfig.Mono;
+            } else if (!monoInSystemPath && !monoAtConfigPath) {
+                vscode.window.showErrorMessage(ErrorMsg.NoMono);
+                const command: Command = new Command();
+                command.notFound = true;
+                return command;
+            }
+            baseCommand = monoPath;
+            args = [commandName];
+            return new Command(baseCommand, args);
+        }
     }
 }

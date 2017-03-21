@@ -10,7 +10,7 @@ export class ProcessWrapper {
     constructor(
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
-        dataCallback: () => void, exitCallback: () => void, 
+        dataCallback: () => void, exitCallback: () => void,
         commandEndRegex: RegExp) {
         if(!process.pid) {
             throw new DafnyServerExeption();
