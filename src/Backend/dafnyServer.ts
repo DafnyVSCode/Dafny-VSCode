@@ -22,8 +22,6 @@ export interface IVerificationTask {
 }
 
 export class DafnyServer {
-    // the dafny server runs as a child process (either through mono or .net)
-    // ipc is done through stdin/stdout of the server process
     private MAX_RETRIES: number = 5;
     private active: boolean = false;
     private serverProc: ProcessWrapper;

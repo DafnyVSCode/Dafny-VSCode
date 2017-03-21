@@ -40,7 +40,6 @@ export class ProcessWrapper {
         this.serverProc.on("exit", exitCallback);
     }
     public killServerProc(): void {
-        // detach old callback listeners - this is done to prevent a spurious 'end' event response
         this.serverProc.stdout.removeAllListeners();
         this.serverProc.removeAllListeners();
         this.serverProc.kill();
@@ -64,7 +63,7 @@ export class ProcessWrapper {
     }
 
     public sendQuit(): void {
-        const good: boolean = this.serverProc.stdin.write("quit\n", () => { // the verify command
+        const good: boolean = this.serverProc.stdin.write("quit\n", () => {
             if (!good) {
                 throw new CommandFailedException("Sending of quit failed");
             }

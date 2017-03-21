@@ -26,11 +26,11 @@ export class GoDefinitionInformtation {
             const firstMatch = dafnyDefResponse[0];
             if(firstMatch.SymbolInfos && firstMatch.SymbolInfos.length && firstMatch.SymbolInfos.length > 0) {
                 const symbolInfo = firstMatch.SymbolInfos[0];
-                this.column = symbolInfo.Column;
+                this.line = parseInt(symbolInfo.Line, 10) - 1; // 1 based
+                this.column = Math.max(0, parseInt(symbolInfo.Column, 10) - 1); // ditto, but 0 can appear in some cases
                 this.declarationlines = firstMatch.Symbol;
                 this.doc = firstMatch.Symbol;
                 this.file = firstMatch.FilePath;
-                this.line = symbolInfo.Line;
                 this.name = firstMatch.Symbol;
                 this.toolUsed = "DafnyDef";
             }

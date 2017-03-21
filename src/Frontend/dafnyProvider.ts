@@ -10,8 +10,8 @@ export class DafnyDiagnosticsProvider {
     private diagCol: vscode.DiagnosticCollection = null;
 
     private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
-    private docChangeVerify: boolean = false; // dafny.automaticVerification config param
-    private docChangeDelay: number = 0; // dafny.automaticVerificationDelayMS config param
+    private docChangeVerify: boolean = false;
+    private docChangeDelay: number = 0;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -31,7 +31,7 @@ export class DafnyDiagnosticsProvider {
 
     public activate(subs: vscode.Disposable[]): void {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
-            if (editor) { // may be undefined
+            if (editor) {
                 this.dafnyStatusbar.update();
             }
         }, this);
@@ -45,7 +45,7 @@ export class DafnyDiagnosticsProvider {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
-        vscode.workspace.textDocuments.forEach(this.doVerify, this); // verify each active document
+        vscode.workspace.textDocuments.forEach(this.doVerify, this);
     }
 
     public dispose(): void {
