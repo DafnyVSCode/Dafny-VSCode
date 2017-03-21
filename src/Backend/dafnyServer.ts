@@ -182,7 +182,7 @@ export class DafnyServer {
         const encoded: string = encodeBase64(task);
         if(this.isRunning()) {
             this.serverProc.clearBuffer();
-            this.serverProc.writeVerificationRequestToServer(encoded);
+            this.serverProc.writeVerificationRequestToDafnyServer(encoded);
         }
         request.timeSent = Date.now();
     }

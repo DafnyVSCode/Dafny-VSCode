@@ -1,6 +1,6 @@
 import * as cp from "child_process";
-import {CommandEndFailedException, DafnyServerExeption,
-    VericationCommandFailedException, VericationRequestFailedException} from "../ErrorHandling/errors";
+import {CommandEndFailedException, CommandFailedException,
+    DafnyServerExeption, RequestFailedException} from "../ErrorHandling/errors";
 
 export class ProcessWrapper {
     public pid: number;
@@ -53,46 +53,20 @@ export class ProcessWrapper {
     public clearBuffer(): void {
         this.outBuf = "";
     }
-    public writeVerificationRequestToServer(request: string): void {
-        let good: boolean = this.serverProc.stdin.write("verify\n", () => { // the verify command
-            if (!good) {
-                throw new VericationCommandFailedException("Verification command failed of request: ${request}");
-            }
-            good = this.serverProc.stdin.write(request + "\n", () => { // the base64 encoded task
-                if (!good) {
-                    throw new VericationRequestFailedException("Verification request failed of task: ${request}");
-                }
-                good = this.serverProc.stdin.write("[[DAFNY-CLIENT: EOM]]\n", () => { // the client end of message marker
-                    if (!good) {
-                        throw new CommandEndFailedException("Verification command end failed of task: ${request}");
-                    }
-                });
-            });
-        });
+    public writeVerificationRequestToDafnyServer(request: string): void {
+        this.writeRequestToServer(request, "verify", "[[DAFNY-CLIENT: EOM]]",
+        "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
     }
 
     public writeDefinitionRequestToDafnyDef(request: string): void {
-        let good: boolean = this.serverProc.stdin.write("findDefinition\n", () => { // the verify command
-            if (!good) {
-                throw new VericationCommandFailedException("Verification command failed of request: ${request}");
-            }
-            good = this.serverProc.stdin.write(request + "\n", () => { // the base64 encoded task
-                if (!good) {
-                    throw new VericationRequestFailedException("Verification request failed of task: ${request}");
-                }
-                good = this.serverProc.stdin.write("[[DafnyDef-CLIENT: EOM]]\n", () => { // the client end of message marker
-                    if (!good) {
-                        throw new CommandEndFailedException("Verification command end failed of task: ${request}");
-                    }
-                });
-            });
-        });
+        this.writeRequestToServer(request, "findDefinition", "[[DafnyDef-CLIENT: EOM]]",
+        "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
     }
 
     public sendQuit(): void {
         const good: boolean = this.serverProc.stdin.write("quit\n", () => { // the verify command
             if (!good) {
-                throw new VericationCommandFailedException("Sending of quit failed");
+                throw new CommandFailedException("Sending of quit failed");
             }
         });
     }
@@ -103,5 +77,23 @@ export class ProcessWrapper {
 
     public positionCommandEnd(): number {
         return this.outBuf.search(this.commandEndRegex);
+    }
+    private writeRequestToServer(request: string, verb: string, serverEndTag: string,
+                                 commandFailedMessage: string, requestFailedMessage: string): void {
+        let good: boolean = this.serverProc.stdin.write(verb + "\n", () => {
+            if (!good) {
+                throw new CommandFailedException(commandFailedMessage);
+            }
+            good = this.serverProc.stdin.write(request + "\n", () => {
+                if (!good) {
+                    throw new RequestFailedException(requestFailedMessage);
+                }
+                good = this.serverProc.stdin.write(serverEndTag + "\n", () => {
+                    if (!good) {
+                        throw new CommandEndFailedException(commandFailedMessage);
+                    }
+                });
+            });
+        });
     }
 }

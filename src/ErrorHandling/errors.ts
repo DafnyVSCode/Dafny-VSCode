@@ -1,23 +1,23 @@
 "use strict";
 
-export class VericationCommandFailedException extends Error {
+export class CommandFailedException extends Error {
     constructor(message: string) {
         super(message);
-        Object.setPrototypeOf(this, VericationCommandFailedException.prototype);
+        Object.setPrototypeOf(this, CommandFailedException.prototype);
     }
 }
 
-export class VericationRequestFailedException extends Error {
+export class RequestFailedException extends Error {
     constructor(message: string) {
         super(message);
-        Object.setPrototypeOf(this, VericationCommandFailedException.prototype);
+        Object.setPrototypeOf(this, CommandFailedException.prototype);
     }
 }
 
 export class CommandEndFailedException extends Error {
     constructor(message: string) {
         super(message);
-        Object.setPrototypeOf(this, VericationCommandFailedException.prototype);
+        Object.setPrototypeOf(this, CommandFailedException.prototype);
     }
 }
 
