@@ -2,7 +2,7 @@
 
 version_url="https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/master/version.txt"
 
-dafny_osx_url="https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/master/osx.txt"
+dafny_osx_url="https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/develop/osx.txt"
 
 cd ~
 mkdir -p ".Dafny"

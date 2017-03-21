@@ -4,7 +4,7 @@ import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
 import {IncorrectPathExeption} from "../ErrorHandling/errors";
-import {Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../Strings/stringRessources";
+import {Application, Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../Strings/stringRessources";
 
 export class Command {
     public notFound: boolean = false;
@@ -17,13 +17,11 @@ export class Environment {
     public usesMono: boolean;
     public hasCustomMonoPath: boolean;
     private config: vscode.WorkspaceConfiguration;
-    private dafnyServerPath: string;
-    private dafnyDefPath: string;
+    private dafnyBasePath: string;
     constructor() {
         this.config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.usesMono = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;
-        this.dafnyServerPath = this.config.get<string>(Config.DafnyServerPath);
-        this.dafnyDefPath = this.config.get<string>(Config.DafnyDefPath);
+        this.dafnyBasePath = this.config.get<string>(Config.DafnyBasePath);
         const monoPath: string = this.config.get<string>(Config.MonoPath);
         this.hasCustomMonoPath = monoPath !== "";
     }
@@ -38,11 +36,11 @@ export class Environment {
     }
 
     public getStartDafnyCommand(): Command {
-        return this.getCommand(this.dafnyServerPath);
+        return this.getCommand(this.dafnyBasePath + "/" + Application.DafnyServer);
     }
 
     public getStartDafnyDefCommand(): Command {
-       return this.getCommand(this.dafnyDefPath);
+       return this.getCommand(this.dafnyBasePath + "/" + Application.DafnyDef);
     }
 
     public getStandardSpawnOptions(): cp.SpawnOptions {

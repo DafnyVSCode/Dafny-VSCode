@@ -1,6 +1,6 @@
 $version_url = "https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/master/version.txt"
 
-$dafny_windows_url = "https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/master/windows.txt"
+$dafny_windows_url = "https://raw.githubusercontent.com/FunctionalCorrectness/Dafny/develop/windows.txt"
 
 Try 
 {

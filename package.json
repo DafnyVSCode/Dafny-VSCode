@@ -52,9 +52,9 @@
             "type": "object",
             "title": "Dafny extension configuration",
             "properties": {
-                "dafny.dafnyServerPath": {
+                "dafny.basePath": {
                     "type": "string",
-                    "description": "Absolute path to the DafnyServer.exe binary"
+                    "description": "Absolute path to the dafny directory, which contains the DafnyServer.exe and the DafnyDef.exe"
                 },
                 "dafny.useMono": {
                     "type": "boolean",

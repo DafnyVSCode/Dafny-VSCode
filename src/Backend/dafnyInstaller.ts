@@ -19,18 +19,18 @@ export class DafnyInstaller {
 
         if(os.platform() === EnvironmentConfig.Win32) {
             const appdata = process.env.APPDATA;
-            installPath = appdata + "\\Dafny\\Windows\\dafny\\DafnyServer.exe";
+            installPath = appdata + "\\Dafny\\Windows\\dafny";
             downloadScript = this.extensionPath + "\\scripts\\windows\\download.ps1";
 
         } else if(os.platform() === EnvironmentConfig.OSX) {
             const home = process.env.HOME;
-            installPath = home + "/.Dafny/dafny/DafnyServer.exe";
+            installPath = home + "/.Dafny/dafny";
             downloadScript = this.extensionPath + "/scripts/osx/download.sh";
             terminal.sendText("chmod +x " + downloadScript);
 
         } else if(os.platform() === EnvironmentConfig.Ubuntu) {
             const home = process.env.HOME;
-            installPath = home + "/.Dafny/dafny/DafnyServer.exe";
+            installPath = home + "/.Dafny/dafny";
             downloadScript = this.extensionPath + "/scripts/ubuntu/download.sh";
             terminal.sendText("chmod +x " + downloadScript);
 
@@ -66,7 +66,7 @@ export class DafnyInstaller {
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
             if(e.name === terminal.name) {
-                config.update(Config.DafnyServerPath, undefined, true);
+                config.update(Config.DafnyBasePath, undefined, true);
                 vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
             }
         });
@@ -77,7 +77,7 @@ export class DafnyInstaller {
     private finishInstallation(dafnyServerPath: string): void {
         const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
 
-        config.update(Config.DafnyServerPath, dafnyServerPath, true).then(() => {
+        config.update(Config.DafnyBasePath, dafnyServerPath, true).then(() => {
             this.installationComplete();
         });
     }

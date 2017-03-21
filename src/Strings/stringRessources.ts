@@ -20,12 +20,16 @@ export class ErrorMsg {
 }
 
 export class Config {
-    public static DafnyServerPath: string = "dafnyServerPath";
     public static MonoPath: string = "monoPath";
     public static UseMono: string = "useMono";
     public static AutomaticVerification: string = "automaticVerification";
     public static AutomaticVerificationDelay: string = "automaticVerificationDelayMS";
-    public static DafnyDefPath: string = "dafnyDefPath";
+    public static DafnyBasePath: string = "basePath";
+}
+
+export class Application {
+    public static DafnyServer: string = "DafnyServer.exe";
+    public static DafnyDef: string = "DafnyDef.exe";
 }
 
 export class Commands {
