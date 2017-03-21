@@ -2,13 +2,12 @@
 
 import * as os from "os";
 import * as vscode from "vscode";
-import {DafnyServer} from "../Backend/dafnyServer";
 import {DafnyUnsupportedPlatform} from "../ErrorHandling/errors";
-import {Config, EnvironmentConfig, ErrorMsg, InfoMsg } from "../Strings/stringRessources";
+import {Config, EnvironmentConfig, InfoMsg } from "../Strings/stringRessources";
 
 export class DafnyInstaller {
 
-    constructor(private extensionPath: string, private successfulInstalled?: () => any) {
+    constructor(private extensionPath: string, private installationComplete?: () => any) {
     }
 
     public install(): void {
@@ -79,20 +78,7 @@ export class DafnyInstaller {
         const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
 
         config.update(Config.DafnyServerPath, dafnyServerPath, true).then(() => {
-            this.verifyInstallation();
+            this.installationComplete();
         });
-    }
-
-    private verifyInstallation() {
-
-        const dafnyServer = new DafnyServer(null, null);
-        if(dafnyServer.verify()) {
-            vscode.window.showInformationMessage(InfoMsg.DafnyInstallationSucceeded);
-            if(this.successfulInstalled) {
-                this.successfulInstalled();
-            }
-        } else {
-            vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
-        }
     }
 }

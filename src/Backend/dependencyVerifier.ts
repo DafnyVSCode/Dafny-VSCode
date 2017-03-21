@@ -7,16 +7,25 @@ import { Environment } from "./environment";
 
 export class DependencyVerifier {
 
+    private environment: Environment = new Environment();
     private serverProc: ProcessWrapper;
+    private callbackSuccess: (data: any) => any;
+    private callbackError: (error: any) => any;
 
-    constructor(private callbackSuccess: (data: any) => any, private callbackError: (error: any) => any) {
+    public verifyDafnyServer(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+        const spawnOptions = this.environment.getStandardSpawnOptions();
+        const dafnyCommand: Command = this.environment.getStartDafnyCommand();
+        this.callbackError = callbackError;
+        this.callbackSuccess = callbackSuccess;
 
+        this.verify(dafnyCommand, spawnOptions);
     }
 
-    public verifyDafnyServer() {
-        const environment: Environment = new Environment();
-        const spawnOptions = environment.getStandardSpawnOptions();
-        const dafnyCommand: Command = environment.getStartDafnyCommand();
+    public verifyDafnyDef(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+        const spawnOptions = this.environment.getStandardSpawnOptions();
+        const dafnyCommand: Command = this.environment.getStartDafnyDefCommand();
+        this.callbackError = callbackError;
+        this.callbackSuccess = callbackSuccess;
 
         this.verify(dafnyCommand, spawnOptions);
     }
@@ -34,7 +43,8 @@ export class DependencyVerifier {
         const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
         return new ProcessWrapper(process,
             (err: Error) => { this.callbackError(err); },
-            () => { },
+            // tslint:disable-next-line:no-empty
+            () => {},
             (code: number) => { this.handleProcessExit(code); }, Verification.commandEndRegexDafnyServer);
     }
 
