@@ -21,7 +21,8 @@ import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { Environment } from "./../environment";
 
 export class ReferencesCodeLens extends CodeLens {
-    constructor(public document: Uri, public file: string, range: Range, public symbol: string) {
+    constructor(public document: Uri, public file: string, range: Range, public symbol: string,
+                public module: string, public parentClass: string, public source: string) {
         super(range);
     }
 }
@@ -30,10 +31,16 @@ export class CodeLensInfo {
     public filePath: string;
     public position: Range;
     public symbol: string;
-    public constructor(filePath: string, start: Position, end: Position, symbol: string) {
+    public module: string;
+    public parentClass: string;
+    public source: string;
+    public constructor(filePath: string, start: Position, end: Position, symbol: string,
+                       module: string, parentClass: string) {
         this.filePath = filePath;
         this.position = new Range(start, end);
         this.symbol = symbol;
+        this.module = module;
+        this.parentClass = parentClass;
     }
 }
 export class CodeLensInformtation {
@@ -50,7 +57,10 @@ export class CodeLensInformtation {
                             const start = new Position(line, column);
                             const end = new Position(line, column + Number(symbolInfo.Name.length));
                             const path = String(symbolDef.FilePath);
-                            this.lenses.push(new CodeLensInfo(path, start, end, symbolInfo.Name));
+                            if(symbolInfo.Module && symbolInfo.ParentClass) {
+                                this.lenses.push(new CodeLensInfo(path, start, end, symbolInfo.Name,
+                                symbolInfo.Module, symbolInfo.ParentClass));
+                            }
                         }
                     }
                 }
@@ -66,10 +76,10 @@ interface GetDefinitionsTask {
     monoPath?: string;
 }
 export class DafnyBaseCodeLensProvider implements CodeLensProvider {
+    protected serverProc: ProcessWrapper;
+    protected environment: Environment = new Environment();
     private enabled: boolean = true;
     private onDidChangeCodeLensesEmitter = new EventEmitter<void>();
-    private serverProc: ProcessWrapper;
-    private environment: Environment = new Environment();
 
     public get onDidChangeCodeLenses(): Event<void> {
         return this.onDidChangeCodeLensesEmitter.event;
@@ -94,7 +104,8 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
                 return Promise.resolve(null);
             }
             return definitions.lenses.map((info: CodeLensInfo) =>
-            new ReferencesCodeLens(document.uri, info.filePath, info.position, info.symbol));
+            new ReferencesCodeLens(document.uri, info.filePath, info.position, info.symbol,
+            info.module, info.parentClass, document.getText()));
 
         }, (err: any) => {
             if (err) {

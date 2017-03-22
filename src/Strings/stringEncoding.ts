@@ -23,7 +23,7 @@ function convertStringToBytes(bytesString: string): Uint8Array {
 }
 
 export function decodeBase64(task: string): any {
-    const byteArray = b64.toByteArray(task);
+    const byteArray = b64.toByteArray(task.trim());
     let ret = "";
     for(const byte of byteArray) {
         ret += String.fromCharCode(byte);

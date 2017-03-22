@@ -5,10 +5,15 @@ import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
 import { DAFNYMODE, GoDefinitionProvider } from "./Backend/features/definitionProvider";
 import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
-import { DafnyImplementationsCodeLensProvider } from "./Backend/Features/implementationsCodeLensProvider";
+//import { DafnyImplementationsCodeLensProvider } from "./Backend/Features/implementationsCodeLensProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
+
+
+
+
+import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
 export function activate(context: vscode.ExtensionContext): void {
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
@@ -35,7 +40,7 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.languages.registerDefinitionProvider(
             DAFNYMODE, new GoDefinitionProvider()));
     context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider()));
+        vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
     context.subscriptions.push(
         vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {

@@ -57,6 +57,11 @@ export class ProcessWrapper {
         "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
     }
 
+    public writeReferenceRequestToDafnyServer(request: string): void {
+        this.writeRequestToServer(request, "findReferences", "[[DAFNY-CLIENT: EOM]]",
+        "Reference command failed of request: ${request}", "Reference request failed of task: ${request}");
+    }
+
     public writeDefinitionRequestToDafnyDef(request: string): void {
         this.writeRequestToServer(request, "findDefinition", "[[DafnyDef-CLIENT: EOM]]",
         "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
