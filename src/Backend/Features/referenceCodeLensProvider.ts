@@ -7,7 +7,6 @@ import { ProcessWrapper } from "./../../Process/process";
 import { Verification } from "./../../Strings/regexRessources";
 import { encodeBase64 } from "./../../Strings/stringEncoding";
 import { decodeBase64 } from "./../../Strings/stringEncoding";
-//import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { Environment } from "./../environment";
 import { ReferencesCodeLens } from "./baseCodeLensProvider";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
@@ -102,16 +101,6 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
                 callback(null);
             }
         }
-/*        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            const referenceResponse = log.substring(0, log.indexOf("[SUCCESS]"));
-            const referenceInfo = this.parseReferenceResponse(
-                referenceResponse.substring("REFERENCE_START".length, referenceResponse.indexOf("REFERENCE_END")));
-            if(referenceInfo) {
-                callback(referenceInfo);
-            } else {
-                callback(null);
-            }
-        }*/
         console.log(log);
         this.serverProc.clearBuffer();
     }
