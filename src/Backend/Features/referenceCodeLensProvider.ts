@@ -32,7 +32,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             }
             const locations: Location[] = [];
             for(const info of referenceInfo) {
-                locations.push(new Location(Uri.parse(info.file), new Range(info.line, info.column,
+                locations.push(new Location(Uri.file(info.file), new Range(info.line, info.column,
                 info.line, info.column + info.methodName.length)));
             }
             codeLens.command = {
