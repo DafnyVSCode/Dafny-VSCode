@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
-import { DAFNYMODE, GoDefinitionProvider } from "./Backend/features/definitionProvider";
+import { DAFNYMODE, GoDefinitionProvider } from "./Backend/Features/definitionProvider";
 import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
 import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
