@@ -2,7 +2,7 @@
     "name": "dafny-vscode",
     "displayName": "Dafny VSCode",
     "description": "Dafny support for Visual Studio Code",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "publisher": "FunctionalCorrectness",
     "homepage": "https://github.com/FunctionalCorrectness/",
     "repository": {
@@ -82,17 +82,17 @@
             {
                 "command": "dafny.restartDafnyServer",
                 "icon": "$(issue-reopened)",
-                "title": "Restart DafnyServer"
+                "title": "Dafny: Restart DafnyServer"
             },
             {
                 "command": "dafny.installDafny",
                 "icon": "$(issue-reopened)",
-                "title": "Install DafnyServer"
+                "title": "Dafny: Install Dafny"
             },
             {
                 "command": "dafny.uninstallDafny",
                 "icon": "$(issue-reopened)",
-                "title": "Uninstall DafnyServer"
+                "title": "Dafny: Uninstall Dafny"
             }
         ]
     },
