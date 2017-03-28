@@ -4,11 +4,12 @@ import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
 import { DAFNYMODE, GoDefinitionProvider } from "./Backend/Features/definitionProvider";
-import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
-import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
+//import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
+//import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
+
 export function activate(context: vscode.ExtensionContext): void {
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
@@ -34,10 +35,10 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
             DAFNYMODE, new GoDefinitionProvider()));
-    context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
-    context.subscriptions.push(
-        vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
+    //context.subscriptions.push(
+    //    vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
+    //context.subscriptions.push(
+    //    vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
     });
