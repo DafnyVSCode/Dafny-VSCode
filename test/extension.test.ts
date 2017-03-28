@@ -5,46 +5,54 @@
 
 // the module 'assert' provides assertion methods from node
 import * as assert from "assert";
+import * as vscode from "vscode";
+import {Context} from "../src/Backend/context";
+import {DafnyServer} from "../src/Backend/dafnyServer";
+import {Statusbar} from "../src/Frontend/dafnyStatusbar";
 
-// defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+const extensionID = "FunctionalCorrectness.dafny-vscode";
+const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + '/test/sampleFolder/';
+const tempFolder = samplesFolder ;//+ 'temp/';
 
-    // defines a Mocha unit test
-    test("Something 1", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+function verifyFile(startFilePath: string, expectedResult: any) {
+    let editor: vscode.TextEditor;
+    const workingFilePath = tempFolder + startFilePath;
+
+    const context: Context = new Context();
+    const statusbar: Statusbar = new Statusbar(context);
+    const dafnyServer = new DafnyServer(statusbar, context);
+    let actual: any = null;
+
+    const testPromise = vscode.workspace.openTextDocument(workingFilePath).then((workingDocument) => {
+        return vscode.window.showTextDocument(workingDocument);
+    }).then((_editor) => {
+        editor = _editor;
+        dafnyServer.reset();
+        dafnyServer.addDocument(_editor.document);
+        return new Promise((f) => setTimeout(f, 10000));
+    }).then(() => {
+        const result = context.verificationResults.latestResults[editor.document.fileName];
+        actual = result;
+    }).then(() => {
+        return;
+    }).then(() => {
+        return vscode.commands.executeCommand("workbench.action.closeActiveEditor");
     });
 
-    // Defines a Mocha unit test
-    test("Something 2", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+    return testPromise.then(() => {
+        assert.deepEqual(actual, expectedResult);
     });
+}
 
-    // Defines a Mocha unit test
-    test("Something 3", () => {
-        assert.equal(true, true);
+suite("DafnyServer Tests", function () {
+
+    test("Verify simple.dfy", function () {
+        this.timeout(30000);
+        return verifyFile("simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
     });
-
+    test("Verify simple_invalid_assert.dfy", function () {
+        this.timeout(30000);
+        return verifyFile("simple_invalid_assert.dfy", { crashed: false, errorCount: 1, proofObligations: 1 });
+    });
 });
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests 2", () => {
-
-    // Defines a Mocha unit test
-    test("Something 4", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
-    });
-
-    // Defines a Mocha unit test
-    test("Something 5", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
-    });
-
-    // Defines a Mocha unit test
-    test("Something 6", () => {
-        assert.equal(true, true);
-    });
-});
