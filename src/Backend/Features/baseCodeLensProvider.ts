@@ -1,18 +1,8 @@
 "use strict";
 
 import * as cp from "child_process";
-import {
-    CodeLens,
-    CodeLensProvider,
-    Event,
-    EventEmitter,
-    Position,
-    Range,
-    TextDocument,
-    Uri,
-    window,
-    workspace
-} from "vscode";
+import {CodeLens, CodeLensProvider, Event, EventEmitter, Position, Range,
+    TextDocument, Uri, window, workspace } from "vscode";
 import { ProcessWrapper } from "./../../Process/process";
 import { Verification } from "./../../Strings/regexRessources";
 import { encodeBase64 } from "./../../Strings/stringEncoding";
