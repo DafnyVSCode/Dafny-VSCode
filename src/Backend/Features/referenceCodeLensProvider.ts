@@ -91,15 +91,20 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
         if(serverProc.outBuf.indexOf("REFERENCE_START") > -1) {
             const info = serverProc.outBuf.substring("REFERENCE_START".length, serverProc.outBuf.indexOf("REFERENCE_END"));
             console.log(info);
-            const referenceInfo = this.parseReferenceResponse(info, file);
-            console.log(referenceInfo);
-            serverProc.clearBuffer();
+            if(info.length % 4 === 0) {
+                const referenceInfo = this.parseReferenceResponse(info, file);
+                console.log(referenceInfo);
+                serverProc.clearBuffer();
 
-            if(referenceInfo) {
-                callback(referenceInfo);
+                if(referenceInfo) {
+                    callback(referenceInfo);
+                } else {
+                    callback(null);
+                }
             } else {
                 callback(null);
             }
+
         }
         console.log(log);
         this.serverProc.clearBuffer();

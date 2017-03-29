@@ -177,6 +177,9 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
     }
 
     private parseResponse(response: string): CodeLensInformtation {
+        if(response.length % 4 !== 0) {
+            return null;
+        }
         const responseJson =  decodeBase64(response);
         return new CodeLensInformtation(responseJson);
     }

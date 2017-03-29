@@ -3,13 +3,15 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
-import { DAFNYMODE, GoDefinitionProvider } from "./Backend/features/definitionProvider";
+import { DAFNYMODE } from "./Backend/features/definitionProvider";
+import { DafnyDefinitionProvider } from "./Backend/Features/definitionProvider";
 import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
 import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
 export function activate(context: vscode.ExtensionContext): void {
+
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
     dependencyVerifier.verifyDafnyServer(() => {
@@ -33,7 +35,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(restartServerCommand);
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
-            DAFNYMODE, new GoDefinitionProvider()));
+            DAFNYMODE, new DafnyDefinitionProvider()));
     context.subscriptions.push(
         vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
     context.subscriptions.push(

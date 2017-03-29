@@ -3,14 +3,14 @@
 import { CodeLens, Location, Range, Uri } from "vscode";
 import { ReferencesCodeLens } from "./baseCodeLensProvider";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
-import { GoDefinitionInformtation } from "./definitionProvider";
-import { GoDefinitionProvider } from "./definitionProvider";
+import { DafnyDefinitionInformtation } from "./definitionProvider";
+import { DafnyDefinitionProvider } from "./definitionProvider";
 export class DafnyImplementationsCodeLensProvider extends DafnyBaseCodeLensProvider {
-    private definitionProvider = new GoDefinitionProvider();
+    private definitionProvider = new DafnyDefinitionProvider();
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
         return this.definitionProvider.provideDefinitionInternalDirectly(codeLens.file, codeLens.symbol, true)
-        .then((defintion: GoDefinitionInformtation) => {
+        .then((defintion: DafnyDefinitionInformtation) => {
             if (!defintion) {
                 throw codeLens;
             }

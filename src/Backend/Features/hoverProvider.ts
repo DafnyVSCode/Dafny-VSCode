@@ -1,10 +1,10 @@
 "use strict";
 
 import { Hover, HoverProvider, Location, Position, TextDocument } from "vscode";
-import { GoDefinitionProvider } from "./definitionProvider";
+import { DafnyDefinitionProvider } from "./definitionProvider";
 
 export class DafnyHoverProvider implements HoverProvider {
-    private goDefinitionProvider = new GoDefinitionProvider();
+    private goDefinitionProvider = new DafnyDefinitionProvider();
 
     public provideHover(document: TextDocument, position: Position): Promise<Hover | undefined | null> {
         const filepath = document.fileName;

@@ -10,7 +10,7 @@ import { isPositionInString } from "./../../Strings/StringUtils";
 import { Environment } from "./../environment";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
-export class GoDefinitionInformtation {
+export class DafnyDefinitionInformtation {
     public file: string;
     public line: number;
     public column: number;
@@ -46,9 +46,10 @@ interface DefinitionTask {
     word: string;
 }
 
-export class GoDefinitionProvider implements vscode.DefinitionProvider {
+export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     private serverProc: ProcessWrapper;
     private environment: Environment = new Environment();
+
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position):
     Thenable<vscode.Location> {
         return this.provideDefinitionInternal(document, position).then((definitionInfo) => {
@@ -67,8 +68,8 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     public provideDefinitionInternal(
-        document: vscode.TextDocument, position: vscode.Position): Promise<GoDefinitionInformtation> {
-            return new Promise<GoDefinitionInformtation>((resolve, reject) => {
+        document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
+            return new Promise<DafnyDefinitionInformtation>((resolve, reject) => {
                 const wordRange = document.getWordRangeAtPosition(position);
                 const lineText = document.lineAt(position.line).text;
                 const word = wordRange ? document.getText(wordRange) : "";
@@ -80,7 +81,7 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
         });
     }
     public provideDefinitionInternalDirectly(fileName: string, symbol: string, restartServer: boolean) {
-        return new Promise<GoDefinitionInformtation>((resolve, reject) => {
+        return new Promise<DafnyDefinitionInformtation>((resolve, reject) => {
                 return this.askDafnyDef(resolve, reject, fileName, symbol, restartServer);
         });
     }
@@ -146,9 +147,9 @@ export class GoDefinitionProvider implements vscode.DefinitionProvider {
         this.serverProc.clearBuffer();
     }
 
-    private parseResponse(response: string): GoDefinitionInformtation {
+    private parseResponse(response: string): DafnyDefinitionInformtation {
         const responseJson =  decodeBase64(response);
-        return new GoDefinitionInformtation(responseJson);
+        return new DafnyDefinitionInformtation(responseJson);
     }
     private handleProcessExit() {
         if(this.serverIsAlive()) {
