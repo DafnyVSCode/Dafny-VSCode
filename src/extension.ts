@@ -7,9 +7,11 @@ import { DAFNYMODE } from "./Backend/features/definitionProvider";
 import { DafnyDefinitionProvider } from "./Backend/Features/definitionProvider";
 import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
 import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
+
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
 import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
+
 export function activate(context: vscode.ExtensionContext): void {
 
     let provider: DafnyDiagnosticsProvider = null;
@@ -35,11 +37,13 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(restartServerCommand);
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
+
             DAFNYMODE, new DafnyDefinitionProvider()));
     context.subscriptions.push(
         vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
     context.subscriptions.push(
         vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
+
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
     });

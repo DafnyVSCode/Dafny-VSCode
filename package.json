@@ -2,7 +2,7 @@
   "name": "dafny-vscode",
   "displayName": "Dafny VSCode",
   "description": "Dafny support for Visual Studio Code",
-  "version": "0.5.3",
+  "version": "0.7.2",
   "publisher": "FunctionalCorrectness",
   "homepage": "https://github.com/FunctionalCorrectness/",
   "repository": {
@@ -75,21 +75,6 @@
           "type": "number",
           "default": 700,
           "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
-        },
-        "languageServer.maxNumberOfProblems": {
-          "type": "number",
-          "default": 100,
-          "descripiton": "Controls the maximum number of problems produced by the server."
-        },
-        "languageServer.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "description": "Traces the communication between VSCode and the languageServerExample service."
         }
       }
     },
@@ -97,17 +82,17 @@
       {
         "command": "dafny.restartDafnyServer",
         "icon": "$(issue-reopened)",
-        "title": "Restart DafnyServer"
+        "title": "Dafny: Restart DafnyServer"
       },
       {
         "command": "dafny.installDafny",
         "icon": "$(issue-reopened)",
-        "title": "Install DafnyServer"
+        "title": "Dafny: Install Dafny"
       },
       {
         "command": "dafny.uninstallDafny",
         "icon": "$(issue-reopened)",
-        "title": "Uninstall DafnyServer"
+        "title": "Dafny: Uninstall Dafny"
       }
     ]
   },
@@ -125,13 +110,11 @@
     "@types/node": "^6.0.40",
     "mocha": "^2.3.3",
     "typescript": "^2.0.3",
-    "typescript-collections": "^1.2.3",
     "vscode": "^1.0.0"
   },
   "dependencies": {
-    "base64-js": "*",
-    "cancellation": "^1.0.0",
     "utf8": "*",
-    "vscode": "^1.0.0"
+    "base64-js": "*",
+    "typescript-collections": "^1.2.3"
   }
 }

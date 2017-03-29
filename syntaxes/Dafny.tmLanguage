@@ -42,13 +42,6 @@
 			<string>keyword.control.dafny</string>
 		</dict>
 		<dict>
-			<key>match</key>
-			<string>&lt;.+?&gt;</string>
-			<key>name</key>
-			<string>storage.type.dafny</string>
-		</dict>
-
-		<dict>
 			<key>begin</key>
 			<string>(\w+)\s*\(</string>
 			<key>beginCaptures</key>

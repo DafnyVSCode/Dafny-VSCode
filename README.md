@@ -14,7 +14,6 @@ Dafny support for Visual Studio Code.
 * Left hand side status bar item provides information about the current file.
 * Right hand size status bar item relates to the state of the DafnyServer.
 
-
 ![assertions animation](example.gif)
 
 ## Tasks
@@ -63,5 +62,6 @@ The following are optional:
 
 
 ## TODO
-* context aware suggestions.
-* full context awareness, code completion.
+* CodeLens
+* Context aware suggestions.
+* Full context awareness, code completion.
