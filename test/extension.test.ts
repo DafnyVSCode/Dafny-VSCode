@@ -8,8 +8,8 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import {Context} from "../src/Backend/context";
 import {DafnyServer} from "../src/Backend/dafnyServer";
-import {Statusbar} from "../src/Frontend/dafnyStatusbar";
 import {DafnyDefinitionProvider} from "../src/Backend/Features/definitionProvider"
+import {Statusbar} from "../src/Frontend/dafnyStatusbar";
 
 const extensionID = "FunctionalCorrectness.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + '/test/sampleFolder/';
