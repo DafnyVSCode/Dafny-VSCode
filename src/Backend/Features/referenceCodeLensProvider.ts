@@ -76,8 +76,13 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
             source: codeLens.source,
             sourceIsFile: false
         };
-        const encoded = encodeBase64(task);
-        serverProc.writeReferenceRequestToDafnyServer(encoded);
+        try {
+            const encoded = encodeBase64(task);
+            serverProc.writeReferenceRequestToDafnyServer(encoded);
+            serverProc.clearBuffer();
+        } catch(exception) {
+            console.error("Unable to encode request: " + exception);
+        }
     }
 
     private handleProcessReferenceError(err: Error): void {
@@ -91,20 +96,19 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
         if(serverProc.outBuf.indexOf("REFERENCE_START") > -1) {
             const info = serverProc.outBuf.substring("REFERENCE_START".length, serverProc.outBuf.indexOf("REFERENCE_END"));
             console.log(info);
-            if(info.length % 4 === 0) {
+            try {
                 const referenceInfo = this.parseReferenceResponse(info, file);
                 console.log(referenceInfo);
                 serverProc.clearBuffer();
-
                 if(referenceInfo) {
                     callback(referenceInfo);
                 } else {
                     callback(null);
                 }
-            } else {
+            } catch(exception) {
+                console.error("Unable to parse response: " + exception);
                 callback(null);
             }
-
         }
         console.log(log);
         this.serverProc.clearBuffer();

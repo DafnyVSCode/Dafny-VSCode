@@ -123,9 +123,13 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         if(this.environment.usesMono) {
             task.monoPath = this.environment.getMonoPath();
         }
-        const encoded = encodeBase64(task);
-        this.serverProc.clearBuffer();
-        this.serverProc.writeDefinitionRequestToDafnyDef(encoded);
+        try {
+            const encoded = encodeBase64(task);
+            this.serverProc.clearBuffer();
+            this.serverProc.writeDefinitionRequestToDafnyDef(encoded);
+        } catch(exp) {
+            console.error("Could not send request, error:" + exp);
+        }
     }
 
     private handleProcessError(err: Error): void {
@@ -136,12 +140,18 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     private handleProcessData(callback: (data: any) => any): void {
         const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
         if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-            if(definitionInfo.isValid()) {
-                callback(definitionInfo);
-            } else {
+            try {
+                const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
+                if(definitionInfo.isValid()) {
+                    callback(definitionInfo);
+                } else {
+                    callback(null);
+                }
+            } catch(exp) {
+                console.error(exp);
                 callback(null);
             }
+
         }
         console.log(log);
         this.serverProc.clearBuffer();
