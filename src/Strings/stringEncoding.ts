@@ -30,4 +30,3 @@ export function decodeBase64(task: string): any {
     }
     return JSON.parse(ret);
 }
-

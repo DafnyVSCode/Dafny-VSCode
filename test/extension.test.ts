@@ -11,8 +11,8 @@ import {DafnyServer} from "../src/Backend/dafnyServer";
 import {Statusbar} from "../src/Frontend/dafnyStatusbar";
 
 const extensionID = "FunctionalCorrectness.dafny-vscode";
-const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + '/test/sampleFolder/';
-const tempFolder = samplesFolder ;//+ 'temp/';
+const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
+const tempFolder = samplesFolder;
 
 function verifyFile(startFilePath: string, expectedResult: any) {
     let editor: vscode.TextEditor;
@@ -44,15 +44,13 @@ function verifyFile(startFilePath: string, expectedResult: any) {
     });
 }
 
-suite("DafnyServer Tests", function () {
-
-    test("Verify simple.dfy", function () {
+suite("DafnyServer Tests", () => {
+    test("Verify simple.dfy", function() {
         this.timeout(30000);
         return verifyFile("simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
     });
-    test("Verify simple_invalid_assert.dfy", function () {
+    test("Verify simple_invalid_assert.dfy", function() {
         this.timeout(30000);
         return verifyFile("simple_invalid_assert.dfy", { crashed: false, errorCount: 1, proofObligations: 1 });
     });
 });
-

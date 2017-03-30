@@ -142,9 +142,13 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         if(this.environment.usesMono) {
             task.monoPath = this.environment.getMonoPath();
         }
-        const encoded = encodeBase64(task);
-        this.serverProc.clearBuffer();
-        this.serverProc.writeGetDefinitionsRequestToDafnyDef(encoded);
+        try {
+            const encoded = encodeBase64(task);
+            this.serverProc.clearBuffer();
+            this.serverProc.writeGetDefinitionsRequestToDafnyDef(encoded);
+        } catch(exception) {
+            console.error("Unable to encode request task:" + exception);
+        }
     }
 
     private handleProcessError(err: Error): void {
@@ -155,10 +159,15 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
     private handleProcessData(callback: (data: any) => any): void {
         const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
         if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-            if(definitionInfo) {
-                callback(definitionInfo);
-            } else {
+            try {
+                const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
+                if(definitionInfo) {
+                    callback(definitionInfo);
+                } else {
+                    callback(null);
+                }
+            } catch(exception) {
+                console.error("Unable to parse response: " + exception);
                 callback(null);
             }
         }
