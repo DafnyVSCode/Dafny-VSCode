@@ -11,26 +11,14 @@ import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { Environment } from "./../environment";
 
 export class ReferencesCodeLens extends CodeLens {
-    constructor(public document: Uri, public file: string, range: Range, public symbol: string,
-                public module: string, public parentClass: string, public source: string) {
-        super(range);
+    constructor(public document: Uri, public codeLensInfo: CodeLensInfo, public source: string) {
+        super(codeLensInfo.range);
     }
 }
 
 export class CodeLensInfo {
-    public filePath: string;
-    public position: Range;
-    public symbol: string;
-    public module: string;
-    public parentClass: string;
-    public source: string;
-    public constructor(filePath: string, start: Position, end: Position, symbol: string,
-                       module: string, parentClass: string) {
-        this.filePath = filePath;
-        this.position = new Range(start, end);
-        this.symbol = symbol;
-        this.module = module;
-        this.parentClass = parentClass;
+    public constructor(public filePath: string, public range: Range, public symbol: string,
+                       public module: string, public parentClass: string) {
     }
 }
 export class CodeLensInformtation {
@@ -48,7 +36,7 @@ export class CodeLensInformtation {
                             const end = new Position(line, column + Number(symbolInfo.Name.length));
                             const path = String(symbolDef.FilePath);
                             if(symbolInfo.Module && symbolInfo.ParentClass) {
-                                this.lenses.push(new CodeLensInfo(path, start, end, symbolInfo.Name,
+                                this.lenses.push(new CodeLensInfo(path, new Range(start, end), symbolInfo.Name,
                                 symbolInfo.Module, symbolInfo.ParentClass));
                             }
                         }
@@ -91,16 +79,13 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         }
         return this.provideDefinitionInternal(document).then((definitions: CodeLensInformtation) => {
             if (definitions == null || definitions.lenses == null) {
-                return Promise.resolve(null);
+                return Promise.resolve([]);
             }
             return definitions.lenses.map((info: CodeLensInfo) =>
-            new ReferencesCodeLens(document.uri, info.filePath, info.position, info.symbol,
-            info.module, info.parentClass, document.getText()));
+            new ReferencesCodeLens(document.uri, info, document.getText()));
 
         }, (err: any) => {
-            if (err) {
-                console.log(err);
-            }
+            console.error(err);
             return Promise.resolve(null);
         });
     }
@@ -159,29 +144,26 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
     private handleProcessData(callback: (data: any) => any): void {
         const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
         if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            try {
-                const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-                if(definitionInfo) {
-                    callback(definitionInfo);
-                } else {
-                    callback(null);
-                }
-            } catch(exception) {
-                console.error("Unable to parse response: " + exception);
+            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
+            if(definitionInfo) {
+                callback(definitionInfo);
+            } else {
                 callback(null);
             }
         }
-        console.log(log);
         this.serverProc.clearBuffer();
     }
 
     private parseResponse(response: string): CodeLensInformtation {
-        if(response.length % 4 !== 0) {
+        try {
+            const responseJson =  decodeBase64(response);
+            return new CodeLensInformtation(responseJson);
+        } catch(exception) {
+            console.error("Failure  to parse response: " + exception);
             return null;
         }
-        const responseJson =  decodeBase64(response);
-        return new CodeLensInformtation(responseJson);
     }
+
     private handleProcessExit() {
         if(this.serverIsAlive()) {
             this.serverProc.killServerProc();

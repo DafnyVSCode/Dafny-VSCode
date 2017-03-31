@@ -9,13 +9,13 @@ export class DafnyImplementationsCodeLensProvider extends DafnyBaseCodeLensProvi
     private definitionProvider = new DafnyDefinitionProvider();
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
-        return this.definitionProvider.provideDefinitionInternalDirectly(codeLens.file, codeLens.symbol, true)
+        return this.definitionProvider.provideDefinitionInternalDirectly(codeLens.codeLensInfo.filePath, codeLens.codeLensInfo.symbol, true)
         .then((defintion: DafnyDefinitionInformtation) => {
             if (!defintion) {
                 throw codeLens;
             }
-            const location = new Location(Uri.file(defintion.file), new Range(defintion.line,
-                defintion.column, defintion.line, defintion.column + defintion.name.length));
+            const location = new Location(Uri.file(defintion.file), new Range(defintion.position.line,
+                defintion.position.character, defintion.position.line, defintion.position.character + defintion.name.length));
             const locations = [location];
             codeLens.command = {
                 arguments: [codeLens.document, codeLens.range.start, locations],

@@ -8,7 +8,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import {Context} from "../src/Backend/context";
 import {DafnyServer} from "../src/Backend/dafnyServer";
-import {DafnyDefinitionProvider} from "../src/Backend/Features/definitionProvider"
+import {DafnyDefinitionProvider} from "../src/Backend/Features/definitionProvider";
 import {Statusbar} from "../src/Frontend/dafnyStatusbar";
 
 const extensionID = "FunctionalCorrectness.dafny-vscode";
@@ -68,22 +68,26 @@ function verifyFile(startFilePath: string, expectedResult: any) {
 }
 
 suite("DafnyServer Tests", () => {
+    // tslint:disable-next-line:only-arrow-functions
     test("Verify simple.dfy", function() {
         this.timeout(30000);
         return verifyFile("simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
     });
+    // tslint:disable-next-line:only-arrow-functions
     test("Verify simple_invalid_assert.dfy", function() {
         this.timeout(30000);
         return verifyFile("simple_invalid_assert.dfy", { crashed: false, errorCount: 1, proofObligations: 1 });
     });
 });
 
-suite("DafnyDef Tests", function() {
+suite("DafnyDef Tests", () => {
+    // tslint:disable-next-line:only-arrow-functions
     test("Verify go to definition", function() {
         this.timeout(30000);
         return getProvider("gotodefinition.dfy", new vscode.Position(6, 13),
             {_end: new vscode.Position(1, 11), _start: new vscode.Position(1, 11)});
     });
+    // tslint:disable-next-line:only-arrow-functions
     test("Verify go to definition, not available", function() {
         this.timeout(30000);
         return getProvider("gotodefinition.dfy", new vscode.Position(14, 14),

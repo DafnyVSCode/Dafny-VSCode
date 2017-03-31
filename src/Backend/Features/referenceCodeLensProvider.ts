@@ -1,8 +1,7 @@
-
 "use strict";
 
 import * as cp from "child_process";
-import { CodeLens, Location, Range, Uri, window } from "vscode";
+import { CodeLens, Location, Position, Range, Uri, window } from "vscode";
 import { ProcessWrapper } from "./../../Process/process";
 import { Verification } from "./../../Strings/regexRessources";
 import { encodeBase64 } from "./../../Strings/stringEncoding";
@@ -15,7 +14,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private servers: ProcessWrapper[] = [];
     public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
             return new Promise<ReferenceInformation[]>((resolve, reject) => {
-                if(!codeLens.file || !codeLens.symbol) {
+                if(!codeLens.codeLensInfo) {
                     return resolve(null);
                 }
                 return this.askDafnyDefForReference(resolve, reject, codeLens);
@@ -31,8 +30,8 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             }
             const locations: Location[] = [];
             for(const info of referenceInfo) {
-                locations.push(new Location(Uri.file(info.file), new Range(info.line, info.column,
-                info.line, info.column + info.methodName.length)));
+                locations.push(new Location(Uri.file(info.file), new Range(info.position.line, info.position.character,
+                info.position.line, info.position.character + info.methodName.length)));
             }
             codeLens.command = {
                 arguments: [codeLens.document, codeLens.range.start, locations],
@@ -63,16 +62,16 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
                     return reject(null);
                 }
                 return resolve(data);
-            }, serverProc, codeLens.file); },
+            }, serverProc, codeLens.codeLensInfo.filePath); },
             () => { this.handleProcessReferenceExit(); },
             Verification.commandEndRegexDafnyServer
         );
 
         this.servers.push(serverProc);
         const task: ReferenceTask = {
-            args: [codeLens.module, codeLens.parentClass, codeLens.symbol],
-            fileName: codeLens.file,
-            filename: codeLens.file,
+            args: [codeLens.codeLensInfo.module, codeLens.codeLensInfo.parentClass, codeLens.codeLensInfo.symbol],
+            fileName: codeLens.codeLensInfo.filePath,
+            filename: codeLens.codeLensInfo.filePath,
             source: codeLens.source,
             sourceIsFile: false
         };
@@ -139,17 +138,16 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
 
 export class ReferenceInformation {
     public file: string;
-    public line: number;
     public methodName: string;
-    public position: number;
-    public column: number;
-
+    public loc: number;
+    public position: Position;
     constructor(dafnyReference: any, file: string) {
          if(dafnyReference) {
             this.methodName = dafnyReference.MethodName;
-            this.position = dafnyReference.Position;
-            this.line = parseInt(dafnyReference.Line, 10) - 1; // 1 based
-            this.column = Math.max(0, parseInt(dafnyReference.Column, 10) - 1); // ditto, but 0 can appear in some cases
+            this.loc = dafnyReference.Position;
+            const line = parseInt(dafnyReference.Line, 10) - 1; // 1 based
+            const column = Math.max(0, parseInt(dafnyReference.Column, 10) - 1); // ditto, but 0 can appear in some cases
+            this.position = new Position(line, column);
             this.file = file;
         }
     }

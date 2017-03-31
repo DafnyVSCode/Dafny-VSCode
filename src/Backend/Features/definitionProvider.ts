@@ -12,22 +12,22 @@ import { Environment } from "./../environment";
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class DafnyDefinitionInformtation {
     public file: string;
-    public line: number;
-    public column: number;
+    public position: vscode.Position;
     public doc: string;
     public declarationlines: string[];
     public name: string;
     public toolUsed: string;
     public isValid(): boolean {
-        return this.column > 0 && this.file !== "" && this.line > 0 && this.name !== "";
+        return this.position.character > 0 && this.file !== "" && this.position.line > 0 && this.name !== "";
     }
     constructor(dafnyDefResponse: any) {
          if(dafnyDefResponse.length && dafnyDefResponse.length > 0) {
             const firstMatch = dafnyDefResponse[0];
             if(firstMatch.SymbolInfos && firstMatch.SymbolInfos.length && firstMatch.SymbolInfos.length > 0) {
                 const symbolInfo = firstMatch.SymbolInfos[0];
-                this.line = parseInt(symbolInfo.Line, 10) - 1; // 1 based
-                this.column = Math.max(0, parseInt(symbolInfo.Column, 10) - 1); // ditto, but 0 can appear in some cases
+                const line = parseInt(symbolInfo.Line, 10) - 1; // 1 based
+                const column = Math.max(0, parseInt(symbolInfo.Column, 10) - 1); // ditto, but 0 can appear in some cases
+                this.position = new vscode.Position(line, column);
                 this.declarationlines = firstMatch.Symbol;
                 this.doc = firstMatch.Symbol;
                 this.file = firstMatch.FilePath;
@@ -52,17 +52,14 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
 
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position):
     Thenable<vscode.Location> {
-        return this.provideDefinitionInternal(document, position).then((definitionInfo) => {
+        return this.provideDefinitionInternal(document, position).then((definitionInfo: DafnyDefinitionInformtation) => {
             if (definitionInfo == null || definitionInfo.file == null) {
                 return Promise.resolve(null);
             }
             const definitionResource = vscode.Uri.file(definitionInfo.file);
-            const pos = new vscode.Position(definitionInfo.line, definitionInfo.column);
-            return new vscode.Location(definitionResource, pos);
+            return new vscode.Location(definitionResource, definitionInfo.position);
         }, (err) => {
-            if (err) {
-                console.log(err);
-            }
+            console.error(err);
             return Promise.resolve(null);
         });
     }
@@ -75,7 +72,7 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
                 const word = wordRange ? document.getText(wordRange) : "";
                 if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
                     || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
-                    return Promise.resolve(null);
+                    return Promise.reject(null);
                 }
                 return this.askDafnyDef(resolve, reject, document.fileName, word);
         });
@@ -140,27 +137,26 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     private handleProcessData(callback: (data: any) => any): void {
         const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
         if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            try {
-                const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-                if(definitionInfo.isValid()) {
-                    callback(definitionInfo);
-                } else {
-                    callback(null);
-                }
-            } catch(exp) {
-                console.error(exp);
+            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
+            if(definitionInfo.isValid()) {
+                callback(definitionInfo);
+            } else {
                 callback(null);
             }
-
         }
-        console.log(log);
         this.serverProc.clearBuffer();
     }
 
     private parseResponse(response: string): DafnyDefinitionInformtation {
-        const responseJson =  decodeBase64(response);
-        return new DafnyDefinitionInformtation(responseJson);
+        try {
+            const responseJson =  decodeBase64(response);
+            return new DafnyDefinitionInformtation(responseJson);
+        } catch(exception) {
+            console.error("Unable to parse response: " + exception);
+            return null;
+        }
     }
+
     private handleProcessExit() {
         if(this.serverIsAlive()) {
             this.serverProc.killServerProc();
