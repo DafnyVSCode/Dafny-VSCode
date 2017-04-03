@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import {IncorrectPathExeption} from "../ErrorHandling/errors";
 import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
-import { encodeBase64 } from "../Strings/stringEncoding";
+import { encodeBase64/*, decodeBase64*/ } from "../Strings/stringEncoding";
 import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
 import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
@@ -63,8 +63,8 @@ export class DafnyServer {
         return this.isRunning() ? this.serverProc.pid : -1;
     }
 
-    public addDocument(doc: vscode.TextDocument): void {
-        const request: VerificationRequest = new VerificationRequest(doc.getText(), doc);
+    public addDocument(doc: vscode.TextDocument, verb: string, callback?: ((data: any) => any), error?: ((data: any) => any)): void {
+        const request: VerificationRequest = new VerificationRequest(doc.getText(), doc, verb, callback, error);
         this.context.enqueueRequest(request);
         this.statusbar.update();
         this.sendNextRequest();
@@ -102,14 +102,24 @@ export class DafnyServer {
     private handleProcessError(err: Error): void {
         vscode.window.showErrorMessage("DafnyServer process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
+        this.context.activeRequest.error(err);
+
+        this.statusbar.changeServerStatus(StatusString.Idle);
+        this.active = false;
+        this.context.activeRequest = null;
+        this.sendNextRequest();
     }
 
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
-            // parse output
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
             console.log(log);
-            this.context.collectRequest(log);
+            if(this.context.activeRequest.verb === "verify") {
+                this.context.collectRequest(log);
+            } else {
+                this.context.activeRequest.callback(log);
+                this.context.activeRequest = null;
+            }
             this.serverProc.clearBuffer();
             this.statusbar.update();
         }
@@ -170,7 +180,9 @@ export class DafnyServer {
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {
-        this.statusbar.changeServerStatus(StatusString.Verifying);
+        if(request.verb === "verify") {
+            this.statusbar.changeServerStatus(StatusString.Verifying);
+        }
         const task: IVerificationTask = {
             args: [],
             filename: request.document.fileName,
@@ -180,7 +192,7 @@ export class DafnyServer {
         const encoded: string = encodeBase64(task);
         if(this.isRunning()) {
             this.serverProc.clearBuffer();
-            this.serverProc.writeVerificationRequestToDafnyServer(encoded);
+            this.serverProc.writeVerificationRequestToDafnyServer(encoded, request.verb);
         }
         request.timeSent = Date.now();
     }

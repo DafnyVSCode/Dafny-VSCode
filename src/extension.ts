@@ -3,13 +3,9 @@
 import * as vscode from "vscode";
 import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
-import { DAFNYMODE } from "./Backend/Features/definitionProvider";
-import { DafnyDefinitionProvider } from "./Backend/Features/definitionProvider";
-import { DafnyHoverProvider } from "./Backend/Features/hoverProvider";
-import { DafnyReferencesCodeLensProvider } from "./Backend/Features/referenceCodeLensProvider";
 
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
-import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
+import { ErrorMsg/*, InfoMsg*/ } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -17,12 +13,13 @@ export function activate(context: vscode.ExtensionContext): void {
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
     dependencyVerifier.verifyDafnyServer(() => {
-        dependencyVerifier.verifyDafnyDef(() => {
+        /*dependencyVerifier.verifyDafnyDef(() => {
             init();
         }, () => {
             vscode.window.showErrorMessage(ErrorMsg.DafnyDefMissing);
             askToInstall();
-        });
+        });*/
+        init();
     }, () => {
         vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
         askToInstall();
@@ -35,14 +32,6 @@ export function activate(context: vscode.ExtensionContext): void {
         return false;
     });
     context.subscriptions.push(restartServerCommand);
-    context.subscriptions.push(
-        vscode.languages.registerDefinitionProvider(
-
-            DAFNYMODE, new DafnyDefinitionProvider()));
-    context.subscriptions.push(
-        vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider()));
-    context.subscriptions.push(
-        vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
 
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
@@ -61,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): void {
     function init() {
         try {
             if(!provider) {
-                provider = new DafnyDiagnosticsProvider();
+                provider = new DafnyDiagnosticsProvider(context);
                 provider.activate(context.subscriptions);
                 context.subscriptions.push(provider);
                 provider.resetServer();
@@ -87,12 +76,13 @@ export function activate(context: vscode.ExtensionContext): void {
 
             const verifier: DependencyVerifier = new DependencyVerifier();
             verifier.verifyDafnyServer(() => {
-                verifier.verifyDafnyDef(() => {
+                /*verifier.verifyDafnyDef(() => {
                     vscode.window.showInformationMessage(InfoMsg.DafnyInstallationSucceeded);
                     init();
                 }, () => {
                     vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
-                });
+                });*/
+                init();
             }, () => {
                 vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
             });

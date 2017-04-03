@@ -21,14 +21,14 @@ export class DependencyVerifier {
         this.verify(dafnyCommand, spawnOptions);
     }
 
-    public verifyDafnyDef(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+    /*public verifyDafnyDef(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
         const spawnOptions = this.environment.getStandardSpawnOptions();
-        const dafnyCommand: Command = this.environment.getStartDafnyDefCommand();
+        const dafnyCommand: Command = this.environment.getStartDafnyCommand();
         this.callbackError = callbackError;
         this.callbackSuccess = callbackSuccess;
 
         this.verify(dafnyCommand, spawnOptions);
-    }
+    }*/
 
     private verify(command: Command, spawnOptions: cp.SpawnOptions): void {
         try {

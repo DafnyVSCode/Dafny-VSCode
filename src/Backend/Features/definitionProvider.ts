@@ -1,13 +1,14 @@
-import * as cp from "child_process";
+//import * as cp from "child_process";
 import * as vscode from "vscode";
+import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../LanguageDefinition/keywords";
-import { ProcessWrapper } from "./../../Process/process";
-import { Verification } from "./../../Strings/regexRessources";
-import { encodeBase64 } from "./../../Strings/stringEncoding";
-import { decodeBase64 } from "./../../Strings/stringEncoding";
+//import { ProcessWrapper } from "./../../Process/process";
+//import { Verification } from "./../../Strings/regexRessources";
+//import { decodeBase64 } from "./../../Strings/stringEncoding";
+//import { encodeBase64 } from "./../../Strings/stringEncoding";
 import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { isPositionInString } from "./../../Strings/StringUtils";
-import { Environment } from "./../environment";
+//import { Environment } from "./../environment";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class DafnyDefinitionInformtation {
@@ -38,17 +39,19 @@ export class DafnyDefinitionInformtation {
     }
 }
 
-interface DefinitionTask {
+/*interface DefinitionTask {
     args: string[];
     baseDir: string;
     fileName: string;
     monoPath?: string;
     word: string;
-}
+}*/
 
 export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
-    private serverProc: ProcessWrapper;
-    private environment: Environment = new Environment();
+    //private serverProc: ProcessWrapper;
+    //private environment: Environment = new Environment();
+
+    public constructor(public server: DafnyServer) {}
 
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position):
     Thenable<vscode.Location> {
@@ -74,15 +77,23 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
                     || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
                     return Promise.reject(null);
                 }
-                return this.askDafnyDef(resolve, reject, document.fileName, word);
+                return this.askDafnyDef(resolve, reject, document, word);
         });
     }
-    public provideDefinitionInternalDirectly(fileName: string, symbol: string, restartServer: boolean) {
+    public provideDefinitionInternalDirectly(document: vscode.TextDocument, symbol: string) {
         return new Promise<DafnyDefinitionInformtation>((resolve, reject) => {
-                return this.askDafnyDef(resolve, reject, fileName, symbol, restartServer);
+                return this.askDafnyDef(resolve, reject, document, symbol);
         });
     }
-    private askDafnyDef(resolve: any, reject: any, file: string, symbol: any, restartServer: boolean = false) {
+
+    private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument, symbol: any) {
+        this.server.addDocument(document, "findReferences", (log) =>  {
+            console.log(log);
+            resolve(symbol);
+        }, () => {reject(null)});
+    }
+
+    /*private askDafnyDef(resolve: any, reject: any, file: string, symbol: any, restartServer: boolean = false) {
         if(restartServer || !this.serverIsAlive()) {
             const environment = new Environment();
             const command = environment.getStartDafnyDefCommand();
@@ -127,9 +138,9 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         } catch(exp) {
             console.error("Could not send request, error:" + exp);
         }
-    }
+    }*/
 
-    private handleProcessError(err: Error): void {
+    /*private handleProcessError(err: Error): void {
         vscode.window.showErrorMessage("DafnyDef process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
     }
@@ -145,9 +156,9 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             }
         }
         this.serverProc.clearBuffer();
-    }
+    }*/
 
-    private parseResponse(response: string): DafnyDefinitionInformtation {
+    /*private parseResponse(response: string): DafnyDefinitionInformtation {
         try {
             const responseJson =  decodeBase64(response);
             return new DafnyDefinitionInformtation(responseJson);
@@ -155,9 +166,9 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             console.error("Unable to parse response: " + exception);
             return null;
         }
-    }
+    }*/
 
-    private handleProcessExit() {
+    /*private handleProcessExit() {
         if(this.serverIsAlive()) {
             this.serverProc.killServerProc();
         }
@@ -166,5 +177,5 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
 
     private serverIsAlive(): boolean {
         return this.serverProc && this.serverProc.isAlive();
-    }
+    }*/
 }

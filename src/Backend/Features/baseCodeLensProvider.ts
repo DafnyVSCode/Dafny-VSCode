@@ -1,17 +1,14 @@
 "use strict";
 
-import * as cp from "child_process";
+import * as vscode from "vscode";
 import {CodeLens, CodeLensProvider, Event, EventEmitter, Position, Range,
-    TextDocument, Uri, window, workspace } from "vscode";
-import { ProcessWrapper } from "./../../Process/process";
-import { Verification } from "./../../Strings/regexRessources";
-import { encodeBase64 } from "./../../Strings/stringEncoding";
-import { decodeBase64 } from "./../../Strings/stringEncoding";
+    TextDocument, Uri } from "vscode";
+//import { decodeBase64 } from "./../../Strings/stringEncoding";
 import { EnvironmentConfig } from "./../../Strings/stringRessources";
-import { Environment } from "./../environment";
+import {DafnyServer} from "../dafnyServer";
 
 export class ReferencesCodeLens extends CodeLens {
-    constructor(public document: Uri, public codeLensInfo: CodeLensInfo, public source: string) {
+    constructor(public text: vscode.TextDocument, public document: Uri, public codeLensInfo: CodeLensInfo) {
         super(codeLensInfo.range);
     }
 }
@@ -47,17 +44,13 @@ export class CodeLensInformtation {
     }
 }
 
-interface GetDefinitionsTask {
-    args: string[];
-    baseDir: string;
-    fileName: string;
-    monoPath?: string;
-}
 export class DafnyBaseCodeLensProvider implements CodeLensProvider {
-    protected serverProc: ProcessWrapper;
-    protected environment: Environment = new Environment();
     private enabled: boolean = true;
     private onDidChangeCodeLensesEmitter = new EventEmitter<void>();
+
+    public constructor(public server: DafnyServer) {
+
+    }
 
     public get onDidChangeCodeLenses(): Event<void> {
         return this.onDidChangeCodeLensesEmitter.event;
@@ -82,7 +75,7 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
                 return Promise.resolve([]);
             }
             return definitions.lenses.map((info: CodeLensInfo) =>
-            new ReferencesCodeLens(document.uri, info, document.getText()));
+            new ReferencesCodeLens(document, document.uri, info));
 
         }, (err: any) => {
             console.error(err);
@@ -90,10 +83,17 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         });
     }
 
-    private askDafnyDef(resolve: any, reject: any, document: TextDocument) {
+    private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument) {
+        this.server.addDocument(document, "symbols", (log) =>  {
+            this.handleProcessData(log, ((data) => {resolve(data)}));
+
+        }, () => {reject(null)});
+    }
+
+    /*private askDafnyDef(resolve: any, reject: any, document: TextDocument) {
         if(!this.serverIsAlive()) {
             const environment = new Environment();
-            const command = environment.getStartDafnyDefCommand();
+            const command = environment.getStartDafnyCommand();
             const options = environment.getStandardSpawnOptions();
             const process = cp.spawn(command.command, command.args, options);
             this.serverProc = new ProcessWrapper(process,
@@ -130,48 +130,32 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         try {
             const encoded = encodeBase64(task);
             this.serverProc.clearBuffer();
-            this.serverProc.writeGetDefinitionsRequestToDafnyDef(encoded);
+            this.serverProc.writeGetDefinitionsRequestToDafnyDef(encoded, "getDefinitions");
         } catch(exception) {
             console.error("Unable to encode request task:" + exception);
         }
-    }
+    }*/
 
-    private handleProcessError(err: Error): void {
-        window.showErrorMessage("DafnyDef process " + this.serverProc.pid + " error: " + err);
-        console.error("dafny server stdout error:" + err.message);
-    }
+    private handleProcessData(log: string, callback: (data: any) => any): void {
+        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0 && log.indexOf("SYMBOLS_START ") > -1) {
+            const info = log.substring("SYMBOLS_START ".length, log.indexOf(" SYMBOLS_END"));
+            const definitionInfo = this.parseResponse(info);
 
-    private handleProcessData(callback: (data: any) => any): void {
-        const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
             if(definitionInfo) {
                 callback(definitionInfo);
             } else {
                 callback(null);
             }
         }
-        this.serverProc.clearBuffer();
     }
 
     private parseResponse(response: string): CodeLensInformtation {
         try {
-            const responseJson =  decodeBase64(response);
-            return new CodeLensInformtation(responseJson);
+            //const responseJson =  decodeBase64(response);
+            return new CodeLensInformtation(response);
         } catch(exception) {
             console.error("Failure  to parse response: " + exception);
             return null;
         }
-    }
-
-    private handleProcessExit() {
-        if(this.serverIsAlive()) {
-            this.serverProc.killServerProc();
-        }
-        this.serverProc = null;
-    }
-
-    private serverIsAlive(): boolean {
-        return this.serverProc && this.serverProc.isAlive();
     }
 }

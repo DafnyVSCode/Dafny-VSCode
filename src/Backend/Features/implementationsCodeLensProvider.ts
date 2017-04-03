@@ -5,11 +5,16 @@ import { ReferencesCodeLens } from "./baseCodeLensProvider";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { DafnyDefinitionInformtation } from "./definitionProvider";
 import { DafnyDefinitionProvider } from "./definitionProvider";
+import { DafnyServer } from "../dafnyServer";
 export class DafnyImplementationsCodeLensProvider extends DafnyBaseCodeLensProvider {
-    private definitionProvider = new DafnyDefinitionProvider();
+    
+    constructor(server: DafnyServer, public definitionProvider: DafnyDefinitionProvider) {
+        super(server);
+    }
+
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
-        return this.definitionProvider.provideDefinitionInternalDirectly(codeLens.codeLensInfo.filePath, codeLens.codeLensInfo.symbol, true)
+        return this.definitionProvider.provideDefinitionInternalDirectly(codeLens.text, codeLens.codeLensInfo.symbol)
         .then((defintion: DafnyDefinitionInformtation) => {
             if (!defintion) {
                 throw codeLens;

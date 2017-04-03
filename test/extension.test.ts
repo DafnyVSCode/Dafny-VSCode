@@ -18,7 +18,11 @@ const tempFolder = samplesFolder;
 function getProvider(startFilePath: string, position: vscode.Position, expectedResult: any) {
     let editor: vscode.TextEditor;
     const workingFilePath = tempFolder + startFilePath;
-    const dafnyDefinitionProvider = new DafnyDefinitionProvider();
+
+    const context: Context = new Context();
+    const statusbar: Statusbar = new Statusbar(context);
+    const dafnyServer = new DafnyServer(statusbar, context);
+    const dafnyDefinitionProvider = new DafnyDefinitionProvider(dafnyServer);
     let actual: any = null;
 
     const testPromise = vscode.workspace.openTextDocument(workingFilePath).then((workingDocument) => {
@@ -51,7 +55,7 @@ function verifyFile(startFilePath: string, expectedResult: any) {
     }).then((_editor) => {
         editor = _editor;
         dafnyServer.reset();
-        dafnyServer.addDocument(_editor.document);
+        dafnyServer.addDocument(_editor.document, "verify");
         return new Promise((f) => setTimeout(f, 10000));
     }).then(() => {
         const result = context.verificationResults.latestResults[editor.document.fileName];

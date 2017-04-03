@@ -27,7 +27,7 @@ export class ProcessWrapper {
         this.serverProc.on("exit", exitCallback);
     }
 
-    public reasignCallbacks(errorCallback: (error: Error) => void,
+    /*public reasignCallbacks(errorCallback: (error: Error) => void,
                             dataCallback: () => void,
                             exitCallback: (code: number) => void): void {
         this.serverProc.stdout.removeAllListeners();
@@ -38,7 +38,8 @@ export class ProcessWrapper {
             dataCallback();
         });
         this.serverProc.on("exit", exitCallback);
-    }
+    }*/
+    
     public killServerProc(): void {
         this.serverProc.stdout.removeAllListeners();
         this.serverProc.removeAllListeners();
@@ -52,12 +53,12 @@ export class ProcessWrapper {
     public clearBuffer(): void {
         this.outBuf = "";
     }
-    public writeVerificationRequestToDafnyServer(request: string): void {
-        this.writeRequestToServer(request, "verify", "[[DAFNY-CLIENT: EOM]]",
+    public writeVerificationRequestToDafnyServer(request: string, verb: string): void {
+        this.writeRequestToServer(request, verb, "[[DAFNY-CLIENT: EOM]]",
         "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
     }
 
-    public writeReferenceRequestToDafnyServer(request: string): void {
+    /*public writeReferenceRequestToDafnyServer(request: string): void {
         this.writeRequestToServer(request, "findReferences", "[[DAFNY-CLIENT: EOM]]",
         "Reference command failed of request: ${request}", "Reference request failed of task: ${request}");
     }
@@ -70,7 +71,7 @@ export class ProcessWrapper {
     public writeGetDefinitionsRequestToDafnyDef(request: string): void {
         this.writeRequestToServer(request, "getDefinitions", "[[DafnyDef-CLIENT: EOM]]",
         "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
-    }
+    }*/
 
     public sendQuit(): void {
         const good: boolean = this.serverProc.stdin.write("quit\n", () => {

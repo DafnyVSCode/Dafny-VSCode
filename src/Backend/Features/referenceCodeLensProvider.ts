@@ -1,23 +1,28 @@
 "use strict";
 
-import * as cp from "child_process";
-import { CodeLens, Location, Position, Range, Uri, window } from "vscode";
-import { ProcessWrapper } from "./../../Process/process";
+import * as vscode from "vscode";
+import { CodeLens, Location, Position, Range, Uri } from "vscode";
+/*import { ProcessWrapper } from "./../../Process/process";
 import { Verification } from "./../../Strings/regexRessources";
 import { encodeBase64 } from "./../../Strings/stringEncoding";
+import { Environment } from "./../environment";*/
 import { decodeBase64 } from "./../../Strings/stringEncoding";
-import { Environment } from "./../environment";
 import { ReferencesCodeLens } from "./baseCodeLensProvider";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
+import {DafnyServer} from "../dafnyServer";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
-    private servers: ProcessWrapper[] = [];
+    public constructor(server: DafnyServer) {
+        super(server);
+    }
+
+    //private servers: ProcessWrapper[] = [];
     public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
             return new Promise<ReferenceInformation[]>((resolve, reject) => {
                 if(!codeLens.codeLensInfo) {
                     return resolve(null);
                 }
-                return this.askDafnyDefForReference(resolve, reject, codeLens);
+                return this.askDafnyDefForReference(resolve, reject, null, codeLens);
         });
     }
 
@@ -50,8 +55,19 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         });
     }
 
-private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesCodeLens) {
-        const environment = new Environment();
+private askDafnyDefForReference(resolve: any, reject: any, document: vscode.TextDocument, codeLens: ReferencesCodeLens) {
+    this.server.addDocument(document, "symbols", (log) =>  {
+            console.log(log);
+
+            if(log.indexOf("SYMBOLS_START ") > -1) {
+                const info = log.substring("SYMBOLS_START ".length, log.indexOf(" SYMBOLS_END"));
+                console.log(info);
+                const infos = this.parseReferenceResponse(log, codeLens.codeLensInfo.filePath);
+                resolve(infos);
+            }
+            resolve(null);
+        }, () => {reject(null)});
+        /*const environment = new Environment();
         const command = environment.getStartDafnyCommand();
         const options = environment.getStandardSpawnOptions();
         const process = cp.spawn(command.command, command.args, options);
@@ -81,10 +97,12 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
             serverProc.clearBuffer();
         } catch(exception) {
             console.error("Unable to encode request: " + exception);
-        }
+        }*/
+
+        //findReferences
     }
 
-    private handleProcessReferenceError(err: Error): void {
+    /*private handleProcessReferenceError(err: Error): void {
         window.showErrorMessage("DafnyDef process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
     }
@@ -113,16 +131,7 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
         this.serverProc.clearBuffer();
     }
 
-    private parseReferenceResponse(response: string, file: string): ReferenceInformation[] {
-        const responseJson =  decodeBase64(response);
-        const references: ReferenceInformation[] = [];
-        if(responseJson && responseJson.length && responseJson.length > 0) {
-            for(const reference of responseJson) {
-                references.push(new ReferenceInformation(reference, file));
-            }
-        }
-        return references;
-    }
+    
     private handleProcessReferenceExit() {
         if(this.serverForReferenceIsAlive()) {
             this.serverProc.killServerProc();
@@ -132,6 +141,17 @@ private askDafnyDefForReference(resolve: any, reject: any, codeLens: ReferencesC
 
     private serverForReferenceIsAlive(): boolean {
         return this.serverProc && this.serverProc.isAlive();
+    }*/
+
+    private parseReferenceResponse(response: string, file: string): ReferenceInformation[] {
+        const responseJson =  decodeBase64(response);
+        const references: ReferenceInformation[] = [];
+        if(responseJson && responseJson.length && responseJson.length > 0) {
+            for(const reference of responseJson) {
+                references.push(new ReferenceInformation(reference, file));
+            }
+        }
+        return references;
     }
 
 }
@@ -151,12 +171,4 @@ export class ReferenceInformation {
             this.file = file;
         }
     }
-}
-
-interface ReferenceTask {
-    args: string[];
-    fileName: string;
-    filename: string;
-    source: string;
-    sourceIsFile: boolean;
 }

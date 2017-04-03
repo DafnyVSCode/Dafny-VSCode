@@ -39,9 +39,9 @@ export class Environment {
         return this.getCommand(this.dafnyBasePath + "/" + Application.DafnyServer);
     }
 
-    public getStartDafnyDefCommand(): Command {
+    /*public getStartDafnyDefCommand(): Command {
        return this.getCommand(this.dafnyBasePath + "/" + Application.DafnyDef);
-    }
+    }*/
 
     public getStandardSpawnOptions(): cp.SpawnOptions {
         const options: cp.SpawnOptions = {};

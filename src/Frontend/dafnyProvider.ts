@@ -3,6 +3,11 @@
 import * as vscode from "vscode";
 import {Context} from "../Backend/context";
 import {DafnyServer} from "../Backend/dafnyServer";
+import { DAFNYMODE } from "../Backend/Features/definitionProvider";
+import { DafnyDefinitionProvider } from "../Backend/Features/definitionProvider";
+//import { DafnyHoverProvider } from "../Backend/Features/hoverProvider";
+import { DafnyReferencesCodeLensProvider } from "../Backend/Features/referenceCodeLensProvider";
+import { DafnyImplementationsCodeLensProvider } from "../Backend/Features/implementationsCodeLensProvider";
 import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
@@ -17,7 +22,7 @@ export class DafnyDiagnosticsProvider {
     private dafnyServer: DafnyServer;
     private context: Context;
 
-    constructor() {
+    constructor(public vsCodeContext: vscode.ExtensionContext) {
         this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
@@ -46,6 +51,12 @@ export class DafnyDiagnosticsProvider {
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.textDocuments.forEach(this.doVerify, this);
+
+        const definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerDefinitionProvider(DAFNYMODE, definitionProvider));
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider(this.dafnyServer)));
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider(this.dafnyServer, definitionProvider)));
+        //this.vsCodeContext.subscriptions.push(vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
     }
 
     public dispose(): void {
@@ -75,7 +86,7 @@ export class DafnyDiagnosticsProvider {
 
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument.languageId === EnvironmentConfig.Dafny) {
-            this.dafnyServer.addDocument(textDocument);
+            this.dafnyServer.addDocument(textDocument, "verify");
         }
     }
 
