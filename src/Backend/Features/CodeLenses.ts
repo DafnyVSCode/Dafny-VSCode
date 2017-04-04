@@ -12,7 +12,7 @@ export class CodeLensInfo {
 }
 
 export class ReferenceInformation {
-    public file: string;
+    public fileName: string;
     public methodName: string;
     public loc: number;
     public position: Position;
@@ -23,7 +23,7 @@ export class ReferenceInformation {
             const line = parseInt(dafnyReference.Line, 10) - 1; // 1 based
             const column = Math.max(0, parseInt(dafnyReference.Column, 10) - 1); // ditto, but 0 can appear in some cases
             this.position = new Position(line, column);
-            this.file = file;
+            this.fileName = file;
         }
     }
 }
