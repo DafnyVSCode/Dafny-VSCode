@@ -16,7 +16,6 @@ export class ErrorMsg {
     public static DafnyInstallationFailed: string = "Automatic installation failed. Please install manually.";
     public static MaxRetriesReached: string = "Maximum retries to start the server reached. Please restart the server manually";
     public static DafnyCantBeStarted: string = "DafnyServer.exe can not be started. Either it is not installed or the basepath is wrong";
-    public static DafnyDefMissing: string = "DafnyDef.exe can not be started. Either it is not installed or the basepath is wrong";
 }
 
 export class Config {
@@ -29,7 +28,6 @@ export class Config {
 
 export class Application {
     public static DafnyServer: string = "DafnyServer.exe";
-    public static DafnyDef: string = "DafnyDef.exe";
 }
 
 export class Commands {
