@@ -42,6 +42,7 @@ export class InfoMsg {
     public static DafnyServerRestartSucceded: string = "DafnyServer restart succeeded";
     public static DafnyInstallationSucceeded: string = "Automatic installation complete";
     public static DafnyUninstallationSucceeded: string = "Uninstallation complete";
+    public static DafnyUpdateAvailable: string = "Update of Dafny is available. Would you like to update it?";
 }
 export class ServerStatus {
     public static Starting: string = "Starting";

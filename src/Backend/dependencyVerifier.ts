@@ -11,12 +11,14 @@ export class DependencyVerifier {
     private serverProc: ProcessWrapper;
     private callbackSuccess: (data: any) => any;
     private callbackError: (error: any) => any;
+    private upgradeCallback: () => any;
 
-    public verifyDafnyServer(callbackSuccess: (data: any) => any, callbackError: (error: any) => any) {
+    public verifyDafnyServer(callbackSuccess: (data: any) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
         const spawnOptions = this.environment.getStandardSpawnOptions();
         const dafnyCommand: Command = this.environment.getStartDafnyCommand();
         this.callbackError = callbackError;
         this.callbackSuccess = callbackSuccess;
+        this.upgradeCallback = upgradeCallback;
 
         this.verify(dafnyCommand, spawnOptions);
     }
@@ -33,7 +35,8 @@ export class DependencyVerifier {
     private verify(command: Command, spawnOptions: cp.SpawnOptions): void {
         try {
             this.serverProc = this.spawnNewProcess(command, spawnOptions);
-            this.serverProc.sendQuit();
+            this.serverProc.writeVerificationRequestToDafnyServer("", "versioncheck");
+            //
         } catch(e) {
             this.callbackError(e);
         }
@@ -43,8 +46,14 @@ export class DependencyVerifier {
         const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
         return new ProcessWrapper(process,
             (err: Error) => { this.callbackError(err); },
-            // tslint:disable-next-line:no-empty
-            () => {},
+            () => {
+                const upgradeNecessary = "UPDATE_NECESSARY";
+                if(this.serverProc.outBuf.indexOf(upgradeNecessary) > -1) {
+                    this.upgradeCallback();
+                }
+                console.log(this.serverProc.outBuf);
+                this.serverProc.sendQuit();
+            },
             (code: number) => { this.handleProcessExit(code); }, Verification.commandEndRegexDafnyServer);
     }
 
