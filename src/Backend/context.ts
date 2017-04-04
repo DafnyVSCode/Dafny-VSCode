@@ -8,6 +8,7 @@ export class Context {
     public verificationResults: VerificationResults = new VerificationResults();
     public activeRequest: VerificationRequest = null;
     public serverpid: number;
+    public symbolTable: {[fileName: string]: any} = {};
 
     public clear(): void {
         this.queue.clear();
@@ -15,6 +16,13 @@ export class Context {
         this.serverpid = null;
     }
 
+    public addSymbols(fileName: string, symbols: any) {
+        this.symbolTable[fileName] = symbols;
+    }
+
+    public getSymbols(fileName: string): any {
+        return this.symbolTable[fileName];
+    }
     public enqueueRequest(request: VerificationRequest): void {
         this.queue.enqueue(request);
     }

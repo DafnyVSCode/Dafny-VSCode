@@ -5,9 +5,7 @@ import {Context} from "../Backend/context";
 import {DafnyServer} from "../Backend/dafnyServer";
 import { DAFNYMODE } from "../Backend/Features/definitionProvider";
 import { DafnyDefinitionProvider } from "../Backend/Features/definitionProvider";
-//import { DafnyHoverProvider } from "../Backend/Features/hoverProvider";
 import { DafnyReferencesCodeLensProvider } from "../Backend/Features/referenceCodeLensProvider";
-import { DafnyImplementationsCodeLensProvider } from "../Backend/Features/implementationsCodeLensProvider";
 import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
@@ -54,8 +52,9 @@ export class DafnyDiagnosticsProvider {
 
         const definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
         this.vsCodeContext.subscriptions.push(vscode.languages.registerDefinitionProvider(DAFNYMODE, definitionProvider));
-        this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyReferencesCodeLensProvider(this.dafnyServer)));
-        this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider(this.dafnyServer, definitionProvider)));
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE,
+        new DafnyReferencesCodeLensProvider(this.dafnyServer)));
+        //this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider(this.dafnyServer, definitionProvider)));
         //this.vsCodeContext.subscriptions.push(vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
     }
 

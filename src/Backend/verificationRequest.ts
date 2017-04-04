@@ -9,7 +9,8 @@ export class VerificationRequest {
     public timeSent: number = 0;
     public timeFinished: number = 0;
 
-    constructor(public source: string, public document: vscode.TextDocument, public verb: string, public callback: ((data: any) => any), public error: ((data: any) => any)) {
+    constructor(public source: string, public document: vscode.TextDocument, public verb: string,
+                public callback: ((data: any) => any), public error: ((data: any) => any)) {
         this.timeCreated = Date.now();
 
         const lines: string[] = source.split(EnvironmentConfig.NewLine);

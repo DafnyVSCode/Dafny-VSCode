@@ -27,19 +27,6 @@ export class ProcessWrapper {
         this.serverProc.on("exit", exitCallback);
     }
 
-    /*public reasignCallbacks(errorCallback: (error: Error) => void,
-                            dataCallback: () => void,
-                            exitCallback: (code: number) => void): void {
-        this.serverProc.stdout.removeAllListeners();
-        this.serverProc.removeAllListeners();
-        this.serverProc.stdout.on("error", errorCallback);
-        this.serverProc.stdout.on("data", (data: Buffer) => {
-            this.outBuf += data.toString();
-            dataCallback();
-        });
-        this.serverProc.on("exit", exitCallback);
-    }*/
-    
     public killServerProc(): void {
         this.serverProc.stdout.removeAllListeners();
         this.serverProc.removeAllListeners();
@@ -57,21 +44,6 @@ export class ProcessWrapper {
         this.writeRequestToServer(request, verb, "[[DAFNY-CLIENT: EOM]]",
         "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
     }
-
-    /*public writeReferenceRequestToDafnyServer(request: string): void {
-        this.writeRequestToServer(request, "findReferences", "[[DAFNY-CLIENT: EOM]]",
-        "Reference command failed of request: ${request}", "Reference request failed of task: ${request}");
-    }
-
-    public writeDefinitionRequestToDafnyDef(request: string): void {
-        this.writeRequestToServer(request, "findDefinition", "[[DafnyDef-CLIENT: EOM]]",
-        "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
-    }
-
-    public writeGetDefinitionsRequestToDafnyDef(request: string): void {
-        this.writeRequestToServer(request, "getDefinitions", "[[DafnyDef-CLIENT: EOM]]",
-        "Definition command failed of request: ${request}", "Definition request failed of task: ${request}");
-    }*/
 
     public sendQuit(): void {
         const good: boolean = this.serverProc.stdin.write("quit\n", () => {

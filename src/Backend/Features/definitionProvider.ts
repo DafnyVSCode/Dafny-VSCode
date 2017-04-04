@@ -1,14 +1,8 @@
-//import * as cp from "child_process";
 import * as vscode from "vscode";
 import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../LanguageDefinition/keywords";
-//import { ProcessWrapper } from "./../../Process/process";
-//import { Verification } from "./../../Strings/regexRessources";
-//import { decodeBase64 } from "./../../Strings/stringEncoding";
-//import { encodeBase64 } from "./../../Strings/stringEncoding";
 import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { isPositionInString } from "./../../Strings/StringUtils";
-//import { Environment } from "./../environment";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class DafnyDefinitionInformtation {
@@ -39,17 +33,7 @@ export class DafnyDefinitionInformtation {
     }
 }
 
-/*interface DefinitionTask {
-    args: string[];
-    baseDir: string;
-    fileName: string;
-    monoPath?: string;
-    word: string;
-}*/
-
 export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
-    //private serverProc: ProcessWrapper;
-    //private environment: Environment = new Environment();
 
     public constructor(public server: DafnyServer) {}
 
@@ -87,10 +71,10 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument, symbol: any) {
-        this.server.addDocument(document, "findReferences", (log) =>  {
+        this.server.addDocument(document, "findDefinition", (log) =>  {
             console.log(log);
             resolve(symbol);
-        }, () => {reject(null)});
+        }, () => {reject(null); });
     }
 
     /*private askDafnyDef(resolve: any, reject: any, file: string, symbol: any, restartServer: boolean = false) {

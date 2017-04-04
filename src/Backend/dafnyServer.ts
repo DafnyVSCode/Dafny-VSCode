@@ -84,6 +84,31 @@ export class DafnyServer {
         this.reset();
     }
 
+    public addSymbols(doc: vscode.TextDocument, symbols: any) {
+        const hash = this.getHashCode(doc.getText());
+        if(!this.getSymbols(doc.fileName) || this.getSymbols(doc.fileName).hash === hash) {
+            this.context.addSymbols(doc.fileName, symbols);
+        }
+    }
+
+    public getSymbols(fileName: string): any {
+        return this.context.getSymbols(fileName);
+    }
+    private getHashCode(str: string) {
+        let hash = 0;
+
+        if (str.length === 0) {
+            return hash;
+        }
+        for (let i = 0; i < str.length; i++) {
+            const chr   = str.charCodeAt(i);
+            // tslint:disable-next-line:no-bitwise
+            hash  = ((hash << 5) - hash) + chr;
+            // tslint:disable-next-line:no-bitwise
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    };
     private resetProcess(): boolean {
         const environment: Environment = new Environment();
         const dafnyCommand: Command = environment.getStartDafnyCommand();
@@ -114,7 +139,7 @@ export class DafnyServer {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
             console.log(log);
-            if(this.context.activeRequest.verb === "verify") {
+            if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
                 this.context.collectRequest(log);
             } else {
                 this.context.activeRequest.callback(log);
