@@ -118,7 +118,7 @@ export class DafnyServer {
             console.log(log);
             if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
                 this.context.collectRequest(log);
-            } else {
+            } else if(this.context.activeRequest) {
                 this.context.activeRequest.callback(log);
                 this.context.activeRequest = null;
             }

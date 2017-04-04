@@ -10,13 +10,17 @@ export class SymbolService {
 
     public constructor(public server: DafnyServer) {}
 
-    public addSymbols(doc: TextDocument, symbols: any): void {
+    public addSymbols(doc: TextDocument, symbols: any, forceAddition: boolean = false): void {
         const hash = hashString(doc.getText());
-        this.getSymbols(doc).then((sym: any) => {
-            if(!sym || sym.hash !== hash) {
-                this.symbolTable[doc.fileName] = symbols;
-            }
-        });
+        if(forceAddition) {
+            this.symbolTable[doc.fileName] = symbols;
+        } else {
+            this.getSymbols(doc).then((sym: any) => {
+                if(!sym || sym.hash !== hash) {
+                    this.symbolTable[doc.fileName] = symbols;
+                }
+            });
+        }
     }
 
     public getSymbols(doc: TextDocument): Promise<any> {
@@ -24,8 +28,8 @@ export class SymbolService {
         if(!symbols) {
             return this.getSymbolsFromDafny(doc).then((symb: any) => {
                 symb.hash = hashString(doc.getText());
-                this.addSymbols(doc, symb);
-                return symb;
+                this.addSymbols(doc, symb, true);
+                return Promise.resolve(symb);
             });
         } else {
             return Promise.resolve(symbols);
