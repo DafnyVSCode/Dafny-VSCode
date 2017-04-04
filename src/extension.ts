@@ -5,7 +5,7 @@ import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
 
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
-import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
+import { Answer, ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -13,12 +13,6 @@ export function activate(context: vscode.ExtensionContext): void {
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
     dependencyVerifier.verifyDafnyServer(() => {
-        /*dependencyVerifier.verifyDafnyDef(() => {
-            init();
-        }, () => {
-            vscode.window.showErrorMessage(ErrorMsg.DafnyDefMissing);
-            askToInstall();
-        });*/
         init();
     }, () => {
         vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
@@ -65,9 +59,9 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     }
 
-    function askToInstall(text: string = "Would you like to install Dafny?") {
-        vscode.window.showInformationMessage(text, "Yes", "No").then((value: string) => {
-            if("Yes" === value) {
+    function askToInstall(text: string = InfoMsg.AskInstallDafny) {
+        vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
+            if(Answer.Yes === value) {
                 install();
             }
         });
@@ -78,12 +72,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
             const verifier: DependencyVerifier = new DependencyVerifier();
             verifier.verifyDafnyServer(() => {
-                /*verifier.verifyDafnyDef(() => {
-                    vscode.window.showInformationMessage(InfoMsg.DafnyInstallationSucceeded);
-                    init();
-                }, () => {
-                    vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
-                });*/
                 init();
             }, () => {
                 vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);

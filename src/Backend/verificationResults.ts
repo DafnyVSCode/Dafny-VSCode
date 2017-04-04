@@ -56,7 +56,7 @@ export class VerificationResults {
 
             if (errors) {
                 const lineNum: number = parseInt(errors[1], 10) - 1; // 1 based
-                const colNum: number = Math.max(0, parseInt(errors[2], 10) - 1); // ditto, but 0 can appear in some cases
+                const colNum: number = Math.max(0, parseInt(errors[2], 10) - 1); // 1 based, but 0 can appear in some cases
                 const typeStr: string = errors[3];
                 const msgStr: string = errors[4] !== undefined ? errors[4] + ": " + errors[5] : errors[5];
 

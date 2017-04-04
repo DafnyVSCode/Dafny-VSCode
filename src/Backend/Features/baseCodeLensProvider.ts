@@ -45,8 +45,8 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
     }
 
     private handleProcessData(log: string, callback: (data: any) => any, document: TextDocument): void {
-        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0
-                && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0 && log.indexOf("SYMBOLS_START ") > -1) {
+        if(log && log.indexOf(EnvironmentConfig.DafnySuccess) > 0
+                && log.indexOf(EnvironmentConfig.DafnyFailure) < 0 && log.indexOf("SYMBOLS_START ") > -1) {
             const info = log.substring("SYMBOLS_START ".length, log.indexOf(" SYMBOLS_END"));
             const json = this.getResponseAsJson(info);
             this.addSymbolsToCache(json, document);

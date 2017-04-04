@@ -40,7 +40,7 @@ export class ProcessWrapper {
     public clearBuffer(): void {
         this.outBuf = "";
     }
-    public writeVerificationRequestToDafnyServer(request: string, verb: string): void {
+    public sendRequestToDafnyServer(request: string, verb: string): void {
         this.writeRequestToServer(request, verb, "[[DAFNY-CLIENT: EOM]]",
         "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
     }

@@ -41,9 +41,15 @@ export class InfoMsg {
     public static DafnyInstallationSucceeded: string = "Automatic installation complete";
     public static DafnyUninstallationSucceeded: string = "Uninstallation complete";
     public static DafnyUpdateAvailable: string = "Update of Dafny is available. Would you like to update it?";
+    public static AskInstallDafny: string = "Would you like to install Dafny?";
 }
 export class ServerStatus {
     public static Starting: string = "Starting";
+}
+
+export class Answer {
+    public static Yes: string = "Yes";
+    public static No: string = "No";
 }
 
 export class EnvironmentConfig {
@@ -53,8 +59,8 @@ export class EnvironmentConfig {
     public static Win32: string = "win32";
     public static OSX: string = "darwin";
     public static Ubuntu: string = "linux";
-    public static DafnyDefSuccess: string = "[SUCCESS]";
-    public static DafnyDefFailure: string = "[FAILURE]";
+    public static DafnySuccess: string = "[SUCCESS]";
+    public static DafnyFailure: string = "[FAILURE]";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";

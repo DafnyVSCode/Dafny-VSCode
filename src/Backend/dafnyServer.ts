@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import {IncorrectPathExeption} from "../ErrorHandling/errors";
 import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
-import { encodeBase64/*, decodeBase64*/ } from "../Strings/stringEncoding";
+import { encodeBase64 } from "../Strings/stringEncoding";
 import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
 import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
@@ -15,10 +15,10 @@ import {VerificationRequest} from "./verificationRequest";
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
-    args: string[]; // for the verifier itself; consult Dafny sources
-    filename: string; // need not be an actual file
-    source: string; // actual document source
-    sourceIsFile: boolean; // always set to false for our purposes
+    args: string[];
+    filename: string;
+    source: string;
+    sourceIsFile: boolean;
 }
 
 export class DafnyServer {
@@ -217,7 +217,7 @@ export class DafnyServer {
         const encoded: string = encodeBase64(task);
         if(this.isRunning()) {
             this.serverProc.clearBuffer();
-            this.serverProc.writeVerificationRequestToDafnyServer(encoded, request.verb);
+            this.serverProc.sendRequestToDafnyServer(encoded, request.verb);
         }
         request.timeSent = Date.now();
     }

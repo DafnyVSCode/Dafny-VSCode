@@ -27,7 +27,7 @@ export class DafnyDefinitionInformtation {
                 this.doc = firstMatch.Symbol;
                 this.file = firstMatch.FilePath;
                 this.name = firstMatch.Symbol;
-                this.toolUsed = "DafnyDef";
+                this.toolUsed = "DafnyServer";
             }
         }
     }
@@ -76,90 +76,4 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             resolve(symbol);
         }, () => {reject(null); });
     }
-
-    /*private askDafnyDef(resolve: any, reject: any, file: string, symbol: any, restartServer: boolean = false) {
-        if(restartServer || !this.serverIsAlive()) {
-            const environment = new Environment();
-            const command = environment.getStartDafnyDefCommand();
-            const options = environment.getStandardSpawnOptions();
-            const process = cp.spawn(command.command, command.args, options);
-            this.serverProc = new ProcessWrapper(process,
-                (err: Error) => { this.handleProcessError(err); },
-                () => {this.handleProcessData((data) => {
-                    if(!data) {
-                        return reject(null);
-                    }
-                    return resolve(data);
-                }); },
-                () => { this.handleProcessExit(); },
-                Verification.commandEndRegexDafnyDef
-            );
-        } else {
-            this.serverProc.reasignCallbacks(
-                (err: Error) => { this.handleProcessError(err); },
-                () => {this.handleProcessData((data) => {
-                    if(!data) {
-                        return reject(null);
-                    }
-                    return resolve(data);
-                }); },
-                () => { this.handleProcessExit(); });
-        }
-
-        const task: DefinitionTask = {
-            args: [],
-            baseDir: vscode.workspace.rootPath,
-            fileName: file,
-            word: symbol,
-        };
-        if(this.environment.usesMono) {
-            task.monoPath = this.environment.getMonoPath();
-        }
-        try {
-            const encoded = encodeBase64(task);
-            this.serverProc.clearBuffer();
-            this.serverProc.writeDefinitionRequestToDafnyDef(encoded);
-        } catch(exp) {
-            console.error("Could not send request, error:" + exp);
-        }
-    }*/
-
-    /*private handleProcessError(err: Error): void {
-        vscode.window.showErrorMessage("DafnyDef process " + this.serverProc.pid + " error: " + err);
-        console.error("dafny server stdout error:" + err.message);
-    }
-
-    private handleProcessData(callback: (data: any) => any): void {
-        const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0 && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0) {
-            const definitionInfo = this.parseResponse(log.substring(0, log.indexOf(EnvironmentConfig.DafnyDefSuccess)));
-            if(definitionInfo.isValid()) {
-                callback(definitionInfo);
-            } else {
-                callback(null);
-            }
-        }
-        this.serverProc.clearBuffer();
-    }*/
-
-    /*private parseResponse(response: string): DafnyDefinitionInformtation {
-        try {
-            const responseJson =  decodeBase64(response);
-            return new DafnyDefinitionInformtation(responseJson);
-        } catch(exception) {
-            console.error("Unable to parse response: " + exception);
-            return null;
-        }
-    }*/
-
-    /*private handleProcessExit() {
-        if(this.serverIsAlive()) {
-            this.serverProc.killServerProc();
-        }
-        this.serverProc = null;
-    }
-
-    private serverIsAlive(): boolean {
-        return this.serverProc && this.serverProc.isAlive();
-    }*/
 }
