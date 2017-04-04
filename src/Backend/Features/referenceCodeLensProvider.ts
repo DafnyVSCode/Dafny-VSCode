@@ -1,9 +1,7 @@
 "use strict";
 
-import * as vscode from "vscode";
 import { CodeLens, Location, Range, Uri } from "vscode";
 import {DafnyServer} from "../dafnyServer";
-import { decodeBase64 } from "./../../Strings/stringEncoding";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./CodeLenses";
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
@@ -15,7 +13,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
                 if(!codeLens.codeLensInfo) {
                     return resolve(null);
                 }
-                return this.askDafnyDefForReference(resolve, reject, codeLens.document, codeLens);
+                return this.getReferences(resolve, reject, codeLens);
         });
     }
 
@@ -23,12 +21,16 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         const codeLens = inputCodeLens as ReferencesCodeLens;
 
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
-            if (referenceInfo === null || referenceInfo === undefined) {
-                return Promise.resolve(null);
+            if (!referenceInfo || referenceInfo === []) {
+                codeLens.command = {
+                    command: "",
+                    title: "Could not determine references"
+                };
+                return Promise.resolve(codeLens);
             }
             const locations: Location[] = [];
             for(const info of referenceInfo) {
-                locations.push(new Location(Uri.file(info.file), new Range(info.position.line, info.position.character,
+                locations.push(new Location(Uri.parse(info.file), new Range(info.position.line, info.position.character,
                 info.position.line, info.position.character + info.methodName.length)));
             }
             codeLens.command = {
@@ -38,57 +40,36 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
                     ? "1 reference"
                     : `${locations.length} references`,
         };
-            return codeLens;
+            return Promise.resolve(codeLens);
         }, (err) => {
             codeLens.command = {
                 command: "",
                 title: "Could not determine references" + err
             };
-            return codeLens;
+            return Promise.resolve(codeLens);
         });
     }
 
-private askDafnyDefForReference(resolve: any, reject: any, document: vscode.TextDocument, codeLens: ReferencesCodeLens) {
-    if(this.server.getSymbols(document.fileName)) {
-        const symbols = this.server.getSymbols(document.fileName);
-        console.log(symbols);
-        const infos = this.parseReferenceResponseInternal(symbols,  document.fileName, codeLens);
-        resolve(infos);
-    } else {
-    this.server.addDocument(document, "symbols", (log) =>  {
-            console.log(log);
-
-            if(log.indexOf("SYMBOLS_START ") > -1) {
-                const info = log.substring("SYMBOLS_START ".length, log.indexOf(" SYMBOLS_END"));
-                console.log(info);
-                const infos = this.parseReferenceResponse(log, codeLens.document.fileName);
+    private getReferences(resolve: any, reject: any, codeLens: ReferencesCodeLens) {
+        this.server.symbolService.getSymbols(codeLens.document).then( (symbols: any) =>  {
+            console.log(symbols);
+            if(symbols) {
+                const infos = this.parseReferenceResponse(symbols, codeLens);
                 resolve(infos);
+            } else {
+                resolve(null);
             }
-            resolve(null);
-        }, () => {reject(null); });
+        }).catch(() => {reject(null); });
     }
 
-    }
-
-    private parseReferenceResponse(response: string, file: string): ReferenceInformation[] {
-        const responseJson =  decodeBase64(response);
+    private parseReferenceResponse(symbols: any, codeLens: ReferencesCodeLens): ReferenceInformation[] {
         const references: ReferenceInformation[] = [];
-        if(responseJson && responseJson.length && responseJson.length > 0) {
-            for(const reference of responseJson) {
-                references.push(new ReferenceInformation(reference, file));
-            }
-        }
-        return references;
-    }
-
-    private parseReferenceResponseInternal(response: any, file: string, codeLens: ReferencesCodeLens): ReferenceInformation[] {
-        const references: ReferenceInformation[] = [];
-        if(response && response.length && response.length > 0) {
-            for(const reference of response) {
+        if(symbols && symbols.length && symbols.length > 0) {
+            for(const reference of symbols) {
                 if(reference.References && reference.References.length && reference.References.length > 0) {
                     for(const r of reference.References) {
                         if(reference.Name === codeLens.codeLensInfo.symbol) {
-                            references.push(new ReferenceInformation(r, file));
+                            references.push(new ReferenceInformation(r, codeLens.document.fileName));
                         }
                     }
                 }
