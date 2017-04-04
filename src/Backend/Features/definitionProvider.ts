@@ -15,20 +15,17 @@ export class DafnyDefinitionInformtation {
     public isValid(): boolean {
         return this.position.character > 0 && this.file !== "" && this.position.line > 0 && this.name !== "";
     }
-    constructor(dafnyDefResponse: any) {
-         if(dafnyDefResponse.length && dafnyDefResponse.length > 0) {
-            const firstMatch = dafnyDefResponse[0];
-            if(firstMatch.SymbolInfos && firstMatch.SymbolInfos.length && firstMatch.SymbolInfos.length > 0) {
-                const symbolInfo = firstMatch.SymbolInfos[0];
-                const line = parseInt(symbolInfo.Line, 10) - 1; // 1 based
-                const column = Math.max(0, parseInt(symbolInfo.Column, 10) - 1); // ditto, but 0 can appear in some cases
-                this.position = new vscode.Position(line, column);
-                this.declarationlines = firstMatch.Symbol;
-                this.doc = firstMatch.Symbol;
-                this.file = firstMatch.FilePath;
-                this.name = firstMatch.Symbol;
-                this.toolUsed = "DafnyServer";
-            }
+    constructor(symbol: any, filePath: string) {
+         if(symbol) {
+
+            const line = parseInt(symbol.Line, 10) - 1; // 1 based
+            const column = Math.max(0, parseInt(symbol.Column, 10) - 1); // ditto, but 0 can appear in some cases
+            this.position = new vscode.Position(line, column);
+            this.declarationlines = symbol.Name;
+            this.doc = symbol.Name;
+            this.file = filePath;
+            this.name = symbol.Name;
+            this.toolUsed = "DafnyServer";
         }
     }
 }
@@ -71,9 +68,18 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     }
 
     private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument, symbol: any) {
-        this.server.addDocument(document, "findDefinition", (log) =>  {
-            console.log(log);
-            resolve(symbol);
-        }, () => {reject(null); });
+        this.server.symbolService.getSymbols(document).then((symbols: any) => {
+            let found = false;
+            for(const symb of symbols) {
+                if(symb.Name === symbol) {
+                    found = true;
+                    resolve(new DafnyDefinitionInformtation(symb, document.fileName));
+                    break;
+                }
+            }
+            if(!found) {
+                resolve(null);
+            }
+        }).catch((err: any) => reject(err));
     }
 }
