@@ -20,7 +20,7 @@ export class DafnyDiagnosticsProvider {
     private dafnyServer: DafnyServer;
     private context: Context;
 
-    constructor(public vsCodeContext: vscode.ExtensionContext) {
+    constructor(public vsCodeContext: vscode.ExtensionContext, serverVersion: string) {
         this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
@@ -28,6 +28,7 @@ export class DafnyDiagnosticsProvider {
         this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
 
         this.context = new Context();
+        this.context.serverversion = serverVersion;
         this.dafnyStatusbar = new Statusbar(this.context);
         this.dafnyServer = new DafnyServer(this.dafnyStatusbar, this.context);
     }

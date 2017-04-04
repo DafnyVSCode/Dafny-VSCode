@@ -7,13 +7,17 @@ import { Environment } from "./environment";
 
 export class DependencyVerifier {
 
+    private upgradeNecessary = "UPDATE_NECESSARY";
+    private version = "VERSION:";
+
     private environment: Environment = new Environment();
     private serverProc: ProcessWrapper;
-    private callbackSuccess: (data: any) => any;
+    private callbackSuccess: (serverVersion: string) => any;
     private callbackError: (error: any) => any;
     private upgradeCallback: () => any;
+    private serverVersion: string;
 
-    public verifyDafnyServer(callbackSuccess: (data: any) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
+    public verifyDafnyServer(callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
         const spawnOptions = this.environment.getStandardSpawnOptions();
         const dafnyCommand: Command = this.environment.getStartDafnyCommand();
         this.callbackError = callbackError;
@@ -26,7 +30,7 @@ export class DependencyVerifier {
     private verify(command: Command, spawnOptions: cp.SpawnOptions): void {
         try {
             this.serverProc = this.spawnNewProcess(command, spawnOptions);
-            this.serverProc.sendRequestToDafnyServer("", "versioncheck");
+            this.serverProc.sendRequestToDafnyServer("", "version");
         } catch(e) {
             this.callbackError(e);
         }
@@ -37,12 +41,20 @@ export class DependencyVerifier {
         return new ProcessWrapper(process,
             (err: Error) => { this.callbackError(err); },
             () => {
-                const upgradeNecessary = "UPDATE_NECESSARY";
-                if(this.serverProc.outBuf.indexOf(upgradeNecessary) > -1) {
-                    this.upgradeCallback();
-                }
                 console.log(this.serverProc.outBuf);
-                this.serverProc.sendQuit();
+                if(this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
+                    this.upgradeCallback();
+                    this.serverProc.sendQuit();
+                } else if(this.serverProc.outBuf.indexOf(this.version) > -1) {
+                    const start = this.serverProc.outBuf.indexOf(this.version);
+                    const end = this.serverProc.outBuf.indexOf("\n", start);
+                    this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
+                    console.log(this.serverVersion);
+                    this.serverProc.clearBuffer();
+                    this.serverProc.sendRequestToDafnyServer("", "versioncheck");
+                } else {
+                    this.serverProc.sendQuit();
+                }
             },
             (code: number) => { this.handleProcessExit(code); }, Verification.commandEndRegexDafnyServer);
     }
@@ -51,7 +63,7 @@ export class DependencyVerifier {
         if(code !== 0) {
             this.callbackError(code);
         } else {
-            this.callbackSuccess(code);
+            this.callbackSuccess(this.serverVersion);
         }
     }
 }
