@@ -1,10 +1,8 @@
 "use strict";
 
-import * as vscode from "vscode";
 import {CodeLens, CodeLensProvider, Event, EventEmitter, Position, Range,
     TextDocument} from "vscode";
 import {DafnyServer} from "../dafnyServer";
-import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { CodeLensInfo, ReferencesCodeLens } from "./CodeLenses";
 
 export class DafnyBaseCodeLensProvider implements CodeLensProvider {
@@ -23,7 +21,9 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
             return Promise.resolve([]);
         }
         return new Promise<CodeLensInfo[]>((resolve, reject) => {
-                return this.askDafnyDef(resolve, reject, document);
+            return this.server.symbolService.getSymbols(document).then((symbols: any) => {
+            this.handleProcessData(symbols, ((data) => {resolve(data); }));
+        }).catch(() => reject(null));
         }).then((definitions: CodeLensInfo[]) => {
             if (definitions == null || !definitions.length) {
                 return Promise.resolve([]);
@@ -37,39 +37,16 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         });
     }
 
-    private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument) {
-        this.server.addDocument(document, "symbols", (log) =>  {
-            this.handleProcessData(log, ((data) => {resolve(data); }), document);
-
-        }, () => {reject(null); });
+    private handleProcessData(symbols: any, callback: (data: any) => any): void {
+        const definitionInfo = this.parseSymbols(symbols);
+        callback(definitionInfo);
     }
 
-    private handleProcessData(log: string, callback: (data: any) => any, document: TextDocument): void {
-        if(log && log.indexOf(EnvironmentConfig.DafnyDefSuccess) > 0
-                && log.indexOf(EnvironmentConfig.DafnyDefFailure) < 0 && log.indexOf("SYMBOLS_START ") > -1) {
-            const info = log.substring("SYMBOLS_START ".length, log.indexOf(" SYMBOLS_END"));
-            const json = this.getResponseAsJson(info);
-            this.addSymbolsToCache(json, document);
-            const definitionInfo = this.parseResponse(json);
-            callback(definitionInfo);
-        }
-    }
-    private addSymbolsToCache(info: any, document: TextDocument) {
-        this.server.addSymbols(document, info);
-    }
-    private getResponseAsJson(info: string) {
-        try {
-            return JSON.parse(info);
-        } catch(exception) {
-            console.error("Failure  to parse response: " + exception);
-            return null;
-        }
-    }
-    private parseResponse(response: any): CodeLensInfo[] {
+    private parseSymbols(symbols: any): CodeLensInfo[] {
         try {
             const lenses: CodeLensInfo[] = [];
-            if(response.length && response.length > 0) {
-                for(const symbolDef of response) {
+            if(symbols.length && symbols.length > 0) {
+                for(const symbolDef of symbols) {
                     const line = Math.max(0, parseInt(symbolDef.Line, 10) - 1); // 1 based
                     const column = Math.max(0, parseInt(symbolDef.Column, 10) - 1); // ditto, but 0 can appear in some cases
                     if(!isNaN(line) && !isNaN(column)) {

@@ -10,8 +10,8 @@ import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
 import { Command } from "./environment";
 import { Environment } from "./environment";
+import { SymbolService } from "./Features/symbolService";
 import {VerificationRequest} from "./verificationRequest";
-
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
@@ -22,13 +22,15 @@ export interface IVerificationTask {
 }
 
 export class DafnyServer {
+    public symbolService: SymbolService;
     private MAX_RETRIES: number = 5;
     private active: boolean = false;
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
     private retries: number = 0;
-
-    constructor(private statusbar: Statusbar, private context: Context) {    }
+    constructor(private statusbar: Statusbar, private context: Context) {
+        this.symbolService = new SymbolService(this);
+    }
 
     public reset(): boolean {
         if(this.isRunning()) {
@@ -84,31 +86,6 @@ export class DafnyServer {
         this.reset();
     }
 
-    public addSymbols(doc: vscode.TextDocument, symbols: any) {
-        const hash = this.getHashCode(doc.getText());
-        if(!this.getSymbols(doc.fileName) || this.getSymbols(doc.fileName).hash === hash) {
-            this.context.addSymbols(doc.fileName, symbols);
-        }
-    }
-
-    public getSymbols(fileName: string): any {
-        return this.context.getSymbols(fileName);
-    }
-    private getHashCode(str: string) {
-        let hash = 0;
-
-        if (str.length === 0) {
-            return hash;
-        }
-        for (let i = 0; i < str.length; i++) {
-            const chr   = str.charCodeAt(i);
-            // tslint:disable-next-line:no-bitwise
-            hash  = ((hash << 5) - hash) + chr;
-            // tslint:disable-next-line:no-bitwise
-            hash |= 0; // Convert to 32bit integer
-        }
-        return hash;
-    };
     private resetProcess(): boolean {
         const environment: Environment = new Environment();
         const dafnyCommand: Command = environment.getStartDafnyCommand();

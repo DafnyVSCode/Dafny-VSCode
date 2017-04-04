@@ -8,3 +8,19 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
     doubleQuotesCnt += lineTillCurrentPosition.startsWith('\"') ? 1 : 0;
     return doubleQuotesCnt % 2 === 1;
 }
+
+export function hashString(str: string) {
+    let hash = 0;
+
+    if (str.length === 0) {
+        return hash;
+    }
+    for (let i = 0; i < str.length; i++) {
+        const chr   = str.charCodeAt(i);
+        // tslint:disable-next-line:no-bitwise
+        hash  = ((hash << 5) - hash) + chr;
+        // tslint:disable-next-line:no-bitwise
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+}
