@@ -12,8 +12,8 @@ export function activate(context: vscode.ExtensionContext): void {
 
     let provider: DafnyDiagnosticsProvider = null;
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
-    dependencyVerifier.verifyDafnyServer(() => {
-        init();
+    dependencyVerifier.verifyDafnyServer((serverVersion: string) => {
+        init(serverVersion);
     }, () => {
         vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
         askToInstall();
@@ -43,10 +43,10 @@ export function activate(context: vscode.ExtensionContext): void {
     });
     context.subscriptions.push(uninstallDafnyCommand);
 
-    function init() {
+    function init(serverVersion: string) {
         try {
             if(!provider) {
-                provider = new DafnyDiagnosticsProvider(context);
+                provider = new DafnyDiagnosticsProvider(context, serverVersion);
                 provider.activate(context.subscriptions);
                 context.subscriptions.push(provider);
                 provider.resetServer();
@@ -71,8 +71,8 @@ export function activate(context: vscode.ExtensionContext): void {
         const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
 
             const verifier: DependencyVerifier = new DependencyVerifier();
-            verifier.verifyDafnyServer(() => {
-                init();
+            verifier.verifyDafnyServer((serverVersion: string) => {
+                init(serverVersion);
             }, () => {
                 vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
             }, () => {

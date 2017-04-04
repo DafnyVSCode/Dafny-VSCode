@@ -8,6 +8,7 @@ export class Context {
     public verificationResults: VerificationResults = new VerificationResults();
     public activeRequest: VerificationRequest = null;
     public serverpid: number;
+    public serverversion: string;
     public symbolTable: {[fileName: string]: any} = {};
 
     public clear(): void {

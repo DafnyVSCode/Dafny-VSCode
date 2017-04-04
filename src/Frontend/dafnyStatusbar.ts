@@ -43,6 +43,7 @@ export class Statusbar {
         if(this.context.serverpid) {
             this.serverStatusBar.text = StatusString.ServerUp;
             this.serverStatusBar.text += " (pid " + this.context.serverpid + ")";
+            this.serverStatusBar.text += " | Version " + this.context.serverversion + ")";
             this.serverStatusBar.text += " | " + this.serverStatus + " | ";
             this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
         } else {
