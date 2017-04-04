@@ -5,7 +5,7 @@ import {DafnyInstaller} from "./Backend/dafnyInstaller";
 import {DependencyVerifier} from "./Backend/dependencyVerifier";
 
 import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
-import { ErrorMsg/*, InfoMsg*/ } from "./Strings/stringRessources";
+import { ErrorMsg, InfoMsg } from "./Strings/stringRessources";
 import {Commands} from "./Strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -23,6 +23,8 @@ export function activate(context: vscode.ExtensionContext): void {
     }, () => {
         vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
         askToInstall();
+    }, () => {
+        askToInstall(InfoMsg.DafnyUpdateAvailable);
     });
 
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
@@ -63,8 +65,8 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     }
 
-    function askToInstall() {
-        vscode.window.showInformationMessage("Would you like to install Dafny?", "Yes", "No").then((value: string) => {
+    function askToInstall(text: string = "Would you like to install Dafny?") {
+        vscode.window.showInformationMessage(text, "Yes", "No").then((value: string) => {
             if("Yes" === value) {
                 install();
             }
@@ -85,6 +87,8 @@ export function activate(context: vscode.ExtensionContext): void {
                 init();
             }, () => {
                 vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
+            }, () => {
+                console.log("Should not happen, that the version which has been installed is already obsolete");
             });
         });
         if (provider) {

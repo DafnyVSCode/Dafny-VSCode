@@ -54,7 +54,7 @@
       "properties": {
         "dafny.basePath": {
           "type": "string",
-          "description": "Absolute path to the dafny directory, which contains the DafnyServer.exe and the DafnyDef.exe"
+          "description": "Absolute path to the dafny directory, which contains the DafnyServer.exe"
         },
         "dafny.useMono": {
           "type": "boolean",
