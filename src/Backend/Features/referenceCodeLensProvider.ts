@@ -22,31 +22,27 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
 
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
             if (!referenceInfo || referenceInfo === []) {
-                codeLens.command = {
-                    command: "",
-                    title: "Could not determine references"
-                };
-                return Promise.resolve(codeLens);
+                return Promise.resolve(null);
             }
             const locations: Location[] = [];
             for(const info of referenceInfo) {
-                locations.push(new Location(Uri.parse(info.file), new Range(info.position.line, info.position.character,
+                locations.push(new Location(Uri.file(info.fileName), new Range(info.position.line, info.position.character,
                 info.position.line, info.position.character + info.methodName.length)));
             }
             codeLens.command = {
-                arguments: [codeLens.document, codeLens.range.start, locations],
+                arguments: [Uri.file(codeLens.document.fileName), codeLens.range.start, locations],
                 command: "editor.action.showReferences",
                 title: locations.length === 1
                     ? "1 reference"
                     : `${locations.length} references`,
         };
-            return Promise.resolve(codeLens);
+            return codeLens;
         }, (err) => {
             codeLens.command = {
                 command: "",
                 title: "Could not determine references" + err
             };
-            return Promise.resolve(codeLens);
+            return codeLens;
         });
     }
 

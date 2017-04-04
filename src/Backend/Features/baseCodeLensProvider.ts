@@ -26,14 +26,14 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         }).catch(() => reject(null));
         }).then((definitions: CodeLensInfo[]) => {
             if (definitions == null || !definitions.length) {
-                return Promise.resolve([]);
+                return [];
             }
             return definitions.map((info: CodeLensInfo) =>
             new ReferencesCodeLens(document, info));
 
         }, (err: any) => {
             console.error(err);
-            return Promise.resolve(null);
+            return null;
         });
     }
 
