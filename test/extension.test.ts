@@ -23,6 +23,7 @@ function getProvider(startFilePath: string, position: vscode.Position, expectedR
     const statusbar: Statusbar = new Statusbar(context);
     const dafnyServer = new DafnyServer(statusbar, context);
     const dafnyDefinitionProvider = new DafnyDefinitionProvider(dafnyServer);
+    dafnyServer.reset();
     let actual: any = null;
 
     const testPromise = vscode.workspace.openTextDocument(workingFilePath).then((workingDocument) => {
