@@ -38,7 +38,7 @@ export class SymbolService {
 
     public getSymbolsFromDafny(document: TextDocument): Promise<any> {
         if (!document) {
-            return Promise.resolve([]);
+            return Promise.resolve(null);
         }
         return new Promise<any>((resolve, reject) => {
                 return this.askDafnyForSymbols(resolve, reject, document);
