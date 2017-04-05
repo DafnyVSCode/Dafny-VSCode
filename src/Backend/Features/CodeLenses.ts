@@ -1,28 +1,22 @@
-import {CodeLens, Position, Range, TextDocument} from "vscode";
+import {CodeLens, TextDocument} from "vscode";
+import { Reference, Symbol } from "./symbolService";
 export class ReferencesCodeLens extends CodeLens {
     constructor(public document: TextDocument, public codeLensInfo: CodeLensInfo) {
-        super(codeLensInfo.range);
+        super(codeLensInfo.symbol.range);
     }
 }
 
 export class CodeLensInfo {
-    public constructor(public range: Range, public symbol: string,
-                       public module: string, public parentClass: string) {
+    public constructor(public symbol: Symbol) {
     }
 }
 
 export class ReferenceInformation {
     public fileName: string;
-    public methodName: string;
-    public loc: number;
-    public position: Position;
-    constructor(dafnyReference: any, file: string) {
+    public reference: Reference;
+    constructor(dafnyReference: Reference, file: string) {
          if(dafnyReference) {
-            this.methodName = dafnyReference.MethodName;
-            this.loc = dafnyReference.Position;
-            const line = parseInt(dafnyReference.Line, 10) - 1; // 1 based
-            const column = Math.max(0, parseInt(dafnyReference.Column, 10) - 1); // ditto, but 0 can appear in some cases
-            this.position = new Position(line, column);
+            this.reference = dafnyReference;
             this.fileName = file;
         }
     }

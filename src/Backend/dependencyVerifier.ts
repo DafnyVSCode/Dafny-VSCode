@@ -17,7 +17,8 @@ export class DependencyVerifier {
     private upgradeCallback: () => any;
     private serverVersion: string;
 
-    public verifyDafnyServer(callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
+    public verifyDafnyServer(callbackSuccess: (serverVersion: string) => any,
+                             callbackError: (error: any) => any, upgradeCallback: () => any) {
         const spawnOptions = this.environment.getStandardSpawnOptions();
         const dafnyCommand: Command = this.environment.getStartDafnyCommand();
         this.callbackError = callbackError;
