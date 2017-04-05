@@ -3,7 +3,7 @@ import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../LanguageDefinition/keywords";
 import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { isPositionInString } from "./../../Strings/StringUtils";
-import { Symbol, SymbolTable } from "./symbolService";
+import { Symbol, SymbolTable } from "./symbols";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class DafnyDefinitionInformtation {
@@ -23,48 +23,38 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     Thenable<vscode.Location> {
         return this.provideDefinitionInternal(document, position).then((definitionInfo: DafnyDefinitionInformtation) => {
             if (definitionInfo == null || definitionInfo.filePath == null) {
-                return Promise.resolve(null);
+                return null;
             }
             const definitionResource = vscode.Uri.file(definitionInfo.filePath);
             return new vscode.Location(definitionResource, definitionInfo.symbol.start);
         }, (err) => {
             console.error(err);
-            return Promise.resolve(null);
+            return null;
         });
     }
 
     public provideDefinitionInternal(
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
-            return new Promise<DafnyDefinitionInformtation>((resolve, reject) => {
-                const wordRange = document.getWordRangeAtPosition(position);
-                const lineText = document.lineAt(position.line).text;
-                const word = wordRange ? document.getText(wordRange) : "";
-                if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
-                    || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
-                    return Promise.reject(null);
-                }
-                return this.askDafnyDef(resolve, reject, document, word);
-        });
-    }
-    public provideDefinitionInternalDirectly(document: vscode.TextDocument, symbol: string) {
-        return new Promise<DafnyDefinitionInformtation>((resolve, reject) => {
-            return this.askDafnyDef(resolve, reject, document, symbol);
-        });
+            const wordRange = document.getWordRangeAtPosition(position);
+            const lineText = document.lineAt(position.line).text;
+            const word = wordRange ? document.getText(wordRange) : "";
+            if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
+                || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
+                return null;
+            }
+            return this.findDefinition(document, word);
     }
 
-    private askDafnyDef(resolve: any, reject: any, document: vscode.TextDocument, symbolName: string) {
-        this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
+    private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
+        return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
             let found = false;
             for(const symb of symbolTable.symbols) {
                 if(symb.name === symbolName) {
                     found = true;
-                    resolve(new DafnyDefinitionInformtation(symb, document.fileName));
-                    break;
+                    return new DafnyDefinitionInformtation(symb, document.fileName);
                 }
             }
-            if(!found) {
-                resolve(null);
-            }
-        }).catch((err: any) => reject(err));
+            return null;
+        }).catch((err: any) => err);
     }
 }

@@ -1,5 +1,5 @@
 "use strict";
-import { SymbolTable } from "./symbolService";
+import { SymbolTable } from "./symbols";
 
 import { CodeLens, Location, Uri } from "vscode";
 import {DafnyServer} from "../dafnyServer";
@@ -11,19 +11,17 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         super(server);
     }
     public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
-            return new Promise<ReferenceInformation[]>((resolve, reject) => {
-                if(!codeLens.codeLensInfo) {
-                    return resolve(null);
-                }
-                return this.getReferences(resolve, reject, codeLens);
-        });
+        if(!codeLens.symbol) {
+            return null;
+        }
+        return this.getReferences(codeLens);
     }
 
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
             if (!referenceInfo) {
-                return Promise.resolve(null);
+                return null;
             }
             return this.buildReferenceCodeLens(codeLens, referenceInfo);
         }, (err) => {
@@ -57,22 +55,22 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             title: "Could not determine references"
         };
     }
-    private getReferences(resolve: any, reject: any, codeLens: ReferencesCodeLens) {
-        this.server.symbolService.getSymbols(codeLens.document).then( (symbols: SymbolTable) =>  {
+    private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
+        return this.server.symbolService.getSymbols(codeLens.document).then( (symbols: SymbolTable) =>  {
             if(symbols) {
                 const infos = this.parseReferenceResponse(symbols, codeLens);
-                resolve(infos);
+                return infos;
             } else {
-                resolve(null);
+                return null;
             }
-        }).catch(() => {reject(null); });
+        }).catch(() => null);
     }
 
     private parseReferenceResponse(symbolsTable: SymbolTable, codeLens: ReferencesCodeLens): ReferenceInformation[] {
         const references: ReferenceInformation[] = [];
         for(const symbol of symbolsTable.symbols) {
             for(const reference of symbol.References) {
-                if(symbol.name === codeLens.codeLensInfo.symbol.name) {
+                if(symbol.name === codeLens.symbol.name) {
                     references.push(new ReferenceInformation(reference, codeLens.document.fileName));
                 }
             }

@@ -1,13 +1,9 @@
 import {CodeLens, TextDocument} from "vscode";
-import { Reference, Symbol } from "./symbolService";
-export class ReferencesCodeLens extends CodeLens {
-    constructor(public document: TextDocument, public codeLensInfo: CodeLensInfo) {
-        super(codeLensInfo.symbol.range);
-    }
-}
+import { Reference, Symbol } from "./symbols";
 
-export class CodeLensInfo {
-    public constructor(public symbol: Symbol) {
+export class ReferencesCodeLens extends CodeLens {
+    constructor(public document: TextDocument, public symbol: Symbol) {
+        super(symbol.range);
     }
 }
 
@@ -15,9 +11,7 @@ export class ReferenceInformation {
     public fileName: string;
     public reference: Reference;
     constructor(dafnyReference: Reference, file: string) {
-         if(dafnyReference) {
-            this.reference = dafnyReference;
-            this.fileName = file;
-        }
+        this.reference = dafnyReference;
+        this.fileName = file;
     }
 }

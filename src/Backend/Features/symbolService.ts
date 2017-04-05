@@ -1,80 +1,10 @@
 "use strict";
-import {Position, Range, TextDocument} from "vscode";
+import {TextDocument} from "vscode";
 import {DafnyServer} from "../dafnyServer";
 import { EnvironmentConfig } from "./../../Strings/stringRessources";
 import { hashString } from "./../../Strings/StringUtils";
 import { bubbleRejectedPromise } from "./../../Util/PromiseHelpers";
-
-export enum SymbolType {
-    Unknown, Class, Method, Function, Field
-}
-export class SymbolTable {
-    public symbols: Symbol[];
-    public hash: number;
-    constructor() {
-        this.symbols = [];
-    }
-}
-export class Symbol {
-    public column: number;
-    public line: number;
-    public module: string;
-    public name: string;
-    public position: number;
-    public symbolType: SymbolType;
-    public parentClass: string;
-    public References: Reference[];
-    public start: Position;
-    public end: Position;
-    public range: Range;
-
-    constructor(column: number, line: number, module: string, name: string, position: number, parentClass: string) {
-        this.column = column;
-        this.line = line;
-        this.module = module;
-        this.name = name;
-        this.position = position;
-        this.parentClass = parentClass;
-        this.References = [];
-        this.start = new Position(this.line, this.column);
-        this.end = new Position(this.line, this.column + Number(this.name.length));
-        this.range = new Range(this.start, this.end);
-    }
-    public setSymbolType(type: string): void {
-        switch(type) {
-            case "Class": this.symbolType = SymbolType.Class; break;
-            case "Method": this.symbolType = SymbolType.Method; break;
-            case "Function": this.symbolType = SymbolType.Function; break;
-            case "Field": this.symbolType = SymbolType.Field; break;
-            default: this.symbolType = SymbolType.Unknown; break;
-        }
-    }
-    public isValid(): boolean {
-        return !isNaN(this.column) && !isNaN(this.line) && this.name !== "" && this.name !== undefined;
-    }
-}
-export class Reference {
-    public column: number;
-    public line: number;
-    public position: number;
-    public methodName: string;
-    public start: Position;
-    public end: Position;
-    public range: Range;
-
-    constructor(column: number, line: number, position: number, methodName: string) {
-        this.column = column;
-        this.line = line;
-        this.position = position;
-        this.methodName = methodName;
-        this.start = new Position(this.line, this.column);
-        this.end = new Position(this.line, this.column + this.methodName.length);
-        this.range = new Range(this.start, this.end);
-    }
-    public isValid(): boolean {
-        return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";
-    }
-}
+import { Reference, Symbol, SymbolTable } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
 
@@ -120,33 +50,42 @@ export class SymbolService {
         const symbolTable = new SymbolTable();
         if(response && response.length && response.length > 0) {
             for(const symbol of response) {
-                const line = Math.max(0, parseInt(symbol.Line, 10) - 1); // 1 based
-                const column = Math.max(0, parseInt(symbol.Column, 10) - 1); // ditto, but 0 can appear in some cases
-                const module = symbol.Module;
-                const name = symbol.Name;
-                const parentClass = symbol.ParentClass;
-                const position = symbol.Position;
-                const parsedSymbol = new Symbol(column, line, module, name, position, parentClass);
+                const parsedSymbol = this.parseSymbol(symbol);
                 if(parsedSymbol.isValid()) {
-                    parsedSymbol.setSymbolType(symbol.SymbolType);
-                    if(symbol.References && symbol.References.length && symbol.References.length > 0) {
-                        for(const reference of symbol.References) {
-                            const methodName = reference.MethodName;
-                            const loc = reference.Position;
-                            const referenceLine = parseInt(reference.Line, 10) - 1; // 1 based
-                            const referenceColumn =
-                                Math.max(0, parseInt(reference.Column, 10) - 1); // ditto, but 0 can appear in some cases
-                            const parsedReference = new Reference(referenceColumn, referenceLine, loc, methodName);
-                            if(parsedReference.isValid()) {
-                                parsedSymbol.References.push(parsedReference);
-                            }
-                        }
-                    }
                     symbolTable.symbols.push(parsedSymbol);
                 }
             }
         }
         return symbolTable;
+    }
+    private parseSymbol(symbol: any): Symbol {
+        const line = Math.max(0, parseInt(symbol.Line, 10) - 1); // 1 based
+        const column = Math.max(0, parseInt(symbol.Column, 10) - 1); // ditto, but 0 can appear in some cases
+        const module = symbol.Module;
+        const name = symbol.Name;
+        const parentClass = symbol.ParentClass;
+        const position = symbol.Position;
+        const parsedSymbol = new Symbol(column, line, module, name, position, parentClass);
+        if(parsedSymbol.isValid()) {
+            parsedSymbol.setSymbolType(symbol.SymbolType);
+            if(symbol.References && symbol.References.length && symbol.References.length > 0) {
+                for(const reference of symbol.References) {
+                    const parsedReference = this.parseReference(reference);
+                    if(parsedReference.isValid()) {
+                        parsedSymbol.References.push(parsedReference);
+                    }
+                }
+            }
+        }
+        return parsedSymbol;
+    }
+    private parseReference(reference: any): Reference {
+        const methodName = reference.MethodName;
+        const loc = reference.Position;
+        const referenceLine = parseInt(reference.Line, 10) - 1; // 1 based
+        const referenceColumn =
+            Math.max(0, parseInt(reference.Column, 10) - 1); // ditto, but 0 can appear in some cases
+        return new Reference(referenceColumn, referenceLine, loc, methodName);
     }
     private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
         this.server.addDocument(document, "symbols", (log) =>  {
