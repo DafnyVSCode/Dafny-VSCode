@@ -85,13 +85,13 @@ export class DafnyDiagnosticsProvider {
     }
 
     private doVerify(textDocument: vscode.TextDocument): void {
-        if (textDocument.languageId === EnvironmentConfig.Dafny) {
+        if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument, "verify");
         }
     }
 
     private docChanged(change: vscode.TextDocumentChangeEvent): void {
-        if (change.document.languageId === EnvironmentConfig.Dafny) {
+        if (change !== null && change.document !== null && change.document.languageId === EnvironmentConfig.Dafny) {
 
             const docName: string = change.document.fileName;
 
