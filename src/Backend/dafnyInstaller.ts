@@ -47,7 +47,7 @@ export class DafnyInstaller {
     }
 
      public uninstall(showUninstallMessage: boolean = true): void {
-        const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
+        //const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         const terminal = vscode.window.createTerminal("Uninstall Dafny");
         terminal.show(true);
 
@@ -66,10 +66,11 @@ export class DafnyInstaller {
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
             if(e.name === terminal.name) {
-                config.update(Config.DafnyBasePath, undefined, true);
-                if(showUninstallMessage) {
-                    vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
-                }
+                //config.update(Config.DafnyBasePath, undefined, true).then(() => {
+                    if(showUninstallMessage) {
+                        vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
+                    }
+                //});
             }
         });
 
@@ -80,6 +81,8 @@ export class DafnyInstaller {
         const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
 
         config.update(Config.DafnyBasePath, dafnyServerPath, true).then(() => {
+            console.log("updated config");
+            vscode.window.showInformationMessage("You may need to restart VSCode, if the DafnyServer doesn't start.");
             this.installationComplete();
         });
     }
