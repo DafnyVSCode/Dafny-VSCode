@@ -106,7 +106,7 @@ export class SymbolService {
         try {
             return JSON.parse(info);
         } catch(exception) {
-            console.error("Failure  to parse response: " + exception);
+            console.error("Failure  to parse response: " + exception + ", json: " + info);
             return null;
         }
     }
