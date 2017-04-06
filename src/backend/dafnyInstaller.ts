@@ -7,7 +7,7 @@ import {Config, EnvironmentConfig, InfoMsg } from "../strings/stringRessources";
 
 export class DafnyInstaller {
 
-    constructor(private extensionPath: string, private installationComplete?: () => any) {
+    constructor(private extensionPath: string, private installationComplete?: () => any, private uninstallComplete?: () => any) {
     }
 
     public install(): void {
@@ -70,6 +70,7 @@ export class DafnyInstaller {
                     if(showUninstallMessage) {
                         vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
                     }
+                    this.uninstallComplete();
                 //});
             }
         });

@@ -79,12 +79,13 @@ export function activate(context: vscode.ExtensionContext): void {
                 console.log("Should not happen, that the version which has been installed is already obsolete");
                 init("unknown");
             });
+        }, () => {
+            installer.install();
         });
         if (provider) {
             provider.stop();
         }
         installer.uninstall(false);
-        installer.install();
     }
 
 }
