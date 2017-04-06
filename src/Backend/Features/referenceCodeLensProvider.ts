@@ -4,7 +4,7 @@ import { SymbolTable } from "./symbols";
 import { CodeLens, Location, Uri } from "vscode";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
-import { ReferenceInformation, ReferencesCodeLens } from "./CodeLenses";
+import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {

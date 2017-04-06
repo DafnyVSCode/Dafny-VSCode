@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 import {DafnyServer} from "../dafnyServer";
-import { dafnyKeywords } from "./../../LanguageDefinition/keywords";
-import { EnvironmentConfig } from "./../../Strings/stringRessources";
-import { isPositionInString } from "./../../Strings/StringUtils";
+import { dafnyKeywords } from "./../../languageDefinition/keywords";
+import { EnvironmentConfig } from "./../../strings/stringRessources";
+import { isPositionInString } from "./../../strings/stringUtils";
 import { Symbol, SymbolTable } from "./symbols";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
@@ -36,8 +36,7 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     public provideDefinitionInternal(
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
             const wordRange = document.getWordRangeAtPosition(position);
-            /*const wordBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
-            console.log(wordBeforeIdentifier);*/
+            console.log(this.isMethodCall(document, position));
             const lineText = document.lineAt(position.line).text;
             const word = wordRange ? document.getText(wordRange) : "";
             if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
@@ -47,6 +46,26 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             return this.findDefinition(document, word);
     }
 
+    private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {
+        const wordRange = document.getWordRangeAtPosition(position);
+        if(!wordRange) {
+            return false;
+        }
+        console.log("this: " + document.getText(wordRange));
+        const wordRangeBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
+        if(!wordRangeBeforeIdentifier) {
+            return false;
+        }
+        console.log("before: " + document.getText(wordRangeBeforeIdentifier));
+        const seperator = document.getText(new vscode.Range(wordRangeBeforeIdentifier.end, wordRange.start));
+        if(!seperator) {
+            return false;
+        }
+        console.log("sep: " + seperator);
+        // matches if a point is between the identifer and the word before it -> its a method call
+        const match = seperator.match(/\w*\.\w*/);
+        return match && match.length > 0;
+    }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
         return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
             let found = false;

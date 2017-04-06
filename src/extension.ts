@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {DafnyInstaller} from "./Backend/dafnyInstaller";
-import {DependencyVerifier} from "./Backend/dependencyVerifier";
+import {DafnyInstaller} from "./backend/dafnyInstaller";
+import {DependencyVerifier} from "./backend/dependencyVerifier";
 
-import {DafnyDiagnosticsProvider} from "./Frontend/dafnyProvider";
-import { Answer, ErrorMsg, InfoMsg } from "./Strings/stringRessources";
-import {Commands} from "./Strings/stringRessources";
+import {DafnyDiagnosticsProvider} from "./frontend/dafnyProvider";
+import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
+import {Commands} from "./strings/stringRessources";
 
 export function activate(context: vscode.ExtensionContext): void {
 

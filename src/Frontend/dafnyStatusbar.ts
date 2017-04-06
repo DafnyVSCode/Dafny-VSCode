@@ -1,9 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
-import {Context} from "../Backend/context";
-import {VerificationRequest} from "../Backend/verificationRequest";
-import {VerificationResult} from "../Backend/verificationResults";
-import {EnvironmentConfig, StatusString} from "../Strings/stringRessources";
+import {Context} from "../backend/context";
+import {VerificationRequest} from "../backend/verificationRequest";
+import {VerificationResult} from "../backend/verificationResults";
+import {EnvironmentConfig, StatusString} from "../strings/stringRessources";
 
 class Priority {
     public static low: number = 1;

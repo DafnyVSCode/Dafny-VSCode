@@ -1,12 +1,12 @@
 "use strict";
 
 import * as vscode from "vscode";
-import {Context} from "../Backend/context";
-import {DafnyServer} from "../Backend/dafnyServer";
-import { DAFNYMODE } from "../Backend/Features/definitionProvider";
-import { DafnyDefinitionProvider } from "../Backend/Features/definitionProvider";
-import { DafnyReferencesCodeLensProvider } from "../Backend/Features/referenceCodeLensProvider";
-import {Config,  EnvironmentConfig } from "../Strings/stringRessources";
+import {Context} from "../backend/context";
+import {DafnyServer} from "../backend/dafnyServer";
+import { DAFNYMODE } from "../backend/features/definitionProvider";
+import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
+import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
+import {Config,  EnvironmentConfig } from "../strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
 export class DafnyDiagnosticsProvider {

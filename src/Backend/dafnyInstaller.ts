@@ -2,8 +2,8 @@
 
 import * as os from "os";
 import * as vscode from "vscode";
-import {DafnyUnsupportedPlatform} from "../ErrorHandling/errors";
-import {Config, EnvironmentConfig, InfoMsg } from "../Strings/stringRessources";
+import {DafnyUnsupportedPlatform} from "../errorHandling/errors";
+import {Config, EnvironmentConfig, InfoMsg } from "../strings/stringRessources";
 
 export class DafnyInstaller {
 

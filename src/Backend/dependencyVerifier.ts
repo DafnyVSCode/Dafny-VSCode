@@ -1,6 +1,6 @@
 "use strict";
 import * as cp from "child_process";
-import { ProcessWrapper } from "../Process/process";
+import { ProcessWrapper } from "../process/process";
 import { Command } from "./environment";
 import { Environment } from "./environment";
 

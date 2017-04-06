@@ -3,8 +3,8 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode";
-import {IncorrectPathExeption} from "../ErrorHandling/errors";
-import {Application, Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../Strings/stringRessources";
+import {IncorrectPathExeption} from "../errorHandling/errors";
+import {Application, Config, EnvironmentConfig, ErrorMsg, WarningMsg } from "../strings/stringRessources";
 
 export class Command {
     public notFound: boolean = false;

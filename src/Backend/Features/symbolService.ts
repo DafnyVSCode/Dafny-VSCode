@@ -1,9 +1,9 @@
 "use strict";
 import {TextDocument} from "vscode";
 import {DafnyServer} from "../dafnyServer";
-import { EnvironmentConfig } from "./../../Strings/stringRessources";
-import { hashString } from "./../../Strings/StringUtils";
-import { bubbleRejectedPromise } from "./../../Util/PromiseHelpers";
+import { EnvironmentConfig } from "./../../strings/stringRessources";
+import { hashString } from "./../../strings/stringUtils";
+import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { Reference, Symbol, SymbolTable } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};

@@ -1,6 +1,6 @@
 import * as cp from "child_process";
 import {CommandEndFailedException, CommandFailedException,
-    DafnyServerExeption, RequestFailedException} from "../ErrorHandling/errors";
+    DafnyServerExeption, RequestFailedException} from "../errorHandling/errors";
 
 export class ProcessWrapper {
     public pid: number;

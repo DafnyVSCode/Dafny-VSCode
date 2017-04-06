@@ -1,7 +1,7 @@
 "use strict";
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
-import {ByteOutOfRangeException} from "../ErrorHandling/errors";
+import {ByteOutOfRangeException} from "../errorHandling/errors";
 
 export function encodeBase64(task: any): string {
     const jsonString: string = JSON.stringify(task);

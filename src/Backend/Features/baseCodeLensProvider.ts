@@ -1,8 +1,8 @@
 "use strict";
 import {CodeLens, CodeLensProvider, Event, EventEmitter, TextDocument} from "vscode";
 import {DafnyServer} from "../dafnyServer";
-import { bubbleRejectedPromise } from "./../../Util/PromiseHelpers";
-import { ReferencesCodeLens } from "./CodeLenses";
+import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
+import { ReferencesCodeLens } from "./codeLenses";
 import { SymbolType } from "./symbols";
 import { Symbol, SymbolTable } from "./symbols";
 

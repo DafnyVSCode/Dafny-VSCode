@@ -1,8 +1,8 @@
 "use strict";
 
 import * as vscode from "vscode";
-import { Verification } from "../Strings/regexRessources";
-import { EnvironmentConfig, Severity } from "../Strings/stringRessources";
+import { Verification } from "../strings/regexRessources";
+import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import {VerificationRequest} from "./verificationRequest";
 
 export enum VerificationStatus {
