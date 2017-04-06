@@ -11,16 +11,15 @@ export class ProcessWrapper {
         process: cp.ChildProcess,
         errorCallback: (error: Error) => void,
         dataCallback: () => void,
-        exitCallback: (code: number) => void,
-        commandEndRegex: RegExp) {
+        exitCallback: (code: number) => void) {
         if(!process.pid) {
             throw new DafnyServerExeption();
         }
         this.pid = process.pid;
-        this.commandEndRegex = commandEndRegex;
         this.serverProc = process;
         this.serverProc.stdout.on("error", errorCallback);
         this.serverProc.stdout.on("data", (data: Buffer) => {
+            this.outBuf = this.outBuf;  //refresh outBuf, otherwise it may still hold old data
             this.outBuf += data.toString();
             dataCallback();
         });

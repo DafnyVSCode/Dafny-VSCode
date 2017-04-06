@@ -1,7 +1,6 @@
 "use strict";
 import * as cp from "child_process";
 import { ProcessWrapper } from "../Process/process";
-import { Verification } from "./../Strings/regexRessources";
 import { Command } from "./environment";
 import { Environment } from "./environment";
 
@@ -57,7 +56,7 @@ export class DependencyVerifier {
                     this.serverProc.sendQuit();
                 }
             },
-            (code: number) => { this.handleProcessExit(code); }, Verification.commandEndRegexDafnyServer);
+            (code: number) => { this.handleProcessExit(code); });
     }
 
     private handleProcessExit(code: number) {

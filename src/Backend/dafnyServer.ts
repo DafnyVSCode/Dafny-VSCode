@@ -6,7 +6,6 @@ import {Statusbar} from "../Frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../Process/process";
 import { encodeBase64 } from "../Strings/stringEncoding";
 import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../Strings/stringRessources";
-import { Verification } from "./../Strings/regexRessources";
 import {Context} from "./context";
 import { Command } from "./environment";
 import { Environment } from "./environment";
@@ -115,19 +114,22 @@ export class DafnyServer {
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-            console.log(log);
+            console.log(this.serverProc.outBuf);
             if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
                 this.context.collectRequest(log);
             } else if(this.context.activeRequest) {
                 this.context.activeRequest.callback(log);
                 this.context.activeRequest = null;
+            } else {
+                console.error("active request was null");
             }
+
             this.serverProc.clearBuffer();
+            this.statusbar.changeServerStatus(StatusString.Idle);
             this.statusbar.update();
+            this.active = false;
+            this.sendNextRequest();
         }
-        this.statusbar.changeServerStatus(StatusString.Idle);
-        this.active = false;
-        this.sendNextRequest();
     }
 
     private handleProcessExit() {
@@ -178,7 +180,7 @@ export class DafnyServer {
         return new ProcessWrapper(process,
             (err: Error) => { this.handleProcessError(err); },
             () => {this.handleProcessData(); },
-            () => { this.handleProcessExit(); }, Verification.commandEndRegexDafnyServer);
+            () => { this.handleProcessExit(); });
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {
