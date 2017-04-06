@@ -36,6 +36,8 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     public provideDefinitionInternal(
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
             const wordRange = document.getWordRangeAtPosition(position);
+            /*const wordBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
+            console.log(wordBeforeIdentifier);*/
             const lineText = document.lineAt(position.line).text;
             const word = wordRange ? document.getText(wordRange) : "";
             if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)

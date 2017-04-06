@@ -24,8 +24,9 @@ export class SymbolService {
     }
 
     public getSymbols(doc: TextDocument): Promise<SymbolTable> {
+        const hash = hashString(doc.getText());
         const symbols = this.symbolTable[doc.fileName];
-        if(!symbols) {
+        if(!symbols || hash !== symbols.hash) {
             return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
                 symb.hash = hashString(doc.getText());
                 this.addSymbols(doc, symb, true);
