@@ -77,6 +77,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
             }, () => {
                 console.log("Should not happen, that the version which has been installed is already obsolete");
+                init("unknown");
             });
         });
         if (provider) {

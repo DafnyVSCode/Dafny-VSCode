@@ -9,7 +9,7 @@ export class DependencyVerifier {
     private upgradeNecessary = "UPDATE_NECESSARY";
     private version = "VERSION:";
 
-    private environment: Environment = new Environment();
+
     private serverProc: ProcessWrapper;
     private callbackSuccess: (serverVersion: string) => any;
     private callbackError: (error: any) => any;
@@ -18,8 +18,9 @@ export class DependencyVerifier {
 
     public verifyDafnyServer(callbackSuccess: (serverVersion: string) => any,
                              callbackError: (error: any) => any, upgradeCallback: () => any) {
-        const spawnOptions = this.environment.getStandardSpawnOptions();
-        const dafnyCommand: Command = this.environment.getStartDafnyCommand();
+        const environment: Environment = new Environment();
+        const spawnOptions = environment.getStandardSpawnOptions();
+        const dafnyCommand: Command = environment.getStartDafnyCommand();
         this.callbackError = callbackError;
         this.callbackSuccess = callbackSuccess;
         this.upgradeCallback = upgradeCallback;

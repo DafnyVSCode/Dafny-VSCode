@@ -4,6 +4,7 @@ Dafny support for Visual Studio Code.
 
 ## Features
 * **NEW** Update notification if there is a newer release of Dafny. **Needs Dafny 1.9.11+**
+* **NEW** CodeLens showing method references
 * DafnyDefinition provider to support refactorings in the future 
 * Automatic verification as one types, 
 * Automatic installation of DafnyServer (windows, osx and ubuntu)
@@ -46,6 +47,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.8.0 CodeLens showing method references, Go to Definition, version checking for newer Dafny release. 
 * 0.6.0 DafnyDef allows to get SymbolInformation from DafnyServer, which will allow in the future to implement Refactorings. Go to Definition is already implemented. 
 * 0.5.5 Fallback to wget, if curl is not found.
 * 0.5.4 Automatic validation as you type.  
