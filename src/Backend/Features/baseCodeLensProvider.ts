@@ -3,6 +3,7 @@ import {CodeLens, CodeLensProvider, Event, EventEmitter, TextDocument} from "vsc
 import {DafnyServer} from "../dafnyServer";
 import { bubbleRejectedPromise } from "./../../Util/PromiseHelpers";
 import { ReferencesCodeLens } from "./CodeLenses";
+import { SymbolType } from "./symbols";
 import { Symbol, SymbolTable } from "./symbols";
 
 export class DafnyBaseCodeLensProvider implements CodeLensProvider {
@@ -21,8 +22,10 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         }
         return this.server.symbolService.getSymbols(document)
         .then((symbolTable: SymbolTable) => {
-            return symbolTable.symbols.map((info: Symbol) =>
-                new ReferencesCodeLens(document, info));
+            return symbolTable.symbols
+                .filter((info: Symbol) => info.name !== "_default" &&
+                    (info.symbolType === SymbolType.Class || info.symbolType === SymbolType.Unknown))
+                .map((info: Symbol) => new ReferencesCodeLens(document, info));
         }, bubbleRejectedPromise);
     }
 }
