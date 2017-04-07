@@ -9,7 +9,6 @@ export class DependencyVerifier {
     private upgradeNecessary = "UPDATE_NECESSARY";
     private version = "VERSION:";
 
-
     private serverProc: ProcessWrapper;
     private callbackSuccess: (serverVersion: string) => any;
     private callbackError: (error: any) => any;

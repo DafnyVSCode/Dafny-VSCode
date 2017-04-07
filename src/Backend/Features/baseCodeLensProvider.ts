@@ -23,8 +23,8 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
         return this.server.symbolService.getSymbols(document)
         .then((symbolTable: SymbolTable) => {
             return symbolTable.symbols
-                .filter((info: Symbol) => info.name !== "_default" &&
-                    (info.symbolType === SymbolType.Class || info.symbolType === SymbolType.Unknown))
+                .filter((info: Symbol) => !(info.name === "_default" && info.symbolType === SymbolType.Class) &&
+                    (info.symbolType !== SymbolType.Unknown && info.symbolType !== SymbolType.Call))
                 .map((info: Symbol) => new ReferencesCodeLens(document, info));
         }, bubbleRejectedPromise);
     }

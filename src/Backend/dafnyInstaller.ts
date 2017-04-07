@@ -47,7 +47,7 @@ export class DafnyInstaller {
     }
 
      public uninstall(showUninstallMessage: boolean = true): void {
-        //const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
+        // const config = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         const terminal = vscode.window.createTerminal("Uninstall Dafny");
         terminal.show(true);
 
@@ -66,11 +66,11 @@ export class DafnyInstaller {
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
             if(e.name === terminal.name) {
-                //config.update(Config.DafnyBasePath, undefined, true).then(() => {
+                // config.update(Config.DafnyBasePath, undefined, true).then(() => {
                     if(showUninstallMessage) {
                         vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
                     }
-                //});
+                // });
             }
         });
 

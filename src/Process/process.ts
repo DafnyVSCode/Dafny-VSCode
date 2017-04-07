@@ -19,7 +19,7 @@ export class ProcessWrapper {
         this.serverProc = process;
         this.serverProc.stdout.on("error", errorCallback);
         this.serverProc.stdout.on("data", (data: Buffer) => {
-            this.outBuf = this.outBuf;  //refresh outBuf, otherwise it may still hold old data
+            this.outBuf = this.outBuf;  // refresh outBuf, otherwise it may still hold old data
             this.outBuf += data.toString();
             dataCallback();
         });

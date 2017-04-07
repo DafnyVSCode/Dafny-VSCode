@@ -1,7 +1,7 @@
 import {Position, Range} from "vscode";
 
 export enum SymbolType {
-    Unknown, Class, Method, Function, Field
+    Unknown, Class, Method, Function, Field, Call
 }
 export class SymbolTable {
     public symbols: Symbol[];
@@ -22,8 +22,9 @@ export class Symbol {
     public start: Position;
     public end: Position;
     public range: Range;
+    public call: string;
 
-    constructor(column: number, line: number, module: string, name: string, position: number, parentClass: string) {
+    constructor(column: number, line: number, module: string, name: string, position: number, parentClass: string, call: string) {
         this.column = column;
         this.line = line;
         this.module = module;
@@ -31,6 +32,7 @@ export class Symbol {
         this.position = position;
         this.parentClass = parentClass;
         this.References = [];
+        this.call = call;
         this.start = new Position(this.line, this.column);
         this.end = new Position(this.line, this.column + Number(this.name.length));
         this.range = new Range(this.start, this.end);
@@ -41,6 +43,7 @@ export class Symbol {
             case "Method": this.symbolType = SymbolType.Method; break;
             case "Function": this.symbolType = SymbolType.Function; break;
             case "Field": this.symbolType = SymbolType.Field; break;
+            case "Call": this.symbolType = SymbolType.Call; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
     }

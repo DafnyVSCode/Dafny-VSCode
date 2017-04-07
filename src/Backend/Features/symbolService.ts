@@ -62,11 +62,12 @@ export class SymbolService {
     private parseSymbol(symbol: any): Symbol {
         const line = Math.max(0, parseInt(symbol.Line, 10) - 1); // 1 based
         const column = Math.max(0, parseInt(symbol.Column, 10) - 1); // ditto, but 0 can appear in some cases
-        const module = symbol.Module;
+        const mod = symbol.Module;
         const name = symbol.Name;
         const parentClass = symbol.ParentClass;
         const position = symbol.Position;
-        const parsedSymbol = new Symbol(column, line, module, name, position, parentClass);
+        const call = symbol.Call;
+        const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
             if(symbol.References && symbol.References.length && symbol.References.length > 0) {

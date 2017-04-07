@@ -3,7 +3,7 @@ import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../languageDefinition/keywords";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
 import { isPositionInString } from "./../../strings/stringUtils";
-import { Symbol, SymbolTable } from "./symbols";
+import { Symbol, SymbolTable, SymbolType } from "./symbols";
 
 export const DAFNYMODE: vscode.DocumentFilter = { language: EnvironmentConfig.Dafny, scheme: "file" };
 export class DafnyDefinitionInformtation {
@@ -36,7 +36,20 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     public provideDefinitionInternal(
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
             const wordRange = document.getWordRangeAtPosition(position);
-            console.log(this.isMethodCall(document, position));
+            if(this.isMethodCall(document, position)) {
+                return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
+                    const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
+                    console.log(call);
+                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
+                        if(symb.call === call) {
+                            const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
+                                s.parentClass === symb.parentClass && s.name === symb.name; });
+                            return new DafnyDefinitionInformtation(definitionSymbol, document.fileName);
+                        }
+                    }
+                    return null;
+                }).catch((err: any) => err);
+            }
             const lineText = document.lineAt(position.line).text;
             const word = wordRange ? document.getText(wordRange) : "";
             if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
@@ -46,6 +59,14 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             return this.findDefinition(document, word);
     }
 
+    private getFullyQualifiedNameOfCalledMethod(document: vscode.TextDocument, position: vscode.Position): string {
+        const wordRange = document.getWordRangeAtPosition(position);
+        const wordRangeBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
+
+        const call = document.getText(wordRange);
+        const designator = document.getText(wordRangeBeforeIdentifier);
+        return designator + "." + call;
+    }
     private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {
         const wordRange = document.getWordRangeAtPosition(position);
         if(!wordRange) {
@@ -68,10 +89,8 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
         return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
-            let found = false;
             for(const symb of symbolTable.symbols) {
                 if(symb.name === symbolName) {
-                    found = true;
                     return new DafnyDefinitionInformtation(symb, document.fileName);
                 }
             }
