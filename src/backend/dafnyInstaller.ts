@@ -66,13 +66,11 @@ export class DafnyInstaller {
 
         vscode.window.onDidCloseTerminal((e: vscode.Terminal) => {
             if(e.name === terminal.name) {
-                // config.update(Config.DafnyBasePath, undefined, true).then(() => {
                     if(showUninstallMessage) {
                         vscode.window.showInformationMessage(InfoMsg.DafnyUninstallationSucceeded);
                     }
 
                     this.uninstallComplete();
-                //});
             }
         });
 
