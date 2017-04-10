@@ -246,7 +246,6 @@
 		<dict>
 			<key>patterns</key>
 			<array>
-
 				<dict>
 					<key>begin</key>
 					<string>:\s*(\w+)</string>
@@ -255,11 +254,37 @@
 						<key>1</key>
 						<dict>
 							<key>name</key>
-							<string>entity.name.function.dafny</string>
+							<string>storage.type.dafny</string>
 						</dict>
 					</dict>
 					<key>end</key>
 					<string>\s*|,|\)|\}|requires|ensures|modifies</string>
+					<key>name</key>
+					<string>meta.type.identifier.dafny</string>
+				</dict>
+				<dict>
+					<key>include</key>
+					<string>#generics</string>
+				</dict>
+			</array>
+		</dict>
+		<key>generics</key>
+		<dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>begin</key>
+					<string>&lt;(\w+)</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>storage.type.dafny</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>&gt;</string>
 					<key>name</key>
 					<string>meta.type.identifier.dafny</string>
 				</dict>
