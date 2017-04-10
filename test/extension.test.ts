@@ -6,10 +6,10 @@
 // the module 'assert' provides assertion methods from node
 import * as assert from "assert";
 import * as vscode from "vscode";
-import {Context} from "../src/Backend/context";
-import {DafnyServer} from "../src/Backend/dafnyServer";
-import {DafnyDefinitionProvider} from "../src/Backend/Features/definitionProvider";
-import {Statusbar} from "../src/Frontend/dafnyStatusbar";
+import {Context} from "../src/backend/context";
+import {DafnyServer} from "../src/backend/dafnyServer";
+import {DafnyDefinitionProvider} from "../src/backend/features/definitionProvider";
+import {Statusbar} from "../src/frontend/dafnyStatusbar";
 
 const extensionID = "FunctionalCorrectness.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
