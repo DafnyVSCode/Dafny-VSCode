@@ -28,8 +28,10 @@ export class Symbol {
     public end: Position;
     public range: Range;
     public call: string;
+    public fileName: string;
 
-    constructor(column: number, line: number, module: string, name: string, position: number, parentClass: string, call: string) {
+    constructor(column: number, line: number, module: string, name: string,
+                position: number, parentClass: string, call: string, fileName: string) {
         this.column = column;
         this.line = line;
         this.module = module;
@@ -41,6 +43,7 @@ export class Symbol {
         this.start = new Position(this.line, this.column);
         this.end = new Position(this.line, this.column + Number(this.name.length));
         this.range = new Range(this.start, this.end);
+        this.fileName = fileName;
     }
     public setSymbolType(type: string): void {
         switch(type) {
@@ -71,8 +74,9 @@ export class Reference {
     public start: Position;
     public end: Position;
     public range: Range;
+    public fileName: string;
 
-    constructor(column: number, line: number, position: number, methodName: string) {
+    constructor(column: number, line: number, position: number, methodName: string, fileName: string) {
         this.column = column;
         this.line = line;
         this.position = position;
@@ -80,6 +84,7 @@ export class Reference {
         this.start = new Position(this.line, this.column);
         this.end = new Position(this.line, this.column + this.methodName.length);
         this.range = new Range(this.start, this.end);
+        this.fileName = fileName;
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";

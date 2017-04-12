@@ -59,7 +59,7 @@ export class SymbolService {
         const symbolTable = new SymbolTable(fileName);
         if(response && response.length && response.length > 0) {
             for(const symbol of response) {
-                const parsedSymbol = this.parseSymbol(symbol);
+                const parsedSymbol = this.parseSymbol(symbol, fileName);
                 if(parsedSymbol.isValid()) {
                     symbolTable.symbols.push(parsedSymbol);
                 }
@@ -67,7 +67,7 @@ export class SymbolService {
         }
         return symbolTable;
     }
-    private parseSymbol(symbol: any): Symbol {
+    private parseSymbol(symbol: any, fileName: string): Symbol {
         const line = this.adjustDafnyLinePositionInfo(symbol.Line);
         const column = this.adjustDafnyColumnPositionInfo(symbol.Column);
         const mod = symbol.Module;
@@ -75,7 +75,7 @@ export class SymbolService {
         const parentClass = symbol.ParentClass;
         const position = symbol.Position;
         const call = symbol.Call;
-        const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call);
+        const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call, fileName);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
             if(parsedSymbol.symbolType === SymbolType.Class) {
@@ -86,7 +86,7 @@ export class SymbolService {
             }
             if(symbol.References && symbol.References.length && symbol.References.length > 0) {
                 for(const reference of symbol.References) {
-                    const parsedReference = this.parseReference(reference);
+                    const parsedReference = this.parseReference(reference, fileName);
                     if(parsedReference.isValid()) {
                         parsedSymbol.References.push(parsedReference);
                     }
@@ -95,12 +95,12 @@ export class SymbolService {
         }
         return parsedSymbol;
     }
-    private parseReference(reference: any): Reference {
+    private parseReference(reference: any, fileName: string): Reference {
         const methodName = reference.MethodName;
         const loc = reference.Position;
         const referenceLine = this.adjustDafnyLinePositionInfo(reference.Line);
         const referenceColumn = this.adjustDafnyColumnPositionInfo(reference.Column);
-        return new Reference(referenceColumn, referenceLine, loc, methodName);
+        return new Reference(referenceColumn, referenceLine, loc, methodName, fileName);
     }
     private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
         this.server.addDocument(document, "symbols", (log) =>  {

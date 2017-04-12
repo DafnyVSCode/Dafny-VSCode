@@ -1,8 +1,8 @@
-import {CodeLens, TextDocument} from "vscode";
+import {CodeLens} from "vscode";
 import { Reference, Symbol } from "./symbols";
 
 export class ReferencesCodeLens extends CodeLens {
-    constructor(public document: TextDocument, public symbol: Symbol) {
+    constructor(public symbol: Symbol) {
         super(symbol.range);
     }
 }
