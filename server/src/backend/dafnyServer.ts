@@ -1,16 +1,19 @@
 "use strict";
 import * as cp from "child_process";
-import * as vscode from "vscode";
+import {IConnection} from "vscode-languageserver";
+import * as vscode from "vscode-languageserver";
 import {IncorrectPathExeption} from "../errorHandling/errors";
 import {Statusbar} from "../frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../process/process";
 import { encodeBase64 } from "../strings/stringEncoding";
-import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg } from "../strings/stringRessources";
+import { ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg, LanguageServerNotification, LanguageServerRequest } from "../strings/stringRessources";
 import {Context} from "./context";
 import { Command } from "./environment";
 import { Environment } from "./environment";
-import { SymbolService } from "./features/symbolService";
+//import { SymbolService } from "./features/symbolService";
 import {VerificationRequest} from "./verificationRequest";
+import {DafnySettings} from "./dafnySettings";
+
 // see DafnyServer/VerificationTask.cs in Dafny sources
 // it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
@@ -21,14 +24,14 @@ export interface IVerificationTask {
 }
 
 export class DafnyServer {
-    public symbolService: SymbolService;
+    //public symbolService: SymbolService;
     private MAX_RETRIES: number = 5;
     private active: boolean = false;
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
     private retries: number = 0;
-    constructor(private statusbar: Statusbar, private context: Context) {
-        this.symbolService = new SymbolService(this);
+    constructor(private connection: IConnection, private statusbar: Statusbar, private context: Context, private settings: DafnySettings) {
+        //this.symbolService = new SymbolService(this);
     }
 
     public reset(): boolean {
@@ -46,7 +49,7 @@ export class DafnyServer {
     }
 
     public verify(): boolean {
-        const environment: Environment = new Environment();
+        const environment: Environment = new Environment(this.context.rootPath, this.connection, this.settings);
         const dafnyCommand: Command = environment.getStartDafnyCommand();
         try {
             this.serverProc = this.spawnNewProcess(dafnyCommand, environment.getStandardSpawnOptions());
@@ -67,7 +70,7 @@ export class DafnyServer {
     public addDocument(doc: vscode.TextDocument, verb: string, callback?: ((data: any) => any), error?: ((data: any) => any)): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc, verb, callback, error);
         this.context.enqueueRequest(request);
-        this.statusbar.update();
+        this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size);
         this.sendNextRequest();
     }
 
@@ -86,22 +89,22 @@ export class DafnyServer {
     }
 
     private resetProcess(): boolean {
-        const environment: Environment = new Environment();
+        const environment: Environment = new Environment(this.context.rootPath, this.connection, this.settings);
         const dafnyCommand: Command = environment.getStartDafnyCommand();
 
-        if (environment.usesNonStandardMonoPath()) {
+        /*if (environment.usesNonStandardMonoPath()) {
             vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
-        }
+        }*/
 
         if (dafnyCommand.notFound) {
-            vscode.window.showErrorMessage(ErrorMsg.NoMono);
+            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.NoMono);
             return false;
         }
         return this.resetServerProc(dafnyCommand, environment.getStandardSpawnOptions());
     }
 
     private handleProcessError(err: Error): void {
-        vscode.window.showErrorMessage("DafnyServer process " + this.serverProc.pid + " error: " + err);
+        this.connection.sendNotification(LanguageServerNotification.Error, "DafnyServer process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
         this.context.activeRequest.error(err);
 
@@ -116,7 +119,9 @@ export class DafnyServer {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
             console.log(this.serverProc.outBuf);
             if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
-                this.context.collectRequest(log);
+                const result = this.context.collectRequest(log);
+                this.connection.sendNotification(LanguageServerNotification.VerificationResult,
+                    [this.context.activeRequest.document.uri.toString(), JSON.stringify(result)]);
             } else if(this.context.activeRequest) {
                 this.context.activeRequest.callback(log);
                 this.context.activeRequest = null;
@@ -126,7 +131,6 @@ export class DafnyServer {
 
             this.serverProc.clearBuffer();
             this.statusbar.changeServerStatus(StatusString.Idle);
-            this.statusbar.update();
             this.active = false;
             this.sendNextRequest();
         }
@@ -134,7 +138,7 @@ export class DafnyServer {
 
     private handleProcessExit() {
         this.serverProc = null;
-        vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestart);
+        this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerRestart);
         if(this.context != null) {
             const crashedRequest: VerificationRequest = this.context.activeRequest;
             this.context.clear();
@@ -148,29 +152,30 @@ export class DafnyServer {
         if(this.retries < this.MAX_RETRIES) {
             setTimeout(() => {
                 if (this.reset()) {
-                    vscode.window.showInformationMessage(InfoMsg.DafnyServerRestartSucceded);
+                    this.connection.sendNotification(LanguageServerNotification.Info, InfoMsg.DafnyServerRestartSucceded);
                 } else {
-                    vscode.window.showErrorMessage(ErrorMsg.DafnyServerRestartFailed);
+                    this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerRestartFailed);
                 }
             }, 1000);
         } else {
             this.retries = 0;
-            vscode.window.showErrorMessage(ErrorMsg.MaxRetriesReached);
+            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.MaxRetriesReached);
         }
 
-        this.statusbar.update();
+        //this.statusbar.update();
     }
     private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {
         try {
             this.serverProc = this.spawnNewProcess(dafnyCommand, options);
             this.context.serverpid = this.serverProc.pid;
             this.statusbar.changeServerStatus(StatusString.Idle);
-            this.statusbar.update();
+            this.connection.sendNotification(LanguageServerNotification.ServerStarted,
+            [this.context.serverpid, this.context.serverversion]);
             return true;
         } catch(e) {
-            this.statusbar.update();
+            //this.statusbar.update();
             this.active = false;
-            vscode.window.showErrorMessage(ErrorMsg.DafnyServerWrongPath);
+            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerWrongPath);
             throw new IncorrectPathExeption();
         }
     }
@@ -187,9 +192,10 @@ export class DafnyServer {
         if(request.verb === "verify") {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
+        console.log("Sending: " + request);
         const task: IVerificationTask = {
             args: [],
-            filename: request.document.fileName,
+            filename: request.document.uri,
             source: request.source,
             sourceIsFile: false
         };
@@ -198,6 +204,7 @@ export class DafnyServer {
             this.serverProc.clearBuffer();
             this.serverProc.sendRequestToDafnyServer(encoded, request.verb);
         }
+        this.connection.sendNotification(LanguageServerNotification.ActiveVerifiyingDocument, request.document.uri);
         request.timeSent = Date.now();
     }
 

@@ -1,7 +1,7 @@
-"use strict";
+/*"use strict";
 import { SymbolTable } from "./symbols";
 
-import { CodeLens, Location, Uri } from "vscode";
+import { CodeLens, Location, Uri } from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
@@ -78,3 +78,4 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         return references;
     }
 }
+*/

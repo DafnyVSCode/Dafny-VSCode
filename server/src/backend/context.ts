@@ -1,13 +1,14 @@
 "use strict";
 import * as Collections from "typescript-collections";
 import {VerificationRequest} from "./verificationRequest";
-import {VerificationResults} from "./verificationResults";
+import {VerificationResults, VerificationResult} from "./verificationResults";
 
 export class Context {
     public queue: Collections.Queue<VerificationRequest> = new Collections.Queue<VerificationRequest>();
     public verificationResults: VerificationResults = new VerificationResults();
     public activeRequest: VerificationRequest = null;
     public serverpid: number;
+    public rootPath: string;
     public serverversion: string;
     public symbolTable: {[fileName: string]: any} = {};
 
@@ -28,10 +29,11 @@ export class Context {
         this.queue.enqueue(request);
     }
 
-    public collectRequest(serverReturn: string): void {
+    public collectRequest(serverReturn: string): VerificationResult {
         this.activeRequest.timeFinished = Date.now();
-        this.verificationResults.collect(serverReturn, this.activeRequest);
+        var result = this.verificationResults.collect(serverReturn, this.activeRequest);
         this.activeRequest = null;
+        return result;
     }
 
     public addCrashedRequest(request: VerificationRequest): void {

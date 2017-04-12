@@ -1,7 +1,7 @@
 
 "use strict";
 
-import * as vscode from "vscode";
+import * as vscode from "vscode-languageserver";
 import { EnvironmentConfig } from "../strings/stringRessources";
 export class VerificationRequest {
     public srcEnds: number[];

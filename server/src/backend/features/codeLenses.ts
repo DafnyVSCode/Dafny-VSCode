@@ -1,4 +1,4 @@
-import {CodeLens, TextDocument} from "vscode";
+/*import {CodeLens, TextDocument} from "vscode-languageserver";
 import { Reference, Symbol } from "./symbols";
 
 export class ReferencesCodeLens extends CodeLens {
@@ -15,3 +15,4 @@ export class ReferenceInformation {
         this.fileName = file;
     }
 }
+*/

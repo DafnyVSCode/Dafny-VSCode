@@ -1,5 +1,5 @@
-import * as vscode from "vscode";
-export function isPositionInString(document: vscode.TextDocument, position: vscode.Position): boolean {
+import * as vscode from "vscode-languageserver";
+/*export function isPositionInString(document: vscode.TextDocument, position: vscode.Position): boolean {
     const lineText = document.lineAt(position.line).text;
     const lineTillCurrentPosition = lineText.substr(0, position.character);
 
@@ -7,7 +7,7 @@ export function isPositionInString(document: vscode.TextDocument, position: vsco
     let doubleQuotesCnt = (lineTillCurrentPosition.match(/[^\\]\"/g) || []).length;
     doubleQuotesCnt += lineTillCurrentPosition.startsWith('\"') ? 1 : 0;
     return doubleQuotesCnt % 2 === 1;
-}
+}*/
 
 export function hashString(str: string) {
     let hash = 0;

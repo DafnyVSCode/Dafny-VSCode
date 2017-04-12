@@ -1,5 +1,5 @@
-"use strict";
-import {TextDocument} from "vscode";
+/*"use strict";
+import {TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
 import { hashString } from "./../../strings/stringUtils";
@@ -113,3 +113,4 @@ export class SymbolService {
         }
     }
 }
+*/

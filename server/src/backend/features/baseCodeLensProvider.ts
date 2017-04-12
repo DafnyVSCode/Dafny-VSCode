@@ -1,5 +1,5 @@
-"use strict";
-import {CodeLens, CodeLensProvider, Event, EventEmitter, TextDocument} from "vscode";
+/*"use strict";
+import {CodeLens, CodeLensProvider, Event, EventEmitter, TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { ReferencesCodeLens } from "./codeLenses";
@@ -28,4 +28,4 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
                 .map((info: Symbol) => new ReferencesCodeLens(document, info));
         }, bubbleRejectedPromise);
     }
-}
+}*/

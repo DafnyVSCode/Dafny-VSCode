@@ -1,6 +1,6 @@
-"use strict";
+/*"use strict";
 
-import { Hover, HoverProvider, /*Location,*/ Position, TextDocument } from "vscode";
+import { Hover, HoverProvider, Location, Position, TextDocument } from "vscode-languageserver";
 
 export class DafnyHoverProvider implements HoverProvider {
 
@@ -13,3 +13,4 @@ export class DafnyHoverProvider implements HoverProvider {
         return i == null ? null : null;
     }
 }
+*/

@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+/*import * as vscode from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../languageDefinition/keywords";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
@@ -84,7 +84,7 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         }
         console.log("sep: " + seperator);
         // matches if a point is between the identifer and the word before it -> its a method call
-        const match = seperator.match(/\w*\.\w*/);
+        const match = seperator.match(/\w*\.\w*REMOVETHIS/);
         return match && match.length > 0;
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
@@ -98,3 +98,4 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         }).catch((err: any) => err);
     }
 }
+*/

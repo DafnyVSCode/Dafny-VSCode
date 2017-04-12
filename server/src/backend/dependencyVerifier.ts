@@ -3,6 +3,8 @@ import * as cp from "child_process";
 import { ProcessWrapper } from "../process/process";
 import { Command } from "./environment";
 import { Environment } from "./environment";
+import {IConnection} from "vscode-languageserver";
+import {DafnySettings} from "./dafnySettings";
 
 export class DependencyVerifier {
 
@@ -15,9 +17,9 @@ export class DependencyVerifier {
     private upgradeCallback: () => any;
     private serverVersion: string;
 
-    public verifyDafnyServer(callbackSuccess: (serverVersion: string) => any,
+    public verifyDafnyServer(rootPath: string, connection: IConnection, dafnySettings: DafnySettings, callbackSuccess: (serverVersion: string) => any,
                              callbackError: (error: any) => any, upgradeCallback: () => any) {
-        const environment: Environment = new Environment();
+        const environment: Environment = new Environment(rootPath, connection, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
         const dafnyCommand: Command = environment.getStartDafnyCommand();
         this.callbackError = callbackError;
@@ -41,19 +43,23 @@ export class DependencyVerifier {
         return new ProcessWrapper(process,
             (err: Error) => { this.callbackError(err); },
             () => {
-                console.log(this.serverProc.outBuf);
-                if(this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
-                    this.upgradeCallback();
-                    this.serverProc.sendQuit();
-                } else if(this.serverProc.outBuf.indexOf(this.version) > -1) {
-                    const start = this.serverProc.outBuf.indexOf(this.version);
-                    const end = this.serverProc.outBuf.indexOf("\n", start);
-                    this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
-                    console.log(this.serverVersion);
-                    this.serverProc.clearBuffer();
-                    this.serverProc.sendRequestToDafnyServer("", "versioncheck");
-                } else {
-                    this.serverProc.sendQuit();
+                try {
+                    console.log(this.serverProc.outBuf);
+                    if(this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
+                        this.upgradeCallback();
+                        this.serverProc.sendQuit();
+                    } else if(this.serverProc.outBuf.indexOf(this.version) > -1) {
+                        const start = this.serverProc.outBuf.indexOf(this.version);
+                        const end = this.serverProc.outBuf.indexOf("\n", start);
+                        this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
+                        console.log(this.serverVersion);
+                        this.serverProc.clearBuffer();
+                        this.serverProc.sendRequestToDafnyServer("", "versioncheck");
+                    } else {
+                        this.serverProc.sendQuit();
+                    }
+                } catch(e) {
+                    this.callbackError(e);
                 }
             },
             (code: number) => { this.handleProcessExit(code); });

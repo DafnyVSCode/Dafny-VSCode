@@ -1,4 +1,4 @@
-import {Position, Range} from "vscode";
+/*import {Position, Range} from "vscode-languageserver";
 
 export enum SymbolType {
     Unknown, Class, Method, Function, Field, Call
@@ -73,3 +73,4 @@ export class Reference {
         return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";
     }
 }
+*/

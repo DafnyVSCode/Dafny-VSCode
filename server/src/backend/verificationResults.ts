@@ -1,6 +1,6 @@
 "use strict";
 
-import * as vscode from "vscode";
+import * as vscode from "vscode-languageserver";
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import {VerificationRequest} from "./verificationRequest";
@@ -20,23 +20,24 @@ export class VerificationResult {
 
 export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-    private diagCol: vscode.DiagnosticCollection = null;
+    //private diagCol: vscode.DiagnosticCollection = null;
 
     constructor() {
-        this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
+        //this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
     }
 
-    public collect(log: string, req: VerificationRequest): void {
+    public collect(log: string, req: VerificationRequest): VerificationResult {
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
-        const fileName: string = req.document.fileName;
+        const fileName: string = req.document.uri;
         this.latestResults[fileName] = verificationResult;
+        return verificationResult;
     }
 
     public addCrashed(req: VerificationRequest): void {
         if(req != null) {
             const verificationResult: VerificationResult = new VerificationResult();
             verificationResult.crashed = true;
-            const fileName: string = req.document.fileName;
+            const fileName: string = req.document.uri;
             this.latestResults[fileName] = verificationResult;
         }
     }
@@ -60,8 +61,8 @@ export class VerificationResults {
                 const typeStr: string = errors[3];
                 const msgStr: string = errors[4] !== undefined ? errors[4] + ": " + errors[5] : errors[5];
 
-                const start: vscode.Position = new vscode.Position(lineNum, colNum);
-                const line: vscode.TextLine = req.document.lineAt(start);
+                const start: vscode.Position = vscode.Position.create(lineNum, colNum);
+                /*const line: vscode.TextLine = req.document.lineAt(start);
                 const range: vscode.Range = line.range;
 
                 const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Error) ?
@@ -71,14 +72,14 @@ export class VerificationResults {
 
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
-                }
+                }*/
 
-                diags.push(new vscode.Diagnostic(range, msgStr, severity));
+                //diags.push(new vscode.Diagnostic(range, msgStr, severity));
             } else if(proofObligationLine) {
                 proofObligations += parseInt(proofObligationLine[1], 10);
             }
         }
-        this.diagCol.set(req.document.uri, diags);
+        //this.diagCol.set(req.document.uri, diags);
         result.errorCount = errorCount;
         result.proofObligations = proofObligations;
         return result;

@@ -1,31 +1,61 @@
 "use strict";
 
+import * as path from "path";
 import * as vscode from "vscode";
-import {DafnyInstaller} from "./backend/dafnyInstaller";
-import {DependencyVerifier} from "./backend/dependencyVerifier";
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient";
+import { DafnyInstaller } from "./dafnyInstaller";
+import { DafnyClientProvider } from "./dafnyProvider";
+import { Answer, Commands, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
 
-import {DafnyDiagnosticsProvider} from "./frontend/dafnyProvider";
-import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
-import {Commands} from "./strings/stringRessources";
+let languageServer: LanguageClient = null;
+let provider: DafnyClientProvider;
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext) {
+    const serverModule = context.asAbsolutePath(path.join("server", "server.js"));
+    const debugOptions = { execArgv: ["--nolazy", "--debug=6009"] };
 
-    let provider: DafnyDiagnosticsProvider = null;
-    const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
-    dependencyVerifier.verifyDafnyServer((serverVersion: string) => {
-        init(serverVersion);
-    }, () => {
-        vscode.window.showErrorMessage(ErrorMsg.DafnyCantBeStarted);
-        askToInstall();
-    }, () => {
-        askToInstall(InfoMsg.DafnyUpdateAvailable);
+    const serverOptions: ServerOptions = {
+        debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions },
+        run: { module: serverModule, transport: TransportKind.ipc }
+    };
+
+    const clientOptions: LanguageClientOptions = {
+        documentSelector: ["dafny"],
+        synchronize: {
+            configurationSection: "dafny",
+        }
+    }
+
+    languageServer = new LanguageClient("dafny-vscode", "Dafny Language Server", serverOptions, clientOptions);
+    languageServer.onReady().then(() => {
+
+        provider = new DafnyClientProvider(context, languageServer);
+
+        languageServer.onNotification(LanguageServerNotification.Error, (message: string) => {
+            vscode.window.showErrorMessage(message);
+        });
+        languageServer.onNotification(LanguageServerNotification.Info, (message: string) => {
+            vscode.window.showInformationMessage(message);
+        });
+
+        languageServer.onNotification(LanguageServerNotification.DafnyMissing, (message: string) => {
+            askToInstall(message);
+        });
+
+        
+
+        provider.activate(context.subscriptions);
     });
 
+    const disposable = languageServer.start();
+    context.subscriptions.push(disposable);
+
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
-        if (provider) {
-            return provider.resetServer();
-        }
-        return false;
+        languageServer.sendRequest(LanguageServerRequest.Reset).then(() => {
+            return true;
+        }, () => {
+            vscode.window.showErrorMessage("Can't restart dafny");
+        });
     });
     context.subscriptions.push(restartServerCommand);
 
@@ -36,60 +66,41 @@ export function activate(context: vscode.ExtensionContext): void {
 
     const uninstallDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.UninstallDafny, () => {
         const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath);
-        if (provider) {
-            provider.stop();
-        }
-        installer.uninstall();
+
+        languageServer.sendRequest(LanguageServerRequest.Stop).then(() => {
+            installer.uninstall();
+        }, () => {
+            vscode.window.showErrorMessage("Can't uninstall dafny");
+        });
+
     });
     context.subscriptions.push(uninstallDafnyCommand);
 
-    function init(serverVersion: string) {
-        try {
-            if(!provider) {
-                provider = new DafnyDiagnosticsProvider(context, serverVersion);
-                provider.activate(context.subscriptions);
-                context.subscriptions.push(provider);
-                provider.resetServer();
-            } else {
-                provider.init();
-                provider.resetServer();
-            }
-        } catch(e) {
-            vscode.window.showErrorMessage("Exception occured: " + e);
-        }
-    }
-
-    function askToInstall(text: string = InfoMsg.AskInstallDafny) {
+    function askToInstall(text: string) {
         vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
-            if(Answer.Yes === value) {
+            if (Answer.Yes === value) {
                 install();
             }
         });
     }
 
-    function install() {
-        const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
+    function install(): Thenable<void> {
 
-            const verifier: DependencyVerifier = new DependencyVerifier();
-            verifier.verifyDafnyServer((serverVersion: string) => {
-                init(serverVersion);
+        const promise = new Promise<void>(function (resolve, reject) {
+
+            const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
+                resolve();
             }, () => {
-                vscode.window.showErrorMessage(ErrorMsg.DafnyInstallationFailed);
-            }, () => {
-                console.log("Should not happen, that the version which has been installed is already obsolete");
-                init("unknown");
+                installer.install();
             });
-        }, () => {
-            installer.install();
+
+            languageServer.sendRequest(LanguageServerRequest.Stop).then(() => {
+                installer.uninstall(false);
+            }, () => {
+                vscode.window.showErrorMessage("Can't stop dafny");
+                reject();
+            });
         });
-        if (provider) {
-            provider.stop();
-        }
-        installer.uninstall(false);
+        return promise;
     }
-
-}
-
-export function deactivate(): void {
-    // todo maybe deinstall dafny server
 }
