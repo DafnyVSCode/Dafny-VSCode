@@ -68,7 +68,6 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
 
     private parseReferenceResponse(symbolsTables: SymbolTable[], codeLens: ReferencesCodeLens): ReferenceInformation[] {
         const references: ReferenceInformation[] = [];
-        console.log("hallo");
         for(const symbolTable of symbolsTables) {
             for(const symbol of symbolTable.symbols) {
                 for(const reference of symbol.References) {
@@ -78,8 +77,6 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
                 }
             }
         }
-        console.log(references);
-
         return references;
     }
 }

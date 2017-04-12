@@ -57,7 +57,8 @@ export class DafnyDiagnosticsProvider {
         new DafnyReferencesCodeLensProvider(this.dafnyServer)));
         //this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider(this.dafnyServer, definitionProvider)));
         //this.vsCodeContext.subscriptions.push(vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
-        this.vsCodeContext.subscriptions.push(vscode.languages.registerRenameProvider(DAFNYMODE, new DafnyRenameProvider(this.dafnyServer)));
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerRenameProvider(DAFNYMODE,
+            new DafnyRenameProvider(this.dafnyServer)));
     }
 
     public dispose(): void {

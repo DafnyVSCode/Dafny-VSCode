@@ -39,7 +39,6 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             if(this.isMethodCall(document, position)) {
                 return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
                     const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
-                    console.log(call);
                     for(const symbolTable of symbolTables) {
                         for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
                             if(symb.call === call) {
@@ -74,17 +73,14 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         if(!wordRange) {
             return false;
         }
-        console.log("this: " + document.getText(wordRange));
         const wordRangeBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
         if(!wordRangeBeforeIdentifier) {
             return false;
         }
-        console.log("before: " + document.getText(wordRangeBeforeIdentifier));
         const seperator = document.getText(new vscode.Range(wordRangeBeforeIdentifier.end, wordRange.start));
         if(!seperator) {
             return false;
         }
-        console.log("sep: " + seperator);
         // matches if a point is between the identifer and the word before it -> its a method call
         const match = seperator.match(/\w*\.\w*/);
         return match && match.length > 0;
@@ -94,9 +90,6 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             for(const symbolTable of symbolTables) {
                 for(const symb of symbolTable.symbols) {
                     if(symb.name === symbolName) {
-                        console.log("foundBiatch");
-                        console.log(symb);
-                        console.log(symbolTable);
                         return new DafnyDefinitionInformtation(symb, symbolTable.fileName);
                     }
                 }

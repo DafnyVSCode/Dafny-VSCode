@@ -21,11 +21,8 @@ export class DafnyRenameProvider implements RenameProvider {
 
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {
 
-        console.log(newName);
         const wordRange = document.getWordRangeAtPosition(position);
         const word = wordRange ? document.getText(wordRange) : "";
-        console.log(word);
-        console.log("Heeer");
         return this.server.symbolService.getSymbols(document).then((tables: SymbolTable[]) => {
             const definingClasses = [].concat(tables.map((table: SymbolTable) => table.symbols)).filter((e: Symbol) => {
                 return e.range.contains(position) && e.symbolType === SymbolType.Class;
@@ -37,7 +34,6 @@ export class DafnyRenameProvider implements RenameProvider {
                 });
                 for(const s of relevantSymbols) {
                     if(s.symbolType === SymbolType.Field) {
-                        console.log("hahaha");
                         results.replace(Uri.file(document.fileName), s.range, newName);
                         for(const ref of s.References) {
                             results.replace(Uri.file(document.fileName), ref.range, newName);
@@ -50,11 +46,10 @@ export class DafnyRenameProvider implements RenameProvider {
 
                         }
                     }
-                    //                    const res = new WorkspaceEdit();
                 }
             }
             return results;
 
-        }).catch((e:any)=> {console.log("arr");console.log(e);});
+        }).catch((e: any) => {console.log(e); });
     }
 }
