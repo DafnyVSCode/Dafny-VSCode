@@ -1,11 +1,11 @@
 "use strict";
-
 import * as vscode from "vscode";
 import {Context} from "../backend/context";
 import {DafnyServer} from "../backend/dafnyServer";
 import { DAFNYMODE } from "../backend/features/definitionProvider";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
+import {DafnyRenameProvider} from "../backend/features/renameProvider";
 import {Config,  EnvironmentConfig } from "../strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
@@ -57,6 +57,7 @@ export class DafnyDiagnosticsProvider {
         new DafnyReferencesCodeLensProvider(this.dafnyServer)));
         //this.vsCodeContext.subscriptions.push(vscode.languages.registerCodeLensProvider(DAFNYMODE, new DafnyImplementationsCodeLensProvider(this.dafnyServer, definitionProvider)));
         //this.vsCodeContext.subscriptions.push(vscode.languages.registerHoverProvider(DAFNYMODE, new DafnyHoverProvider()));
+        this.vsCodeContext.subscriptions.push(vscode.languages.registerRenameProvider(DAFNYMODE, new DafnyRenameProvider(this.dafnyServer)));
     }
 
     public dispose(): void {

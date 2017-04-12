@@ -37,14 +37,16 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
             const wordRange = document.getWordRangeAtPosition(position);
             if(this.isMethodCall(document, position)) {
-                return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
+                return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
                     const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
                     console.log(call);
-                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
-                        if(symb.call === call) {
-                            const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
-                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
-                            return new DafnyDefinitionInformtation(definitionSymbol, document.fileName);
+                    for(const symbolTable of symbolTables) {
+                        for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
+                            if(symb.call === call) {
+                                const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
+                                    s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
+                                return new DafnyDefinitionInformtation(definitionSymbol, symbolTable.fileName);
+                            }
                         }
                     }
                     return null;
@@ -88,10 +90,15 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
         return match && match.length > 0;
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
-        return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
-            for(const symb of symbolTable.symbols) {
-                if(symb.name === symbolName) {
-                    return new DafnyDefinitionInformtation(symb, document.fileName);
+        return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
+            for(const symbolTable of symbolTables) {
+                for(const symb of symbolTable.symbols) {
+                    if(symb.name === symbolName) {
+                        console.log("foundBiatch");
+                        console.log(symb);
+                        console.log(symbolTable);
+                        return new DafnyDefinitionInformtation(symb, symbolTable.fileName);
+                    }
                 }
             }
             return null;

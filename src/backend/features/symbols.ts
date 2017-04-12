@@ -6,16 +6,21 @@ export enum SymbolType {
 export class SymbolTable {
     public symbols: Symbol[];
     public hash: number;
-    constructor() {
+    public fileName: string;
+    constructor(fileName: string) {
         this.symbols = [];
+        this.fileName = fileName;
     }
 }
 export class Symbol {
     public column: number;
+    public endColumn: number;
     public line: number;
+    public endLine: number;
     public module: string;
     public name: string;
     public position: number;
+    public endPosition: number;
     public symbolType: SymbolType;
     public parentClass: string;
     public References: Reference[];
@@ -46,6 +51,13 @@ export class Symbol {
             case "Call": this.symbolType = SymbolType.Call; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
+    }
+    public setBodyEnd(endLine: number, endPos: number, endColumn: number) {
+        this.endLine = endLine;
+        this.endPosition = endPos;
+        this.endColumn = endColumn;
+        this.end = new Position(this.endLine, this.endColumn);
+        this.range = new Range(this.start, this.end);
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.name !== "" && this.name !== undefined;

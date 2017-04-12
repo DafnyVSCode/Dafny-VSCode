@@ -56,9 +56,9 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
-        return this.server.symbolService.getSymbols(codeLens.document).then( (symbols: SymbolTable) =>  {
-            if(symbols) {
-                const infos = this.parseReferenceResponse(symbols, codeLens);
+        return this.server.symbolService.getSymbols(codeLens.document).then( (tables: SymbolTable[]) =>  {
+            if(tables) {
+                const infos = this.parseReferenceResponse(tables, codeLens);
                 return infos;
             } else {
                 return null;
@@ -66,15 +66,20 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         }).catch(() => null);
     }
 
-    private parseReferenceResponse(symbolsTable: SymbolTable, codeLens: ReferencesCodeLens): ReferenceInformation[] {
+    private parseReferenceResponse(symbolsTables: SymbolTable[], codeLens: ReferencesCodeLens): ReferenceInformation[] {
         const references: ReferenceInformation[] = [];
-        for(const symbol of symbolsTable.symbols) {
-            for(const reference of symbol.References) {
-                if(symbol.name === codeLens.symbol.name) {
-                    references.push(new ReferenceInformation(reference, codeLens.document.fileName));
+        console.log("hallo");
+        for(const symbolTable of symbolsTables) {
+            for(const symbol of symbolTable.symbols) {
+                for(const reference of symbol.References) {
+                    if(symbol.name === codeLens.symbol.name) {
+                        references.push(new ReferenceInformation(reference, symbolTable.fileName));
+                    }
                 }
             }
         }
+        console.log(references);
+
         return references;
     }
 }
