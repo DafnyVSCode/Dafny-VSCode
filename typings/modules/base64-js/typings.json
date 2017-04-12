@@ -1,9 +1,0 @@
-{
-  "resolution": "main",
-  "tree": {
-    "src": "https://raw.githubusercontent.com/mxl/typed-base64/a0090d62f02663621aa2979e0d32fcabc5db1ef9/typings.json",
-    "raw": "registry:npm/base64-js#1.1.2+20160526222755",
-    "main": "index.d.ts",
-    "name": "base64-js"
-  }
-}

@@ -2,7 +2,7 @@
     "name": "dafny-vscode",
     "displayName": "Dafny VSCode",
     "description": "Dafny support for Visual Studio Code",
-    "version": "0.8.2",
+    "version": "0.8.5",
     "publisher": "FunctionalCorrectness",
     "homepage": "https://github.com/FunctionalCorrectness/",
     "repository": {
@@ -75,7 +75,17 @@
                     "type": "number",
                     "default": 700,
                     "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
-                }
+                },
+                "dafny.trace.server": {
+                "type": "string",
+                "enum": [
+                    "off",
+                    "messages",
+                    "verbose"
+                ],
+                "default": "verbose",
+                "description": "Traces the communication between VSCode and the LanguageServer service."
+                }  
             }
         },
         "commands": [
@@ -115,6 +125,7 @@
     "dependencies": {
         "utf8": "*",
         "base64-js": "*",
-        "typescript-collections": "^1.2.3"
+        "typescript-collections": "^1.2.3",
+        "vscode-languageclient": "^3.1.0"
     }
 }

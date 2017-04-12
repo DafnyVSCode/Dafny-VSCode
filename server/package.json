@@ -1,0 +1,22 @@
+{
+  "name": "dafny-vscode",
+  "displayName": "Dafny VSCode",
+  "description": "Dafny support for Visual Studio Code",
+  "version": "0.8.5",
+  "publisher": "FunctionalCorrectness",
+  "license": "MIT",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.52",
+    "typescript": "^2.1.5"
+  },
+  "scripts": {
+    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+  }
+}
