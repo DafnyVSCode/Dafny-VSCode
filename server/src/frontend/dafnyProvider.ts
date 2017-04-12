@@ -55,6 +55,7 @@ export class DafnyServerProvider {
 
     public doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
+            console.log("adding to queue")
             this.dafnyServer.addDocument(textDocument, "verify");
         }
     }

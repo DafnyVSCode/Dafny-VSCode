@@ -91,4 +91,5 @@ export class LanguageServerNotification {
     public static VerificationResult: string = "verificationResult";
     public static HideStatusbar: string = "hideStatusbar";
     public static ChangeServerStatus: string = "changeServerStatus";
+    public static Ready: string = "ready";
 }

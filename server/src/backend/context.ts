@@ -32,7 +32,7 @@ export class Context {
     public collectRequest(serverReturn: string): VerificationResult {
         this.activeRequest.timeFinished = Date.now();
         var result = this.verificationResults.collect(serverReturn, this.activeRequest);
-        this.activeRequest = null;
+        
         return result;
     }
 

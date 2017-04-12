@@ -88,6 +88,7 @@ connection.onRequest<void, void>(LanguageServerRequest.Reset, () => {
 connection.onNotification(LanguageServerNotification.Verify, (json: string) => {
     const textDocumentItem: TextDocumentItem = JSON.parse(json);
     const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId, textDocumentItem.version, textDocumentItem.text);
+    console.log(textDocument);
     if (provider) {
         provider.doVerify(textDocument);
     }

@@ -34,6 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
         languageServer.onNotification(LanguageServerNotification.Error, (message: string) => {
             vscode.window.showErrorMessage(message);
         });
+        
         languageServer.onNotification(LanguageServerNotification.Info, (message: string) => {
             vscode.window.showInformationMessage(message);
         });
@@ -42,9 +43,9 @@ export function activate(context: vscode.ExtensionContext) {
             askToInstall(message);
         });
 
-        
-
-        provider.activate(context.subscriptions);
+        languageServer.onNotification(LanguageServerNotification.Ready, () => {
+            provider.activate(context.subscriptions);
+        });
     });
 
     const disposable = languageServer.start();

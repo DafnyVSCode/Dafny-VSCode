@@ -1,7 +1,7 @@
 "use strict";
 import * as vscode from "vscode";
-import {EnvironmentConfig, StatusString, LanguageServerNotification} from "./stringRessources";
-import {VerificationResult} from "./verificationResult";
+import { EnvironmentConfig, StatusString, LanguageServerNotification } from "./stringRessources";
+import { VerificationResult } from "./verificationResult";
 import { LanguageClient } from "vscode-languageclient";
 
 
@@ -43,16 +43,18 @@ export class Statusbar {
         });
 
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
-            (docPathName: string, verificationResult: VerificationResult) => {
+            (docPathName: string, json: string) => {
                 console.log("notificiation: " + docPathName);
-            this.verificationResults[docPathName] = verificationResult;
-            this.update();
-        });
+                const verificationResult: VerificationResult = JSON.parse(json);
+                this.verificationResults[docPathName] = verificationResult;
+                console.log(verificationResult);
+                this.update();
+            });
 
         languageServer.onNotification(LanguageServerNotification.HideStatusbar, () => {
             this.hide();
         });
-        
+
         languageServer.onNotification(LanguageServerNotification.ChangeServerStatus, (status: string) => {
             this.serverStatus = status;
             this.update();
@@ -70,7 +72,7 @@ export class Statusbar {
         return this.queueSize;
     }
 
-    public update(): void  {
+    public update(): void {
         const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         const editorsOpen: number = vscode.window.visibleTextEditors.length;
         if (!editor || editorsOpen === 0 || editor.document.languageId !== EnvironmentConfig.Dafny) {
@@ -79,7 +81,7 @@ export class Statusbar {
             return;
         }
 
-        if(this.serverpid) {
+        if (this.serverpid) {
             this.serverStatusBar.text = StatusString.ServerUp;
             this.serverStatusBar.text += " (pid " + this.serverpid + ")";
             this.serverStatusBar.text += " | Version " + this.serverversion + ")";
@@ -89,7 +91,7 @@ export class Statusbar {
             this.serverStatusBar.text = StatusString.ServerDown;
         }
 
-        if(!this.serverpid) {
+        if (!this.serverpid) {
             this.currentDocumentStatucBar.text = StatusString.Pending;
         } else if (this.activeDocument && editor.document.uri === this.activeDocument) {
             this.currentDocumentStatucBar.text = StatusString.Verifying;
@@ -105,7 +107,7 @@ export class Statusbar {
             }
         }
 
-        
+
 
         this.serverStatusBar.show();
         this.currentDocumentStatucBar.show();
@@ -114,11 +116,11 @@ export class Statusbar {
     private verificationResultToString(result: VerificationResult): string {
         let response: string = "";
 
-        if(result.crashed) {
+        if (result.crashed) {
             return StatusString.Crashed;
         }
 
-        if(result.errorCount === 0) {
+        if (result.errorCount === 0) {
             response = StatusString.Verified;
         } else {
             response = StatusString.NotVerified;

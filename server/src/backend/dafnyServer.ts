@@ -122,6 +122,7 @@ export class DafnyServer {
                 const result = this.context.collectRequest(log);
                 this.connection.sendNotification(LanguageServerNotification.VerificationResult,
                     [this.context.activeRequest.document.uri.toString(), JSON.stringify(result)]);
+                this.context.activeRequest = null;
             } else if(this.context.activeRequest) {
                 this.context.activeRequest.callback(log);
                 this.context.activeRequest = null;
@@ -171,6 +172,7 @@ export class DafnyServer {
             this.statusbar.changeServerStatus(StatusString.Idle);
             this.connection.sendNotification(LanguageServerNotification.ServerStarted,
             [this.context.serverpid, this.context.serverversion]);
+            this.connection.sendNotification(LanguageServerNotification.Ready);
             return true;
         } catch(e) {
             //this.statusbar.update();
