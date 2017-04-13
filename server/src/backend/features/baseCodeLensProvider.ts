@@ -15,11 +15,13 @@ export class DafnyBaseCodeLensProvider {
             return Promise.resolve([]);
         }
         return this.server.symbolService.getSymbols(document)
-        .then((symbolTable: SymbolTable) => {
-            return symbolTable.symbols
+        .then((symbolTables: SymbolTable[]) => {
+            console.log("We being");
+            console.log(symbolTables);
+            return symbolTables.find((table: SymbolTable) => table.fileName === document.uri).symbols
                 .filter((info: Symbol) => !(info.name === "_default" && info.symbolType === SymbolType.Class) &&
                     (info.symbolType !== SymbolType.Unknown && info.symbolType !== SymbolType.Call))
-                .map((info: Symbol) => new ReferencesCodeLens(document, info));
+                .map((info: Symbol) => new ReferencesCodeLens(info));
         }, bubbleRejectedPromise);
     }
 }

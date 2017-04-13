@@ -1,5 +1,4 @@
 "use strict";
-
 import * as vscode from "vscode";
 import {Config,  EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 import {Statusbar} from "./dafnyStatusbar";

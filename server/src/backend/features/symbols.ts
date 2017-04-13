@@ -6,16 +6,21 @@ export enum SymbolType {
 export class SymbolTable {
     public symbols: Symbol[];
     public hash: number;
-    constructor() {
+    public fileName: string;
+    constructor(fileName: string) {
         this.symbols = [];
+        this.fileName = fileName;
     }
 }
 export class Symbol {
     public column: number;
+    public endColumn: number;
     public line: number;
+    public endLine: number;
     public module: string;
     public name: string;
     public position: number;
+    public endPosition: number;
     public symbolType: SymbolType;
     public parentClass: string;
     public References: Reference[];
@@ -23,8 +28,10 @@ export class Symbol {
     public end: Position;
     public range: Range;
     public call: string;
+    public fileName: string;
 
-    constructor(column: number, line: number, module: string, name: string, position: number, parentClass: string, call: string) {
+    constructor(column: number, line: number, module: string, name: string,
+                position: number, parentClass: string, call: string, fileName: string) {
         this.column = column;
         this.line = line;
         this.module = module;
@@ -36,6 +43,7 @@ export class Symbol {
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + Number(this.name.length));
         this.range = Range.create(this.start, this.end);
+		this.fileName = fileName;
     }
     public setSymbolType(type: string): void {
         switch(type) {
@@ -46,6 +54,13 @@ export class Symbol {
             case "Call": this.symbolType = SymbolType.Call; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
+    }
+    public setBodyEnd(endLine: number, endPos: number, endColumn: number) {
+        this.endLine = endLine;
+        this.endPosition = endPos;
+        this.endColumn = endColumn;
+        this.end = Position.create(this.endLine, this.endColumn);
+        this.range = Range.create(this.start, this.end);
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.name !== "" && this.name !== undefined;
@@ -59,8 +74,9 @@ export class Reference {
     public start: Position;
     public end: Position;
     public range: Range;
+    public fileName: string;
 
-    constructor(column: number, line: number, position: number, methodName: string) {
+    constructor(column: number, line: number, position: number, methodName: string, fileName: string) {
         this.column = column;
         this.line = line;
         this.position = position;
@@ -68,6 +84,7 @@ export class Reference {
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + this.methodName.length);
         this.range = Range.create(this.start, this.end);
+		this.fileName = fileName;
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";

@@ -4,7 +4,7 @@ import {DafnyServer} from "../dafnyServer";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
 import { hashString } from "./../../strings/stringUtils";
 import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
-import { Reference, Symbol, SymbolTable } from "./symbols";
+import { Reference, Symbol, SymbolTable, SymbolType } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
 
@@ -23,17 +23,25 @@ export class SymbolService {
         }
     }
 
-    public getSymbols(doc: TextDocument): Promise<SymbolTable> {
+    public getSymbols(doc: TextDocument): Promise<SymbolTable[]> {
         const hash = hashString(doc.getText());
+        const symbolTables: SymbolTable[] = [];
+        for(const key in this.symbolTable) {
+            if(key !== doc.uri) {
+                symbolTables.push(this.symbolTable[key]);
+            }
+        }
         const symbols = this.symbolTable[doc.uri];
         if(!symbols || hash !== symbols.hash) {
             return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
                 symb.hash = hashString(doc.getText());
                 this.addSymbols(doc, symb, true);
-                return Promise.resolve(symb);
+                symbolTables.push(symb);
+                return Promise.resolve(symbolTables);
             });
         } else {
-            return Promise.resolve(symbols);
+            symbolTables.push(symbols);
+            return Promise.resolve(symbolTables);
         }
     }
 
@@ -44,14 +52,14 @@ export class SymbolService {
         return new Promise<any>((resolve, reject) => {
                 return this.askDafnyForSymbols(resolve, reject, document);
         }).then((symbols: any) => {
-            return Promise.resolve(this.parseSymbols(symbols));
+            return Promise.resolve(this.parseSymbols(symbols, document.uri));
         }, bubbleRejectedPromise);
     }
-    private parseSymbols(response: any): SymbolTable {
-        const symbolTable = new SymbolTable();
+    private parseSymbols(response: any, fileName: string): SymbolTable {
+        const symbolTable = new SymbolTable(fileName);
         if(response && response.length && response.length > 0) {
             for(const symbol of response) {
-                const parsedSymbol = this.parseSymbol(symbol);
+                const parsedSymbol = this.parseSymbol(symbol, fileName);
                 if(parsedSymbol.isValid()) {
                     symbolTable.symbols.push(parsedSymbol);
                 }
@@ -59,20 +67,26 @@ export class SymbolService {
         }
         return symbolTable;
     }
-    private parseSymbol(symbol: any): Symbol {
-        const line = Math.max(0, parseInt(symbol.Line, 10) - 1); // 1 based
-        const column = Math.max(0, parseInt(symbol.Column, 10) - 1); // ditto, but 0 can appear in some cases
+    private parseSymbol(symbol: any, fileName: string): Symbol {
+        const line = this.adjustDafnyLinePositionInfo(symbol.Line);
+        const column = this.adjustDafnyColumnPositionInfo(symbol.Column);
         const mod = symbol.Module;
         const name = symbol.Name;
         const parentClass = symbol.ParentClass;
         const position = symbol.Position;
         const call = symbol.Call;
-        const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call);
+        const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call, fileName);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
+            if(parsedSymbol.symbolType === SymbolType.Class) {
+                parsedSymbol.setBodyEnd(
+                    this.adjustDafnyLinePositionInfo(symbol.EndLine),
+                    symbol.EndPosition,
+                    this.adjustDafnyColumnPositionInfo(symbol.EndColumn));
+            }
             if(symbol.References && symbol.References.length && symbol.References.length > 0) {
                 for(const reference of symbol.References) {
-                    const parsedReference = this.parseReference(reference);
+                    const parsedReference = this.parseReference(reference, fileName);
                     if(parsedReference.isValid()) {
                         parsedSymbol.References.push(parsedReference);
                     }
@@ -81,13 +95,12 @@ export class SymbolService {
         }
         return parsedSymbol;
     }
-    private parseReference(reference: any): Reference {
+    private parseReference(reference: any, fileName: string): Reference {
         const methodName = reference.MethodName;
         const loc = reference.Position;
-        const referenceLine = parseInt(reference.Line, 10) - 1; // 1 based
-        const referenceColumn =
-            Math.max(0, parseInt(reference.Column, 10) - 1); // ditto, but 0 can appear in some cases
-        return new Reference(referenceColumn, referenceLine, loc, methodName);
+        const referenceLine = this.adjustDafnyLinePositionInfo(reference.Line);
+        const referenceColumn = this.adjustDafnyColumnPositionInfo(reference.Column);
+        return new Reference(referenceColumn, referenceLine, loc, methodName, fileName);
     }
     private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
         this.server.addDocument(document, "symbols", (log) =>  {
@@ -103,7 +116,12 @@ export class SymbolService {
             callback(json);
         }
     }
-
+    private adjustDafnyColumnPositionInfo(col: string): number {
+        return Math.max(0, parseInt(col, 10) - 1); // 1 based, but 0 can appear in some cases
+    }
+    private adjustDafnyLinePositionInfo(line: string): number {
+        return Math.max(0, parseInt(line, 10) - 1); // 1 based
+    }
     private getResponseAsJson(info: string) {
         try {
             return JSON.parse(info);

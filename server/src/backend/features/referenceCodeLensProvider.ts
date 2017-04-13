@@ -14,10 +14,12 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         if(!codeLens.symbol) {
             return null;
         }
-        return this.getReferences(codeLens);
+        return Promise.resolve(this.getReferences(codeLens));
     }
 
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
+        console.log("We here");
+        console.log(inputCodeLens);
         const codeLens = inputCodeLens as ReferencesCodeLens;
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
             if (!referenceInfo) {
@@ -33,7 +35,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
         const locations = this.buildReferenceLocations(referenceInformation);
         codeLens.command = {
-            arguments: [codeLens.document.uri, codeLens.range.start, locations],
+            arguments: [codeLens.symbol.fileName, codeLens.range.start, locations],
             command: "editor.action.showReferences",
             title: locations.length === 1
                 ? "1 reference"
@@ -55,23 +57,31 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             title: "Could not determine references"
         };
     }
-    private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
-        return this.server.symbolService.getSymbols(codeLens.document).then( (symbols: SymbolTable) =>  {
-            if(symbols) {
-                const infos = this.parseReferenceResponse(symbols, codeLens);
-                return infos;
-            } else {
-                return null;
+    private getReferences(codeLens: ReferencesCodeLens): PromiseLike<ReferenceInformation[]> {
+         return workspace.openTextDocument(codeLens.symbol.fileName).then((doc: TextDocument) => {
+            return this.server.symbolService.getSymbols(doc).then( (tables: SymbolTable[]) =>  {
+            if(!tables) {
+                const emptyRefs: ReferenceInformation[] = [];
+                return emptyRefs;
             }
-        }).catch(() => null);
+            return  this.parseReferenceResponse(tables, codeLens);
+
+        }, (err) => {
+            console.error(err);
+            const emptyRefs: ReferenceInformation[] = [];
+            return emptyRefs;
+            });
+        });
     }
 
-    private parseReferenceResponse(symbolsTable: SymbolTable, codeLens: ReferencesCodeLens): ReferenceInformation[] {
+    private parseReferenceResponse(symbolsTables: SymbolTable[], codeLens: ReferencesCodeLens): ReferenceInformation[] {
         const references: ReferenceInformation[] = [];
-        for(const symbol of symbolsTable.symbols) {
-            for(const reference of symbol.References) {
-                if(symbol.name === codeLens.symbol.name) {
-                    references.push(new ReferenceInformation(reference, codeLens.document.uri));
+        for(const symbolTable of symbolsTables) {
+            for(const symbol of symbolTable.symbols) {
+                for(const reference of symbol.References) {
+                    if(symbol.name === codeLens.symbol.name) {
+                        references.push(new ReferenceInformation(reference, symbolTable.fileName));
+                    }
                 }
             }
         }

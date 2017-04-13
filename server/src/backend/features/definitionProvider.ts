@@ -39,17 +39,16 @@ export class DafnyDefinitionProvider {
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.getWordRangeAtPosition(position);
-        if (this.isMethodCall(document, position)) {
-            return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
+    	if(this.isMethodCall(document, position)) {
+            return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
                 const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
-                console.log(call);
-                for (const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
-                    if (symb.call === call) {
-                        const definitionSymbol = symbolTable.symbols.find((s: Symbol) => {
-                            return s.module === symb.module &&
-                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call;
-                        });
-                        return new DafnyDefinitionInformtation(definitionSymbol, document.uri);
+                for(const symbolTable of symbolTables) {
+                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
+                        if(symb.call === call) {
+                            const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
+                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
+                            return new DafnyDefinitionInformtation(definitionSymbol, symbolTable.fileName);
+                        }
                     }
                 }
                 return null;
@@ -79,26 +78,25 @@ export class DafnyDefinitionProvider {
         if (!wordRange) {
             return false;
         }
-        console.log("this: " + documentDecorator.getText(wordRange));
         const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
         if (!wordRangeBeforeIdentifier) {
             return false;
         }
-        console.log("before: " + documentDecorator.getText(wordRangeBeforeIdentifier));
         const seperator = documentDecorator.getText(vscode.Range.create(wordRangeBeforeIdentifier.end, wordRange.start));
         if (!seperator) {
             return false;
         }
-        console.log("sep: " + seperator);
         // matches if a point is between the identifer and the word before it -> its a method call
         const match = seperator.match(/\w*\.\w*/);
         return match && match.length > 0;
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
-        return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
-            for (const symb of symbolTable.symbols) {
-                if (symb.name === symbolName) {
-                    return new DafnyDefinitionInformtation(symb, document.uri);
+        return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
+			for(const symbolTable of symbolTables) {            
+				for (const symb of symbolTable.symbols) {
+	                if (symb.name === symbolName) {
+	                    return new DafnyDefinitionInformtation(symb, symbolTable.fileName);
+					}
                 }
             }
             return null;

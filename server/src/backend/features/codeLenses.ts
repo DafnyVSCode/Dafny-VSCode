@@ -6,7 +6,7 @@ export class ReferencesCodeLens implements CodeLens {
     public range: Range;
     public command?: Command;
     public data?: any;
-    constructor(public document: TextDocument, public symbol: Symbol) {
+    constructor(public symbol: Symbol) {
         this.range = symbol.range;
     }
 }
