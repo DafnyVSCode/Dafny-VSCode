@@ -1,6 +1,7 @@
-/*"use strict";
+"use strict";
 import * as vscode from "vscode-languageserver";
-import {DafnyServer} from "../dafnyServer";
+import { DocumentDecorator } from "../../vscodeFunctions/documentfunctions";
+import { DafnyServer } from "../dafnyServer";
 import { dafnyKeywords } from "./../../languageDefinition/keywords";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
 import { isPositionInString } from "./../../strings/stringUtils";
@@ -11,17 +12,17 @@ export class DafnyDefinitionInformtation {
     public filePath: string;
     public symbol: Symbol;
     constructor(symbol: Symbol, filePath: string) {
-         this.symbol = symbol;
-         this.filePath = filePath;
+        this.symbol = symbol;
+        this.filePath = filePath;
     }
 }
 
 export class DafnyDefinitionProvider {
 
-    public constructor(public server: DafnyServer) {}
+    public constructor(public server: DafnyServer) { }
 
     public provideDefinition(document: vscode.TextDocument, position: vscode.Position):
-    Thenable<vscode.Location> {
+        Thenable<vscode.Location> {
         return this.provideDefinitionInternal(document, position).then((definitionInfo: DafnyDefinitionInformtation) => {
             if (definitionInfo == null || definitionInfo.filePath == null) {
                 return null;
@@ -36,67 +37,95 @@ export class DafnyDefinitionProvider {
 
     public provideDefinitionInternal(
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
-            const wordRange = document.getWordRangeAtPosition(position);
-            if(this.isMethodCall(document, position)) {
-                return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
-                    const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
-                    console.log(call);
-                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
-                        if(symb.call === call) {
-                            const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
-                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
-                            return new DafnyDefinitionInformtation(definitionSymbol, document.fileName);
-                        }
+        const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
+        const wordRange = documentDecorator.getWordRangeAtPosition(position);
+        if (this.isMethodCall(document, position)) {
+            return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
+                const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
+                console.log(call);
+                for (const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
+                    if (symb.call === call) {
+                        const definitionSymbol = symbolTable.symbols.find((s: Symbol) => {
+                            return s.module === symb.module &&
+                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call;
+                        });
+                        return new DafnyDefinitionInformtation(definitionSymbol, document.uri);
                     }
-                    return null;
-                }).catch((err: any) => err);
-            }
-            const lineText = document.lineAt(position.line).text;
-            const word = wordRange ? document.getText(wordRange) : "";
-            if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
-                || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
+                }
                 return null;
-            }
-            return this.findDefinition(document, word);
+            }).catch((err: any) => err);
+        }
+        const lineText = documentDecorator.lineAt(position);
+        const word = wordRange ? documentDecorator.getText(wordRange) : "";
+        if (!wordRange || lineText.startsWith("//") || isPositionInString(document, position)
+            || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
+            return null;
+        }
+        return this.findDefinition(document, word);
     }
 
     private getFullyQualifiedNameOfCalledMethod(document: vscode.TextDocument, position: vscode.Position): string {
-        const wordRange = document.getWordRangeAtPosition(position);
-        const wordRangeBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
+        const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
+        const wordRange = documentDecorator.getWordRangeAtPosition(position);
+        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
 
-        const call = document.getText(wordRange);
-        const designator = document.getText(wordRangeBeforeIdentifier);
+        const call = documentDecorator.getText(wordRange);
+        const designator = documentDecorator.getText(wordRangeBeforeIdentifier);
         return designator + "." + call;
     }
     private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {
-        const wordRange = document.getWordRangeAtPosition(position);
-        if(!wordRange) {
+        const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
+        const wordRange = documentDecorator.getWordRangeAtPosition(position);
+        if (!wordRange) {
             return false;
         }
-        console.log("this: " + document.getText(wordRange));
-        const wordRangeBeforeIdentifier = document.getWordRangeAtPosition(wordRange.start.translate(0, -1));
-        if(!wordRangeBeforeIdentifier) {
+        console.log("this: " + documentDecorator.getText(wordRange));
+        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
+        if (!wordRangeBeforeIdentifier) {
             return false;
         }
-        console.log("before: " + document.getText(wordRangeBeforeIdentifier));
-        const seperator = document.getText(vscode.Range.create(wordRangeBeforeIdentifier.end, wordRange.start));
-        if(!seperator) {
+        console.log("before: " + documentDecorator.getText(wordRangeBeforeIdentifier));
+        const seperator = documentDecorator.getText(vscode.Range.create(wordRangeBeforeIdentifier.end, wordRange.start));
+        if (!seperator) {
             return false;
         }
         console.log("sep: " + seperator);
         // matches if a point is between the identifer and the word before it -> its a method call
-        const match = seperator.match(/\w*\.\w*//*);
+        const match = seperator.match(/\w*\.\w*/);
         return match && match.length > 0;
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
         return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
-            for(const symb of symbolTable.symbols) {
-                if(symb.name === symbolName) {
+            for (const symb of symbolTable.symbols) {
+                if (symb.name === symbolName) {
                     return new DafnyDefinitionInformtation(symb, document.uri);
                 }
             }
             return null;
         }).catch((err: any) => err);
     }
+
+    private translate(position: vscode.Position, lineDeltaOrChange: number |
+        { lineDelta?: number; characterDelta?: number; }, characterDelta: number = 0): vscode.Position {
+
+        if (lineDeltaOrChange === null || characterDelta === null) {
+            throw new Error("invalid params");
+        }
+
+        let lineDelta: number;
+        if (typeof lineDeltaOrChange === "undefined") {
+            lineDelta = 0;
+        } else if (typeof lineDeltaOrChange === "number") {
+            lineDelta = lineDeltaOrChange;
+        } else {
+            lineDelta = typeof lineDeltaOrChange.lineDelta === "number" ? lineDeltaOrChange.lineDelta : 0;
+            characterDelta = typeof lineDeltaOrChange.characterDelta === "number" ? lineDeltaOrChange.characterDelta : 0;
+        }
+
+        if (lineDelta === 0 && characterDelta === 0) {
+            return position;
+        }
+        return vscode.Position.create(position.line + lineDelta, position.character + characterDelta);
+    }
+
 }
-*/

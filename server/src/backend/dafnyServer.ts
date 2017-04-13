@@ -160,7 +160,7 @@ export class DafnyServer {
             this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.MaxRetriesReached);
         }
 
-        //this.statusbar.update();
+        // this.statusbar.update();
     }
     private resetServerProc(dafnyCommand: Command, options: cp.SpawnOptions): boolean {
         try {
@@ -172,7 +172,7 @@ export class DafnyServer {
             this.connection.sendNotification(LanguageServerNotification.Ready);
             return true;
         } catch(e) {
-            //this.statusbar.update();
+            // this.statusbar.update();
             this.active = false;
             this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerWrongPath);
             throw new IncorrectPathExeption();

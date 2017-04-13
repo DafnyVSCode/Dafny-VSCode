@@ -4,15 +4,15 @@ import * as vscode from "vscode-languageserver";
 import {Context} from "../backend/context";
 import {DafnyServer} from "../backend/dafnyServer";
 import {DafnySettings} from "../backend/dafnySettings";
+import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import {DafnyReferencesCodeLensProvider} from "../backend/features/referenceCodeLensProvider";
-//import { DAFNYMODE } from "../backend/features/definitionProvider";
-//import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import {Config,  EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
 export class DafnyServerProvider {
 
-    public definitionProvider: DafnyReferencesCodeLensProvider;
+    public referenceProvider: DafnyReferencesCodeLensProvider;
+    public definitionProvider: DafnyDefinitionProvider;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -26,7 +26,8 @@ export class DafnyServerProvider {
         this.dafnyStatusbar = new Statusbar(this.connection);
         this.dafnyServer = new DafnyServer(this.connection, this.dafnyStatusbar, this.context, settings);
 
-        this.definitionProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
+        this.referenceProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
+        this.definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
     }
 
     public dispose(): void {
@@ -40,7 +41,7 @@ export class DafnyServerProvider {
     public resetServer(): void {
         this.dafnyServer.setInactive();
         this.dafnyServer.reset();
-        //this.doVerify(vscode.window.activeTextEditor.document);
+        // this.doVerify(vscode.window.activeTextEditor.document);
     }
 
     public stop(): void {

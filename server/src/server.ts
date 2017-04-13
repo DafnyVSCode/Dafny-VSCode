@@ -1,10 +1,10 @@
 "use strict";
 
 import {
-    CodeLens, CodeLensParams, CompletionItem,
-    CompletionItemKind, createConnection, Diagnostic,
-    DiagnosticSeverity, IConnection, InitializeParams, InitializeResult,
-    IPCMessageReader, IPCMessageWriter, RequestHandler, TextDocument,
+    CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
+    createConnection, Diagnostic, DiagnosticSeverity,
+    IConnection, InitializeParams, InitializeResult, IPCMessageReader,
+    IPCMessageWriter, Location, RequestHandler, TextDocument,
     TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind
 } from "vscode-languageserver";
 
@@ -27,8 +27,9 @@ connection.onInitialize((params): InitializeResult => {
     workspaceRoot = params.rootPath;
     return {
         capabilities: {
-            textDocumentSync: documents.syncKind,
-            codeLensProvider: { resolveProvider: true }
+            codeLensProvider: { resolveProvider: true },
+            definitionProvider: true,
+            textDocumentSync: documents.syncKind
         }
     };
 });
@@ -59,11 +60,20 @@ function init(serverVersion: string) {
     }
 }
 
+connection.onDefinition((handler): Thenable<Location> => {
+    if (provider && provider.definitionProvider) {
+        console.log("onDefinition: " + handler.textDocument.uri);
+        return provider.definitionProvider.provideDefinition(documents.get(handler.textDocument.uri), handler.position);
+    } else {
+        console.log("onDefinition: to early");
+    }
+});
+
 connection.onCodeLens((handler: CodeLensParams): Promise<CodeLens[]> => {
 
-    if (provider && provider.definitionProvider) {
+    if (provider && provider.referenceProvider) {
         console.log("onCodeLens: " + handler.textDocument.uri);
-        return provider.definitionProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
+        return provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
     } else {
         console.log("onCodeLens: to early");
     }
@@ -71,9 +81,9 @@ connection.onCodeLens((handler: CodeLensParams): Promise<CodeLens[]> => {
 
 connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
 
-    if (provider && provider.definitionProvider && handler) {
+    if (provider && provider.referenceProvider && handler) {
         console.log("onCodeLensResolve: " + handler);
-        return provider.definitionProvider.resolveCodeLens(handler);
+        return provider.referenceProvider.resolveCodeLens(handler);
     } else {
         console.log("onCodeLensResolve: to early");
     }
