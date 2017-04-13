@@ -4,6 +4,7 @@ import * as vscode from "vscode-languageserver";
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import {VerificationRequest} from "./verificationRequest";
+import {IConnection} from "vscode-languageserver";
 
 export enum VerificationStatus {
     Verified = 0,
@@ -20,11 +21,9 @@ export class VerificationResult {
 
 export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-    //private diagCol: vscode.DiagnosticCollection = null;
+    private diagCol: vscode.PublishDiagnosticsParams;
 
-    constructor() {
-        //this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
-    }
+    constructor(private connection: IConnection) {    }
 
     public collect(log: string, req: VerificationRequest): VerificationResult {
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
@@ -62,8 +61,8 @@ export class VerificationResults {
                 const msgStr: string = errors[4] !== undefined ? errors[4] + ": " + errors[5] : errors[5];
 
                 const start: vscode.Position = vscode.Position.create(lineNum, colNum);
-                /*const line: vscode.TextLine = req.document.lineAt(start);
-                const range: vscode.Range = line.range;
+                const end: vscode.Position = vscode.Position.create(lineNum, Number.MAX_VALUE);
+                const range: vscode.Range = vscode.Range.create(start, end);
 
                 const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Error) ?
                     vscode.DiagnosticSeverity.Error : (typeStr === Severity.Warning) ?
@@ -72,14 +71,17 @@ export class VerificationResults {
 
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
-                }*/
+                }
 
-                //diags.push(new vscode.Diagnostic(range, msgStr, severity));
+                diags.push(vscode.Diagnostic.create(range, msgStr, severity));
             } else if(proofObligationLine) {
                 proofObligations += parseInt(proofObligationLine[1], 10);
             }
         }
-        //this.diagCol.set(req.document.uri, diags);
+
+        const publishDiagnosticsParams: vscode.PublishDiagnosticsParams = {uri: req.document.uri, diagnostics: diags};
+        this.connection.sendDiagnostics(publishDiagnosticsParams);
+
         result.errorCount = errorCount;
         result.proofObligations = proofObligations;
         return result;

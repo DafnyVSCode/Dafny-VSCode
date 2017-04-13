@@ -34,7 +34,11 @@ export function activate(context: vscode.ExtensionContext) {
         languageServer.onNotification(LanguageServerNotification.Error, (message: string) => {
             vscode.window.showErrorMessage(message);
         });
-        
+
+        languageServer.onNotification(LanguageServerNotification.Warning, (message: string) => {
+            vscode.window.showWarningMessage(message);
+        });
+
         languageServer.onNotification(LanguageServerNotification.Info, (message: string) => {
             vscode.window.showInformationMessage(message);
         });

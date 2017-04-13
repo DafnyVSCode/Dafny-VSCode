@@ -21,7 +21,7 @@ export class DafnyServerProvider {
     constructor(public connection: vscode.IConnection, serverVersion: string, rootPath: string, settings: DafnySettings) {
         //this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
-        this.context = new Context();
+        this.context = new Context(connection);
         this.context.serverversion = serverVersion;
         this.context.rootPath = rootPath;
         this.dafnyStatusbar = new Statusbar(this.connection);

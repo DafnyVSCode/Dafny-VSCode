@@ -92,10 +92,6 @@ export class DafnyServer {
         const environment: Environment = new Environment(this.context.rootPath, this.connection, this.settings);
         const dafnyCommand: Command = environment.getStartDafnyCommand();
 
-        /*if (environment.usesNonStandardMonoPath()) {
-            vscode.window.showWarningMessage(WarningMsg.MonoPathWrong);
-        }*/
-
         if (dafnyCommand.notFound) {
             this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.NoMono);
             return false;

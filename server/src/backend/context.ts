@@ -1,16 +1,21 @@
 "use strict";
 import * as Collections from "typescript-collections";
+import {IConnection} from "vscode-languageserver";
 import {VerificationRequest} from "./verificationRequest";
 import {VerificationResults, VerificationResult} from "./verificationResults";
 
 export class Context {
     public queue: Collections.Queue<VerificationRequest> = new Collections.Queue<VerificationRequest>();
-    public verificationResults: VerificationResults = new VerificationResults();
+    public verificationResults: VerificationResults;
     public activeRequest: VerificationRequest = null;
     public serverpid: number;
     public rootPath: string;
     public serverversion: string;
     public symbolTable: {[fileName: string]: any} = {};
+
+    constructor(public connection: IConnection) {
+        this.verificationResults = new VerificationResults(this.connection);
+    }
 
     public clear(): void {
         this.queue.clear();
