@@ -2,10 +2,10 @@
 
 import {
     CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
-    createConnection, Diagnostic, DiagnosticSeverity,
-    IConnection, InitializeParams, InitializeResult, IPCMessageReader,
-    IPCMessageWriter, Location, RequestHandler, TextDocument,
-    TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind
+    createConnection, Diagnostic, DiagnosticSeverity, IConnection,
+    InitializeParams, InitializeResult, IPCMessageReader, IPCMessageWriter,
+    Location, RequestHandler, TextDocument, TextDocumentItem,
+    TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
 
 import { DafnySettings } from "./backend/dafnySettings";
@@ -29,6 +29,7 @@ connection.onInitialize((params): InitializeResult => {
         capabilities: {
             codeLensProvider: { resolveProvider: true },
             definitionProvider: true,
+            renameProvider: true,
             textDocumentSync: documents.syncKind
         }
     };
@@ -59,6 +60,10 @@ function init(serverVersion: string) {
         connection.sendNotification(LanguageServerNotification.Error, "Exception occured: " + e);
     }
 }
+
+connection.onRenameRequest((handler): Thenable<WorkspaceEdit> => {
+    return null;
+});
 
 connection.onDefinition((handler): Thenable<Location> => {
     if (provider && provider.definitionProvider) {
