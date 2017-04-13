@@ -1,21 +1,15 @@
-/*"use strict";
-import {CodeLens, CodeLensProvider, Event, EventEmitter, TextDocument} from "vscode-languageserver";
+"use strict";
+import {CodeLens, Event, TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { ReferencesCodeLens } from "./codeLenses";
 import { SymbolType } from "./symbols";
 import { Symbol, SymbolTable } from "./symbols";
 
-export class DafnyBaseCodeLensProvider implements CodeLensProvider {
+export class DafnyBaseCodeLensProvider {
     private enabled: boolean = true;
-    private onDidChangeCodeLensesEmitter = new EventEmitter<void>();
 
     public constructor(public server: DafnyServer) {}
-
-    public get onDidChangeCodeLenses(): Event<void> {
-        return this.onDidChangeCodeLensesEmitter.event;
-    }
-
     public provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
         if (!this.enabled || !document) {
             return Promise.resolve([]);
@@ -28,4 +22,4 @@ export class DafnyBaseCodeLensProvider implements CodeLensProvider {
                 .map((info: Symbol) => new ReferencesCodeLens(document, info));
         }, bubbleRejectedPromise);
     }
-}*/
+}

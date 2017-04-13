@@ -1,11 +1,11 @@
-/*"use strict";
+"use strict";
 
-import { Hover, HoverProvider, Location, Position, TextDocument } from "vscode-languageserver";
+import { Hover, Location, Position, TextDocument } from "vscode-languageserver";
 
-export class DafnyHoverProvider implements HoverProvider {
+export class DafnyHoverProvider {
 
     public provideHover(document: TextDocument, position: Position): Promise<Hover | undefined | null> {
-        const filepath = document.fileName;
+        const filepath = document.uri;
         if (!filepath) {
             return null;
         }
@@ -13,4 +13,3 @@ export class DafnyHoverProvider implements HoverProvider {
         return i == null ? null : null;
     }
 }
-*/

@@ -4,14 +4,15 @@ import * as vscode from "vscode-languageserver";
 import {Context} from "../backend/context";
 import {DafnyServer} from "../backend/dafnyServer";
 import {DafnySettings} from "../backend/dafnySettings";
+import {DafnyReferencesCodeLensProvider} from "../backend/features/referenceCodeLensProvider";
 //import { DAFNYMODE } from "../backend/features/definitionProvider";
 //import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
-//import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
 import {Config,  EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
 
 export class DafnyServerProvider {
 
+    public definitionProvider: DafnyReferencesCodeLensProvider;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -24,6 +25,8 @@ export class DafnyServerProvider {
         this.context.rootPath = rootPath;
         this.dafnyStatusbar = new Statusbar(this.connection);
         this.dafnyServer = new DafnyServer(this.connection, this.dafnyStatusbar, this.context, settings);
+
+        this.definitionProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
     }
 
     public dispose(): void {

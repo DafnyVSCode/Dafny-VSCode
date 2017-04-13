@@ -1,11 +1,11 @@
 "use strict";
 
 import {
-    CompletionItem, CompletionItemKind, createConnection,
-    Diagnostic, DiagnosticSeverity, IConnection,
-    InitializeParams, InitializeResult, IPCMessageReader, IPCMessageWriter,
-    TextDocument, TextDocumentItem, TextDocumentPositionParams,
-    TextDocuments, TextDocumentSyncKind
+    CodeLens, CodeLensParams, CompletionItem,
+    CompletionItemKind, createConnection, Diagnostic,
+    DiagnosticSeverity, IConnection, InitializeParams, InitializeResult,
+    IPCMessageReader, IPCMessageWriter, RequestHandler, TextDocument,
+    TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind
 } from "vscode-languageserver";
 
 import { DafnySettings } from "./backend/dafnySettings";
@@ -28,6 +28,7 @@ connection.onInitialize((params): InitializeResult => {
     return {
         capabilities: {
             textDocumentSync: documents.syncKind,
+            codeLensProvider: { resolveProvider: true }
         }
     };
 });
@@ -57,6 +58,26 @@ function init(serverVersion: string) {
         connection.sendNotification(LanguageServerNotification.Error, "Exception occured: " + e);
     }
 }
+
+connection.onCodeLens((handler: CodeLensParams): Promise<CodeLens[]> => {
+
+    if (provider && provider.definitionProvider) {
+        console.log("onCodeLens: " + handler.textDocument.uri);
+        return provider.definitionProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
+    } else {
+        console.log("onCodeLens: to early");
+    }
+});
+
+connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
+
+    if (provider && provider.definitionProvider && handler) {
+        console.log("onCodeLensResolve: " + handler);
+        return provider.definitionProvider.resolveCodeLens(handler);
+    } else {
+        console.log("onCodeLensResolve: to early");
+    }
+});
 
 interface Settings {
     dafny: DafnySettings;

@@ -1,7 +1,7 @@
-/*"use strict";
+"use strict";
 import { SymbolTable } from "./symbols";
 
-import { CodeLens, Location, Uri } from "vscode-languageserver";
+import { CodeLens, Location } from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
@@ -33,7 +33,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
         const locations = this.buildReferenceLocations(referenceInformation);
         codeLens.command = {
-            arguments: [Uri.file(codeLens.document.fileName), codeLens.range.start, locations],
+            arguments: [codeLens.document.uri, codeLens.range.start, locations],
             command: "editor.action.showReferences",
             title: locations.length === 1
                 ? "1 reference"
@@ -44,7 +44,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceLocations(referenceInformation: ReferenceInformation[]): Location[] {
             const locations: Location[] = [];
             for(const info of referenceInformation) {
-                locations.push(new Location(Uri.file(info.fileName), info.reference.range));
+                locations.push(Location.create(info.fileName, info.reference.range));
             }
             return locations;
     }
@@ -71,11 +71,10 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         for(const symbol of symbolsTable.symbols) {
             for(const reference of symbol.References) {
                 if(symbol.name === codeLens.symbol.name) {
-                    references.push(new ReferenceInformation(reference, codeLens.document.fileName));
+                    references.push(new ReferenceInformation(reference, codeLens.document.uri));
                 }
             }
         }
         return references;
     }
 }
-*/

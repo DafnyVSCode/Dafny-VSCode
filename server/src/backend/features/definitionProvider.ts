@@ -1,4 +1,5 @@
-/*import * as vscode from "vscode-languageserver";
+/*"use strict";
+import * as vscode from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { dafnyKeywords } from "./../../languageDefinition/keywords";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
@@ -15,7 +16,7 @@ export class DafnyDefinitionInformtation {
     }
 }
 
-export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
+export class DafnyDefinitionProvider {
 
     public constructor(public server: DafnyServer) {}
 
@@ -25,8 +26,8 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             if (definitionInfo == null || definitionInfo.filePath == null) {
                 return null;
             }
-            const definitionResource = vscode.Uri.file(definitionInfo.filePath);
-            return new vscode.Location(definitionResource, definitionInfo.symbol.start);
+            const definitionResource = definitionInfo.filePath;
+            return vscode.Location.create(definitionResource, definitionInfo.symbol.range);
         }, (err) => {
             console.error(err);
             return null;
@@ -78,20 +79,20 @@ export class DafnyDefinitionProvider implements vscode.DefinitionProvider {
             return false;
         }
         console.log("before: " + document.getText(wordRangeBeforeIdentifier));
-        const seperator = document.getText(new vscode.Range(wordRangeBeforeIdentifier.end, wordRange.start));
+        const seperator = document.getText(vscode.Range.create(wordRangeBeforeIdentifier.end, wordRange.start));
         if(!seperator) {
             return false;
         }
         console.log("sep: " + seperator);
         // matches if a point is between the identifer and the word before it -> its a method call
-        const match = seperator.match(/\w*\.\w*REMOVETHIS/);
+        const match = seperator.match(/\w*\.\w*//*);
         return match && match.length > 0;
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
         return this.server.symbolService.getSymbols(document).then((symbolTable: SymbolTable) => {
             for(const symb of symbolTable.symbols) {
                 if(symb.name === symbolName) {
-                    return new DafnyDefinitionInformtation(symb, document.fileName);
+                    return new DafnyDefinitionInformtation(symb, document.uri);
                 }
             }
             return null;

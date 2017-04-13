@@ -1,4 +1,4 @@
-/*"use strict";
+"use strict";
 import {TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
@@ -13,11 +13,11 @@ export class SymbolService {
     public addSymbols(doc: TextDocument, symbols: SymbolTable, forceAddition: boolean = false): void {
         const hash = hashString(doc.getText());
         if(forceAddition) {
-            this.symbolTable[doc.fileName] = symbols;
+            this.symbolTable[doc.uri] = symbols;
         } else {
             this.getSymbols(doc).then((sym: any) => {
                 if(!sym || sym.hash !== hash) {
-                    this.symbolTable[doc.fileName] = symbols;
+                    this.symbolTable[doc.uri] = symbols;
                 }
             });
         }
@@ -25,7 +25,7 @@ export class SymbolService {
 
     public getSymbols(doc: TextDocument): Promise<SymbolTable> {
         const hash = hashString(doc.getText());
-        const symbols = this.symbolTable[doc.fileName];
+        const symbols = this.symbolTable[doc.uri];
         if(!symbols || hash !== symbols.hash) {
             return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
                 symb.hash = hashString(doc.getText());
@@ -113,4 +113,3 @@ export class SymbolService {
         }
     }
 }
-*/

@@ -12,7 +12,7 @@ import {Context} from "./context";
 import {DafnySettings} from "./dafnySettings";
 import { Command } from "./environment";
 import { Environment } from "./environment";
-//import { SymbolService } from "./features/symbolService";
+import { SymbolService } from "./features/symbolService";
 import {VerificationRequest} from "./verificationRequest";
 
 // see DafnyServer/VerificationTask.cs in Dafny sources
@@ -25,14 +25,14 @@ export interface IVerificationTask {
 }
 
 export class DafnyServer {
-    //public symbolService: SymbolService;
+    public symbolService: SymbolService;
     private MAX_RETRIES: number = 5;
     private active: boolean = false;
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
     private retries: number = 0;
     constructor(private connection: IConnection, private statusbar: Statusbar, private context: Context, private settings: DafnySettings) {
-        //this.symbolService = new SymbolService(this);
+        this.symbolService = new SymbolService(this);
     }
 
     public reset(): boolean {
