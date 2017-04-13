@@ -7,12 +7,13 @@ import {DafnySettings} from "../backend/dafnySettings";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import {DafnyReferencesCodeLensProvider} from "../backend/features/referenceCodeLensProvider";
 import {Config,  EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
+import { DafnyRenameProvider } from "./../backend/features/renameProvider";
 import {Statusbar} from "./dafnyStatusbar";
-
 export class DafnyServerProvider {
 
     public referenceProvider: DafnyReferencesCodeLensProvider;
     public definitionProvider: DafnyDefinitionProvider;
+    public renameProvider: DafnyRenameProvider;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -28,6 +29,7 @@ export class DafnyServerProvider {
 
         this.referenceProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
         this.definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
+        this.renameProvider = new DafnyRenameProvider(this.dafnyServer);
     }
 
     public dispose(): void {

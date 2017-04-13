@@ -1,10 +1,9 @@
 "use strict";
-import { SymbolTable } from "./symbols";
-
-import { CodeLens, Location } from "vscode-languageserver";
+import { CodeLens, Location, TextDocument } from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
+import { SymbolTable } from "./symbols";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {
@@ -35,7 +34,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
         const locations = this.buildReferenceLocations(referenceInformation);
         codeLens.command = {
-            arguments: [codeLens.symbol.fileName, codeLens.range.start, locations],
+            arguments: [codeLens.symbol.document.uri, codeLens.range.start, locations],
             command: "editor.action.showReferences",
             title: locations.length === 1
                 ? "1 reference"
@@ -58,19 +57,13 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): PromiseLike<ReferenceInformation[]> {
-         return workspace.openTextDocument(codeLens.symbol.fileName).then((doc: TextDocument) => {
-            return this.server.symbolService.getSymbols(doc).then( (tables: SymbolTable[]) =>  {
+        return this.server.symbolService.getSymbols(codeLens.symbol.document).then( (tables: SymbolTable[]) =>  {
             if(!tables) {
                 const emptyRefs: ReferenceInformation[] = [];
                 return emptyRefs;
             }
             return  this.parseReferenceResponse(tables, codeLens);
 
-        }, (err) => {
-            console.error(err);
-            const emptyRefs: ReferenceInformation[] = [];
-            return emptyRefs;
-            });
         });
     }
 

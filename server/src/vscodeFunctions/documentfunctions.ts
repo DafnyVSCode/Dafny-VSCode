@@ -1,5 +1,5 @@
 import * as vscode from "vscode-languageserver";
-import { getWordAtText, ensureValidWordDefinition } from './wordHelper';
+import { ensureValidWordDefinition, getWordAtText } from "./wordHelper";
 
 export class DocumentDecorator {
 
@@ -11,13 +11,13 @@ export class DocumentDecorator {
     }
 
     public getText(_range: vscode.Range): string {
-        let range = this.validateRange(_range);
+        const range = this.validateRange(_range);
 
         if (range.start.line === range.end.line) {
             return this._lines[range.start.line].substring(range.start.character, range.end.character);
         }
 
-        const lineEnding = "\n";  //TODO: set this correctly
+        const lineEnding = "\n";  // TODO: set this correctly
         const startLineIndex = range.start.line;
         const endLineIndex = range.end.line;
         const resultLines: string[] = [];
@@ -37,7 +37,7 @@ export class DocumentDecorator {
         line = position.line;
 
         if (line < 0 || line >= this._lines.length) {
-            throw new Error('Illegal value for `line`');
+            throw new Error("Illegal value for `line`");
         }
 
         return this._lines[line];
@@ -45,8 +45,8 @@ export class DocumentDecorator {
 
     public validateRange(range: vscode.Range): vscode.Range {
 
-        let start = this.validatePosition(range.start);
-        let end = this.validatePosition(range.end);
+        const start = this.validatePosition(range.start);
+        const end = this.validatePosition(range.end);
 
         if (start === range.start && end === range.end) {
             return range;
@@ -63,19 +63,16 @@ export class DocumentDecorator {
             line = 0;
             character = 0;
             hasChanged = true;
-        }
-        else if (line >= this._lines.length) {
+        } else if (line >= this._lines.length) {
             line = this._lines.length - 1;
             character = this._lines[line].length;
             hasChanged = true;
-        }
-        else {
-            let maxCharacter = this._lines[line].length;
+        } else {
+            const maxCharacter = this._lines[line].length;
             if (character < 0) {
                 character = 0;
                 hasChanged = true;
-            }
-            else if (character > maxCharacter) {
+            } else if (character > maxCharacter) {
                 character = maxCharacter;
                 hasChanged = true;
             }

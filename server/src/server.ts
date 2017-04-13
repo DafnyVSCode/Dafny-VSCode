@@ -2,10 +2,10 @@
 
 import {
     CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
-    createConnection, Diagnostic, DiagnosticSeverity, IConnection,
-    InitializeParams, InitializeResult, IPCMessageReader, IPCMessageWriter,
-    Location, RequestHandler, TextDocument, TextDocumentItem,
-    TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
+    createConnection, DefinitionRequest, Diagnostic, DiagnosticSeverity,
+    IConnection, InitializeParams, InitializeResult, IPCMessageReader,
+    IPCMessageWriter, Location, RenameParams, RequestHandler,
+    TextDocument, TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
 
 import { DafnySettings } from "./backend/dafnySettings";
@@ -61,11 +61,16 @@ function init(serverVersion: string) {
     }
 }
 
-connection.onRenameRequest((handler): Thenable<WorkspaceEdit> => {
-    return null;
+connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
+    if(provider && provider.renameProvider) {
+        console.log("onRename: " + handler.textDocument.uri);
+        return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
+    } else {
+        console.log("onRename: too early");
+    }
 });
 
-connection.onDefinition((handler): Thenable<Location> => {
+connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location> => {
     if (provider && provider.definitionProvider) {
         console.log("onDefinition: " + handler.textDocument.uri);
         return provider.definitionProvider.provideDefinition(documents.get(handler.textDocument.uri), handler.position);

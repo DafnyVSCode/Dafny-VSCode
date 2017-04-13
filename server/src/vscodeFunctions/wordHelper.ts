@@ -7,33 +7,32 @@ export const USUAL_WORD_SEPARATORS = '`~!@#$%^&*()-=+[{]}\\|;:\'",.<>/?';
  * The default would look like this:
  * /(-?\d*\.\d\w*)|([^\`\~\!\@\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g
  */
-function createWordRegExp(allowInWords: string = ''): RegExp {
-    var usualSeparators = USUAL_WORD_SEPARATORS;
-    var source = '(-?\\d*\\.\\d\\w*)|([^';
-    for (var i = 0; i < usualSeparators.length; i++) {
-        if (allowInWords.indexOf(usualSeparators[i]) >= 0) {
+function createWordRegExp(allowInWords: string = ""): RegExp {
+    let source = "(-?\d*\.\d\w*)|([^";
+    for (const seperator of USUAL_WORD_SEPARATORS) {
+        if (allowInWords.indexOf(seperator) >= 0) {
             continue;
         }
-        source += '\\' + usualSeparators[i];
+        source += "\\" + seperator;
     }
-    source += '\\s]+)';
-    return new RegExp(source, 'g');
+    source += "\s]+)";
+    return new RegExp(source, "g");
 }
 
 // catches numbers (including floating numbers) in the first group, and alphanum in the second
 export const DEFAULT_WORD_REGEXP = createWordRegExp();
 
 export function ensureValidWordDefinition(wordDefinition?: RegExp): RegExp {
-    var result: RegExp = DEFAULT_WORD_REGEXP;
+    let result: RegExp = DEFAULT_WORD_REGEXP;
 
     if (wordDefinition && (wordDefinition instanceof RegExp)) {
         if (!wordDefinition.global) {
-            var flags = 'g';
+            let flags = "g";
             if (wordDefinition.ignoreCase) {
-                flags += 'i';
+                flags += "i";
             }
             if (wordDefinition.multiline) {
-                flags += 'm';
+                flags += "m";
             }
             result = new RegExp(wordDefinition.source, flags);
         } else {
@@ -49,13 +48,13 @@ export function ensureValidWordDefinition(wordDefinition?: RegExp): RegExp {
 function getWordAtPosFast(column: number, wordDefinition: RegExp, text: string, textOffset: number): WordAtPosition {
     // find whitespace enclosed text around column and match from there
 
-    if (wordDefinition.test(' ')) {
+    if (wordDefinition.test(" ")) {
         return getWordAtPosSlow(column, wordDefinition, text, textOffset);
     }
 
-    let pos = column - 1 - textOffset;
-    let start = text.lastIndexOf(' ', pos - 1) + 1;
-    let end = text.indexOf(' ', pos);
+    const pos = column - 1 - textOffset;
+    const start = text.lastIndexOf(" ", pos - 1) + 1;
+    let end = text.indexOf(" ", pos);
     if (end === -1) {
         end = text.length;
     }
@@ -65,9 +64,9 @@ function getWordAtPosFast(column: number, wordDefinition: RegExp, text: string, 
     while (match = wordDefinition.exec(text)) {
         if (match.index <= pos && wordDefinition.lastIndex >= pos) {
             return {
-                word: match[0],
+                endColumn: textOffset + 1 + wordDefinition.lastIndex,
                 startColumn: textOffset + 1 + match.index,
-                endColumn: textOffset + 1 + wordDefinition.lastIndex
+                word: match[0]
             };
         }
     }
@@ -75,17 +74,16 @@ function getWordAtPosFast(column: number, wordDefinition: RegExp, text: string, 
     return null;
 }
 
-
 function getWordAtPosSlow(column: number, wordDefinition: RegExp, text: string, textOffset: number): WordAtPosition {
     // matches all words starting at the beginning
     // of the input until it finds a match that encloses
     // the desired column. slow but correct
 
-    let pos = column - 1 - textOffset;
+    const pos = column - 1 - textOffset;
     wordDefinition.lastIndex = 0;
 
     let match: RegExpMatchArray;
-    while (match = wordDefinition.exec(text)) {
+    while (match = wordDefinition.exec(text))  {
 
         if (match.index > pos) {
             // |nW -> matched only after the pos
@@ -94,9 +92,9 @@ function getWordAtPosSlow(column: number, wordDefinition: RegExp, text: string, 
         } else if (wordDefinition.lastIndex >= pos) {
             // W|W -> match encloses pos
             return {
-                word: match[0],
+                endColumn: textOffset + 1 + wordDefinition.lastIndex,
                 startColumn: textOffset + 1 + match.index,
-                endColumn: textOffset + 1 + wordDefinition.lastIndex
+                word: match[0]
             };
         }
     }

@@ -1,4 +1,4 @@
-import {Position, Range} from "vscode-languageserver";
+import {Position, Range, TextDocument} from "vscode-languageserver";
 
 export enum SymbolType {
     Unknown, Class, Method, Function, Field, Call
@@ -28,10 +28,10 @@ export class Symbol {
     public end: Position;
     public range: Range;
     public call: string;
-    public fileName: string;
+    public document: TextDocument;
 
     constructor(column: number, line: number, module: string, name: string,
-                position: number, parentClass: string, call: string, fileName: string) {
+                position: number, parentClass: string, call: string, document: TextDocument) {
         this.column = column;
         this.line = line;
         this.module = module;
@@ -43,7 +43,7 @@ export class Symbol {
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + Number(this.name.length));
         this.range = Range.create(this.start, this.end);
-		this.fileName = fileName;
+        this.document = document;
     }
     public setSymbolType(type: string): void {
         switch(type) {
@@ -74,9 +74,9 @@ export class Reference {
     public start: Position;
     public end: Position;
     public range: Range;
-    public fileName: string;
+    public document: TextDocument;
 
-    constructor(column: number, line: number, position: number, methodName: string, fileName: string) {
+    constructor(column: number, line: number, position: number, methodName: string, document: TextDocument) {
         this.column = column;
         this.line = line;
         this.position = position;
@@ -84,7 +84,7 @@ export class Reference {
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + this.methodName.length);
         this.range = Range.create(this.start, this.end);
-		this.fileName = fileName;
+        this.document = document;
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";

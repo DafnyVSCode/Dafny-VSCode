@@ -39,7 +39,7 @@ export class DafnyDefinitionProvider {
         document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.getWordRangeAtPosition(position);
-    	if(this.isMethodCall(document, position)) {
+        if(this.isMethodCall(document, position)) {
             return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
                 const call = this.getFullyQualifiedNameOfCalledMethod(document, position);
                 for(const symbolTable of symbolTables) {
@@ -92,11 +92,11 @@ export class DafnyDefinitionProvider {
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
         return this.server.symbolService.getSymbols(document).then((symbolTables: SymbolTable[]) => {
-			for(const symbolTable of symbolTables) {            
-				for (const symb of symbolTable.symbols) {
-	                if (symb.name === symbolName) {
-	                    return new DafnyDefinitionInformtation(symb, symbolTable.fileName);
-					}
+            for(const symbolTable of symbolTables) {
+                for (const symb of symbolTable.symbols) {
+                    if (symb.name === symbolName) {
+                        return new DafnyDefinitionInformtation(symb, symbolTable.fileName);
+                    }
                 }
             }
             return null;
@@ -104,7 +104,8 @@ export class DafnyDefinitionProvider {
     }
 
     private translate(position: vscode.Position, lineDeltaOrChange: number |
-        { lineDelta?: number; characterDelta?: number; }, characterDelta: number = 0): vscode.Position {
+        { lineDelta?: number; characterDelta?: number; },
+                      characterDelta: number = 0): vscode.Position {
 
         if (lineDeltaOrChange === null || characterDelta === null) {
             throw new Error("invalid params");
