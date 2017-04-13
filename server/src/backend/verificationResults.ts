@@ -1,10 +1,10 @@
 "use strict";
 
 import * as vscode from "vscode-languageserver";
+import {IConnection} from "vscode-languageserver";
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import {VerificationRequest} from "./verificationRequest";
-import {IConnection} from "vscode-languageserver";
 
 export enum VerificationStatus {
     Verified = 0,

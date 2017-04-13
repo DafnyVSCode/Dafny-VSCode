@@ -1,11 +1,11 @@
 "use strict";
 
 import {
-    IPCMessageReader, IPCMessageWriter, TextDocumentItem,
-    createConnection, IConnection, TextDocumentSyncKind,
-    TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
-    InitializeParams, InitializeResult, TextDocumentPositionParams,
-    CompletionItem, CompletionItemKind
+    CompletionItem, CompletionItemKind, createConnection,
+    Diagnostic, DiagnosticSeverity, IConnection,
+    InitializeParams, InitializeResult, IPCMessageReader, IPCMessageWriter,
+    TextDocument, TextDocumentItem, TextDocumentPositionParams,
+    TextDocuments, TextDocumentSyncKind
 } from "vscode-languageserver";
 
 import { DafnySettings } from "./backend/dafnySettings";
@@ -29,7 +29,7 @@ connection.onInitialize((params): InitializeResult => {
         capabilities: {
             textDocumentSync: documents.syncKind,
         }
-    }
+    };
 });
 
 function verifyDependencies() {
@@ -57,7 +57,6 @@ function init(serverVersion: string) {
         connection.sendNotification(LanguageServerNotification.Error, "Exception occured: " + e);
     }
 }
-
 
 interface Settings {
     dafny: DafnySettings;
@@ -87,7 +86,8 @@ connection.onRequest<void, void>(LanguageServerRequest.Reset, () => {
 
 connection.onNotification(LanguageServerNotification.Verify, (json: string) => {
     const textDocumentItem: TextDocumentItem = JSON.parse(json);
-    const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId, textDocumentItem.version, textDocumentItem.text);
+    const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
+        textDocumentItem.version, textDocumentItem.text);
     console.log(textDocument);
     if (provider) {
         provider.doVerify(textDocument);

@@ -2,7 +2,7 @@
 import * as Collections from "typescript-collections";
 import {IConnection} from "vscode-languageserver";
 import {VerificationRequest} from "./verificationRequest";
-import {VerificationResults, VerificationResult} from "./verificationResults";
+import {VerificationResult, VerificationResults} from "./verificationResults";
 
 export class Context {
     public queue: Collections.Queue<VerificationRequest> = new Collections.Queue<VerificationRequest>();
@@ -36,8 +36,7 @@ export class Context {
 
     public collectRequest(serverReturn: string): VerificationResult {
         this.activeRequest.timeFinished = Date.now();
-        var result = this.verificationResults.collect(serverReturn, this.activeRequest);
-        
+        const result = this.verificationResults.collect(serverReturn, this.activeRequest);
         return result;
     }
 

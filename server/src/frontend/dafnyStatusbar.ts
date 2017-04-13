@@ -1,9 +1,9 @@
 "use strict";
+import {IConnection} from "vscode-languageserver";
 import {Context} from "../backend/context";
 import {VerificationRequest} from "../backend/verificationRequest";
 import {VerificationResult} from "../backend/verificationResults";
-import {EnvironmentConfig, StatusString, LanguageServerNotification} from "../strings/stringRessources";
-import {IConnection} from "vscode-languageserver";
+import {EnvironmentConfig, LanguageServerNotification, StatusString} from "../strings/stringRessources";
 
 class Priority {
     public static low: number = 1;

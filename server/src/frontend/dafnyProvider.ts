@@ -3,15 +3,14 @@
 import * as vscode from "vscode-languageserver";
 import {Context} from "../backend/context";
 import {DafnyServer} from "../backend/dafnyServer";
+import {DafnySettings} from "../backend/dafnySettings";
 //import { DAFNYMODE } from "../backend/features/definitionProvider";
 //import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 //import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
 import {Config,  EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
 import {Statusbar} from "./dafnyStatusbar";
-import{DafnySettings} from "../backend/dafnySettings";
 
 export class DafnyServerProvider {
-    //private diagCol: vscode.DiagnosticCollection = null;
 
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
@@ -19,7 +18,6 @@ export class DafnyServerProvider {
     private context: Context;
 
     constructor(public connection: vscode.IConnection, serverVersion: string, rootPath: string, settings: DafnySettings) {
-        //this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
 
         this.context = new Context(connection);
         this.context.serverversion = serverVersion;
@@ -29,9 +27,6 @@ export class DafnyServerProvider {
     }
 
     public dispose(): void {
-        //this.dafnyStatusbar.hide();
-        //this.diagCol.clear();
-        //this.diagCol.dispose();
         if(this.subscriptions && this.subscriptions.length > 0) {
             for(let i: number = 0; i < this.subscriptions.length; i++) {
                 this.subscriptions[i].dispose();
@@ -55,7 +50,7 @@ export class DafnyServerProvider {
 
     public doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
-            console.log("adding to queue")
+            console.log("adding to queue");
             this.dafnyServer.addDocument(textDocument, "verify");
         }
     }

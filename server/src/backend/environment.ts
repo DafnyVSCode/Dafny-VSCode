@@ -5,7 +5,7 @@ import * as os from "os";
 import * as vscode from "vscode-languageserver";
 import {IConnection} from "vscode-languageserver";
 import {IncorrectPathExeption} from "../errorHandling/errors";
-import {Application, Config, EnvironmentConfig, ErrorMsg, WarningMsg, LanguageServerNotification } from "../strings/stringRessources";
+import {Application, Config, EnvironmentConfig, ErrorMsg, LanguageServerNotification, WarningMsg } from "../strings/stringRessources";
 import {DafnySettings} from "./dafnySettings";
 
 export class Command {
