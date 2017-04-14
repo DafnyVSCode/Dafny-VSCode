@@ -7,7 +7,7 @@ import {
     IPCMessageWriter, Location, RenameParams, RequestHandler,
     TextDocument, TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
-
+import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
@@ -16,6 +16,9 @@ import { Commands, LanguageServerNotification, LanguageServerRequest } from "./s
 
 const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 const documents: TextDocuments = new TextDocuments();
+const codeLenses: {
+    [codeLens: string]: ReferencesCodeLens;
+} = {};
 let settings: Settings = null;
 let started: boolean = false;
 documents.listen(connection);
@@ -62,7 +65,7 @@ function init(serverVersion: string) {
 }
 
 connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
-    if(provider && provider.renameProvider) {
+    if (provider && provider.renameProvider) {
         console.log("onRename: " + handler.textDocument.uri);
         return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
     } else {
@@ -79,21 +82,72 @@ connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location
     }
 });
 
-connection.onCodeLens((handler: CodeLensParams): Promise<CodeLens[]> => {
+const MAX_RETRIES = 30;
+
+function waitForServer(handler: CodeLensParams) {
+    return new Promise(async (resolve, reject) => {
+        let tries = 0;
+        while (!(provider && provider.referenceProvider) && tries < MAX_RETRIES) {
+            console.log("onCodeLens: to early: waiiting");
+            await sleep(2000);
+            tries++;
+        }
+        if ((provider && provider.referenceProvider)) {
+            resolve();
+        } else {
+            reject();
+        }
+    }).then(function () {
+        console.log("onCodeLens: to early: load the shiiiit");
+        const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
+        result.then((value) => {
+            value.forEach(element => {
+                console.log("added codelens" + JSON.stringify(getCodeLens(element)));
+                codeLenses[JSON.stringify(getCodeLens(element))] = element;
+            });
+        });
+        return result;
+    });
+}
+
+function getCodeLens(referenceCodeLens: ReferencesCodeLens): CodeLens {
+    return { command: referenceCodeLens.command, data: referenceCodeLens.data, range: referenceCodeLens.range };
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> => {
 
     if (provider && provider.referenceProvider) {
         console.log("onCodeLens: " + handler.textDocument.uri);
-        return provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
+        const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
+        result.then((value) => {
+            value.forEach(element => {
+                console.log("added codelens" + JSON.stringify(getCodeLens(element)));
+                codeLenses[JSON.stringify(getCodeLens(element))] = element;
+            });
+        });
+        return result;
     } else {
         console.log("onCodeLens: to early");
+        return waitForServer(handler);
     }
 });
 
 connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
 
-    if (provider && provider.referenceProvider && handler) {
-        console.log("onCodeLensResolve: " + handler);
-        return provider.referenceProvider.resolveCodeLens(handler);
+    if (provider && provider.referenceProvider) {
+        console.log("onCodeLensResolve: ");
+        const item = codeLenses[JSON.stringify(handler)];
+        if (item !== null && item as ReferencesCodeLens) {
+            return provider.referenceProvider.resolveCodeLens(item);
+        } else {
+            console.log("key not found ");
+        }
     } else {
         console.log("onCodeLensResolve: to early");
     }
