@@ -1,9 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
-import {Config,  EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
-import {Statusbar} from "./dafnyStatusbar";
 import { LanguageClient } from "vscode-languageclient";
 import {TextDocumentItem} from "vscode-languageserver-types";
+import {Statusbar} from "./dafnyStatusbar";
+import {Config,  EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 
 export class DafnyClientProvider {
     private diagCol: vscode.DiagnosticCollection = null;
@@ -56,7 +56,8 @@ export class DafnyClientProvider {
     }
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
-            const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(), textDocument.languageId, textDocument.version, textDocument.getText()));
+            const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
+                textDocument.languageId, textDocument.version, textDocument.getText()));
             console.log("sending to language server " + tditem);
             this.languageServer.sendNotification(LanguageServerNotification.Verify, tditem);
         }

@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
         synchronize: {
             configurationSection: "dafny",
         }
-    }
+    };
 
     languageServer = new LanguageClient("dafny-vscode", "Dafny Language Server", serverOptions, clientOptions);
     languageServer.onReady().then(() => {
@@ -91,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     function install(): Thenable<void> {
 
-        const promise = new Promise<void>(function (resolve, reject) {
+        const promise = new Promise<void>((resolve, reject) => {
 
             const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
                 resolve();
