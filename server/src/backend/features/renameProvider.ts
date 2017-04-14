@@ -37,7 +37,6 @@ export class DafnyRenameProvider {
                 const relevantSymbols: Symbol[] = allSymbols.filter((e: Symbol) => {
                     return (e.symbolType === SymbolType.Call || e.symbolType === SymbolType.Field) && e.name.includes(word);
                 });
-                console.log(relevantSymbols);
                 for (const s of relevantSymbols) {
                     if (s.symbolType === SymbolType.Field) {
                         edits.push(TextDocumentEdit.create(s.document, [TextEdit.replace(s.range, newName)]));

@@ -11,13 +11,13 @@ export class DafnyBaseCodeLensProvider {
 
     public constructor(public server: DafnyServer) {}
     public provideCodeLenses(document: TextDocument): Promise<CodeLens[]> {
+        console.log("Start codelenses");
         if (!this.enabled || !document) {
+            console.log("Stopped codelenses");
             return Promise.resolve([]);
         }
         return this.server.symbolService.getSymbols(document)
         .then((symbolTables: SymbolTable[]) => {
-            console.log("We being");
-            console.log(symbolTables);
             return symbolTables.find((table: SymbolTable) => table.fileName === document.uri).symbols
                 .filter((info: Symbol) => !(info.name === "_default" && info.symbolType === SymbolType.Class) &&
                     (info.symbolType !== SymbolType.Unknown && info.symbolType !== SymbolType.Call))

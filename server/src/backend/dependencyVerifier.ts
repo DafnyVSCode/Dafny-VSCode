@@ -45,7 +45,6 @@ export class DependencyVerifier {
             (err: Error) => { this.callbackError(err); },
             () => {
                 try {
-                    console.log(this.serverProc.outBuf);
                     if(this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
                         this.upgradeCallback();
                         this.serverProc.sendQuit();
@@ -53,7 +52,6 @@ export class DependencyVerifier {
                         const start = this.serverProc.outBuf.indexOf(this.version);
                         const end = this.serverProc.outBuf.indexOf("\n", start);
                         this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
-                        console.log(this.serverVersion);
                         this.serverProc.clearBuffer();
                         this.serverProc.sendRequestToDafnyServer("", "versioncheck");
                     } else {

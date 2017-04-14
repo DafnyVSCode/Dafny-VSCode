@@ -9,10 +9,11 @@
     "node": "*"
   },
   "dependencies": {
-    "vscode-languageserver": "^3.1.0",
-    "utf8": "*",
     "base64-js": "*",
-    "typescript-collections": "^1.2.3"
+    "typescript-collections": "^1.2.3",
+    "utf8": "*",
+    "vscode-languageserver": "^3.1.0",
+    "vscode-uri": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.52",

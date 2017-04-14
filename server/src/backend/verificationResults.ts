@@ -47,8 +47,7 @@ export class VerificationResults {
         const diags: vscode.Diagnostic[] = [];
         let errorCount: number = 0;
         let proofObligations: number = 0;
-        console.log(log);
-        console.log(req);
+
         // tslint:disable-next-line:forin
         for (const index in lines) {
             const sourceLine: string = lines[index];

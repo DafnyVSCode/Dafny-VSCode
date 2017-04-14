@@ -46,8 +46,11 @@ export class DafnyDefinitionProvider {
                     for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
                         if(symb.call === call) {
                             const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
-                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
-                            return new DafnyDefinitionInformtation(definitionSymbol, symbolTable.fileName);
+                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });¨
+                            if(definitionSymbol) {
+                                return new DafnyDefinitionInformtation(definitionSymbol, symbolTable.fileName);
+                            }
+                            return null;
                         }
                     }
                 }
@@ -69,7 +72,9 @@ export class DafnyDefinitionProvider {
         const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
 
         const call = documentDecorator.getText(wordRange);
+        console.log(call);
         const designator = documentDecorator.getText(wordRangeBeforeIdentifier);
+        console.log(designator);
         return designator + "." + call;
     }
     private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {

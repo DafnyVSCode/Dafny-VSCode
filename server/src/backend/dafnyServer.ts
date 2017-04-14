@@ -1,7 +1,8 @@
 "use strict";
 import * as cp from "child_process";
-import * as vscode from "vscode-languageserver";
 import {IConnection} from "vscode-languageserver";
+import * as vscode from "vscode-languageserver";
+import Uri from "vscode-uri"
 import {IncorrectPathExeption} from "../errorHandling/errors";
 import {Statusbar} from "../frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../process/process";
@@ -114,7 +115,6 @@ export class DafnyServer {
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-            console.log(this.serverProc.outBuf);
             if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
                 const result = this.context.collectRequest(log);
                 this.connection.sendNotification(LanguageServerNotification.VerificationResult,
@@ -191,10 +191,9 @@ export class DafnyServer {
         if(request.verb === "verify") {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
-        console.log("Sending: " + request);
         const task: IVerificationTask = {
             args: [],
-            filename: request.document.uri,
+            filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
             sourceIsFile: false
         };

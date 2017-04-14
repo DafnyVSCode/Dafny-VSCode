@@ -14,7 +14,7 @@ export class DocumentDecorator {
         const range = this.validateRange(_range);
 
         if (range.start.line === range.end.line) {
-            return this._lines[range.start.line].substring(range.start.character, range.end.character);
+            return this._lines[range.start.line].substring(range.start.character, range.end.character).trim();
         }
 
         const lineEnding = "\n";  // TODO: set this correctly
@@ -22,13 +22,13 @@ export class DocumentDecorator {
         const endLineIndex = range.end.line;
         const resultLines: string[] = [];
 
-        resultLines.push(this._lines[startLineIndex].substring(range.start.character));
+        resultLines.push(this._lines[startLineIndex].substring(range.start.character).trim());
         for (let i = startLineIndex + 1; i < endLineIndex; i++) {
-            resultLines.push(this._lines[i]);
+            resultLines.push(this._lines[i].trim());
         }
-        resultLines.push(this._lines[endLineIndex].substring(0, range.end.character));
+        resultLines.push(this._lines[endLineIndex].substring(0, range.end.character).trim());
 
-        return resultLines.join(lineEnding);
+        return resultLines.join(lineEnding).trim();
     }
 
     public lineAt(position: vscode.Position): string {

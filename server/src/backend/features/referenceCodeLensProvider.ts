@@ -11,14 +11,17 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     }
     public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
         if(!codeLens.symbol) {
+            console.log("error");
             return null;
         }
+        console.log("harder");
         return Promise.resolve(this.getReferences(codeLens));
     }
 
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         console.log("We here");
         console.log(inputCodeLens);
+        console.log("bla");
         const codeLens = inputCodeLens as ReferencesCodeLens;
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
             if (!referenceInfo) {
@@ -57,6 +60,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): PromiseLike<ReferenceInformation[]> {
+        console.log("trying");
         return this.server.symbolService.getSymbols(codeLens.symbol.document).then( (tables: SymbolTable[]) =>  {
             if(!tables) {
                 const emptyRefs: ReferenceInformation[] = [];
