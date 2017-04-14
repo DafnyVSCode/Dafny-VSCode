@@ -2,7 +2,7 @@
 import * as cp from "child_process";
 import {IConnection} from "vscode-languageserver";
 import * as vscode from "vscode-languageserver";
-import Uri from "vscode-uri"
+import Uri from "vscode-uri";
 import {IncorrectPathExeption} from "../errorHandling/errors";
 import {Statusbar} from "../frontend/dafnyStatusbar";
 import { ProcessWrapper } from "../process/process";

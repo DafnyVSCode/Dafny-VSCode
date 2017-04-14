@@ -1,9 +1,8 @@
 "use strict";
 import * as vscode from "vscode";
-import { EnvironmentConfig, StatusString, LanguageServerNotification } from "./stringRessources";
-import { VerificationResult } from "./verificationResult";
 import { LanguageClient } from "vscode-languageclient";
-
+import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
+import { VerificationResult } from "./verificationResult";
 
 class Priority {
     public static low: number = 1;
@@ -12,15 +11,14 @@ class Priority {
 }
 
 export class Statusbar {
-
-    private serverStatusBar: vscode.StatusBarItem = null;
-    private currentDocumentStatucBar: vscode.StatusBarItem = null;
     public serverStatus: string;
     public queueSize: number;
     public serverpid: number;
     public serverversion: string;
     public activeDocument: vscode.Uri;
     public verificationResults: { [docPathName: string]: VerificationResult } = {};
+    private serverStatusBar: vscode.StatusBarItem = null;
+    private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
     constructor(languageServer: LanguageClient) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
@@ -59,8 +57,6 @@ export class Statusbar {
             this.serverStatus = status;
             this.update();
         });
-
-
     }
 
     public hide(): void {
@@ -107,8 +103,6 @@ export class Statusbar {
             }
         }
 
-
-
         this.serverStatusBar.show();
         this.currentDocumentStatucBar.show();
     }
@@ -131,7 +125,7 @@ export class Statusbar {
     }
 
     private queueContains(/*filename: string*/): boolean {
-        let found: boolean = false;
+        const found: boolean = false;
         /*this.context.queue.forEach((request: VerificationRequest): void => {
             if(request.document.fileName === filename) {
                 found = true;
