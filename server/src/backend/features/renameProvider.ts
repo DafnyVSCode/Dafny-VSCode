@@ -24,31 +24,41 @@ export class DafnyRenameProvider {
 
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
-        const wordRange = documentDecorator.getWordRangeAtPosition(position);
+        const wordRange = documentDecorator.matchWordRangeAtPosition(position);
         const word = wordRange ? documentDecorator.getText(wordRange) : "";
         return this.server.symbolService.getSymbols(document).then((tables: SymbolTable[]) => {
             const allSymbols = [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
-            const definingClasses = allSymbols.filter((e: Symbol) => {
+            const definingClasses: Symbol[] = allSymbols.filter((e: Symbol) => {
                 return e && e.range && e.symbolType && this.containsPosition(e.range, position) && e.symbolType === SymbolType.Class;
             });
-
-            const edits: TextDocumentEdit[] = [];
+            const changes: {
+        [uri: string]: TextEdit[];
+    } = {};
             if (definingClasses && definingClasses.length && definingClasses[0]) {
+                const definingClass = definingClasses[0];
                 const relevantSymbols: Symbol[] = allSymbols.filter((e: Symbol) => {
                     return (e.symbolType === SymbolType.Call || e.symbolType === SymbolType.Field) && e.name.includes(word);
                 });
                 for (const s of relevantSymbols) {
-                    if (s.symbolType === SymbolType.Field) {
-                        edits.push(TextDocumentEdit.create(s.document, [TextEdit.replace(s.range, newName)]));
+                    if (s.symbolType === SymbolType.Field ||
+                        (s.symbolType === SymbolType.Call && s.document.uri !== definingClass.document.uri)) {
+                        if(!changes[s.document.uri]) {
+                            changes[s.document.uri] = [];
+                        }
+                        changes[s.document.uri].push(TextEdit.replace(s.range, newName));
                         for (const ref of s.References) {
-                            edits.push(TextDocumentEdit.create(ref.document, [TextEdit.replace(ref.range, newName)]));
+                            if(!changes[ref.document.uri]) {
+                                changes[ref.document.uri] = [];
+                            }
+                            changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
 
                         }
                     }
                 }
             }
             const workSpaceEdit: WorkspaceEdit = {};
-            workSpaceEdit.documentChanges = edits;
+            workSpaceEdit.changes = changes;
+            console.log(JSON.stringify(workSpaceEdit));
             return workSpaceEdit;
 
         }).catch((e: any) => { console.log(e); });

@@ -1,5 +1,5 @@
 import * as vscode from "vscode-languageserver";
-import { ensureValidWordDefinition, getWordAtText } from "./wordHelper";
+import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 
 export class DocumentDecorator {
 
@@ -84,6 +84,19 @@ export class DocumentDecorator {
         return vscode.Position.create(line, character);
     }
 
+    public matchWordRangeAtPosition(_position: vscode.Position): vscode.Range {
+        const position = this.validatePosition(_position);
+        const wordAtText = matchWordAtText(
+            position.character + 1,
+            this._lines[position.line],
+            0
+        );
+
+        if (wordAtText) {
+            return vscode.Range.create(position.line, wordAtText.startColumn - 1, position.line, wordAtText.endColumn - 1);
+        }
+        return undefined;
+    }
     public getWordRangeAtPosition(_position: vscode.Position, regexp?: RegExp): vscode.Range {
         const position = this.validatePosition(_position);
         /*if (!regexp || regExpLeadsToEndlessLoop(regexp)) {

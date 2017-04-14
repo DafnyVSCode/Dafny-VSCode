@@ -46,7 +46,7 @@ export class DafnyDefinitionProvider {
                     for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call)) {
                         if(symb.call === call) {
                             const definitionSymbol = symbolTable.symbols.find((s: Symbol) => { return s.module === symb.module &&
-                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });¨
+                                s.parentClass === symb.parentClass && s.name === symb.name && s.symbolType !== SymbolType.Call; });
                             if(definitionSymbol) {
                                 return new DafnyDefinitionInformtation(definitionSymbol, symbolTable.fileName);
                             }
