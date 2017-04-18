@@ -1,5 +1,6 @@
 "use strict";
 import { CodeLens, Location, TextDocument } from "vscode-languageserver";
+import Uri from "vscode-uri";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
@@ -11,17 +12,12 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     }
     public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
         if(!codeLens.symbol) {
-            console.log("error");
             return null;
         }
-        console.log("harder");
         return Promise.resolve(this.getReferences(codeLens));
     }
 
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
-        console.log("We here");
-        console.log(inputCodeLens);
-        console.log("bla");
         const codeLens = inputCodeLens as ReferencesCodeLens;
         return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
             if (!referenceInfo) {
@@ -37,7 +33,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
         const locations = this.buildReferenceLocations(referenceInformation);
         codeLens.command = {
-            arguments: [codeLens.symbol.document.uri, codeLens.range.start, locations],
+            arguments: [Uri.parse(codeLens.symbol.document.uri), codeLens.range.start, locations],
             command: "editor.action.showReferences",
             title: locations.length === 1
                 ? "1 reference"
@@ -48,7 +44,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceLocations(referenceInformation: ReferenceInformation[]): Location[] {
             const locations: Location[] = [];
             for(const info of referenceInformation) {
-                locations.push(Location.create(info.fileName, info.reference.range));
+                locations.push(Location.create(info.fileName.toString(), info.reference.range));
             }
             return locations;
     }
@@ -60,7 +56,6 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): PromiseLike<ReferenceInformation[]> {
-        console.log("trying");
         return this.server.symbolService.getSymbols(codeLens.symbol.document).then( (tables: SymbolTable[]) =>  {
             if(!tables) {
                 const emptyRefs: ReferenceInformation[] = [];
@@ -77,7 +72,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             for(const symbol of symbolTable.symbols) {
                 for(const reference of symbol.References) {
                     if(symbol.name === codeLens.symbol.name) {
-                        references.push(new ReferenceInformation(reference, symbolTable.fileName));
+                        references.push(new ReferenceInformation(reference, Uri.parse(symbolTable.fileName)));
                     }
                 }
             }

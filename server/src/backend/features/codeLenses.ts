@@ -1,5 +1,6 @@
 "use strict";
 import {CodeLens, Command, Range, TextDocument} from "vscode-languageserver";
+import Uri from "vscode-uri";
 import { Reference, Symbol } from "./symbols";
 
 export class ReferencesCodeLens implements CodeLens {
@@ -12,9 +13,9 @@ export class ReferencesCodeLens implements CodeLens {
 }
 
 export class ReferenceInformation {
-    public fileName: string;
+    public fileName: Uri;
     public reference: Reference;
-    constructor(dafnyReference: Reference, file: string) {
+    constructor(dafnyReference: Reference, file: Uri) {
         this.reference = dafnyReference;
         this.fileName = file;
     }

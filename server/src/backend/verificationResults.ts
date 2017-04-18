@@ -1,7 +1,7 @@
 "use strict";
 
 import * as vscode from "vscode-languageserver";
-import {IConnection} from "vscode-languageserver";
+import {Diagnostic, IConnection, Position, TextDocument} from "vscode-languageserver";
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import {VerificationRequest} from "./verificationRequest";
@@ -72,6 +72,7 @@ export class VerificationResults {
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
                 }
+                console.log(msgStr);
 
                 diags.push(vscode.Diagnostic.create(range, msgStr, severity));
             } else if(proofObligationLine) {

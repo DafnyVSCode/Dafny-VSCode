@@ -11,9 +11,7 @@ export class DafnyBaseCodeLensProvider {
 
     public constructor(public server: DafnyServer) {}
     public provideCodeLenses(document: TextDocument): Promise<ReferencesCodeLens[]> {
-        console.log("Start codelenses");
         if (!this.enabled || !document) {
-            console.log("Stopped codelenses");
             return Promise.resolve([]);
         }
         return this.server.symbolService.getSymbols(document)
