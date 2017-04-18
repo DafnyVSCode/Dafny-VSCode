@@ -14,7 +14,8 @@ export class DocumentDecorator {
         const range = this.validateRange(_range);
 
         if (range.start.line === range.end.line) {
-            return this._lines[range.start.line].substring(range.start.character, range.end.character).trim();
+            return this._lines[range.start.line].substring(range.start.character,
+                range.end.character).trim().replace("(", "").replace(")", "");
         }
 
         const lineEnding = "\n";  // TODO: set this correctly
@@ -22,13 +23,13 @@ export class DocumentDecorator {
         const endLineIndex = range.end.line;
         const resultLines: string[] = [];
 
-        resultLines.push(this._lines[startLineIndex].substring(range.start.character).trim());
+        resultLines.push(this._lines[startLineIndex].substring(range.start.character).trim().replace("(", "").replace(")", ""));
         for (let i = startLineIndex + 1; i < endLineIndex; i++) {
-            resultLines.push(this._lines[i].trim());
+            resultLines.push(this._lines[i].trim().replace("(", "").replace(")", ""));
         }
-        resultLines.push(this._lines[endLineIndex].substring(0, range.end.character).trim());
+        resultLines.push(this._lines[endLineIndex].substring(0, range.end.character).trim().replace("(", "").replace(")", ""));
 
-        return resultLines.join(lineEnding).trim();
+        return resultLines.join(lineEnding).trim().replace("(", "").replace(")", "");
     }
 
     public lineAt(position: vscode.Position): string {
