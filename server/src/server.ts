@@ -4,7 +4,7 @@ import {
     CodeActionParams, CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
     createConnection, DefinitionRequest, Diagnostic, DiagnosticSeverity,
     IConnection, InitializeParams, InitializeResult, IPCMessageReader,
-    IPCMessageWriter, Location, RenameParams, RequestHandler,
+    IPCMessageWriter, Location, RenameParams, RequestHandler, TextEdit,
     TextDocument, TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
 import { DafnySettings } from "./backend/dafnySettings";
@@ -13,6 +13,7 @@ import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
 import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
 import { Commands, LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
+import {DocumentFormattingProvider} from "./backend/features/documentFormattingProvider";
 
 const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 const documents: TextDocuments = new TextDocuments();
@@ -26,6 +27,8 @@ documents.listen(connection);
 let workspaceRoot: string;
 let provider: DafnyServerProvider = null;
 
+const documentFormattingProvider: DocumentFormattingProvider = new DocumentFormattingProvider();
+
 connection.onInitialize((params): InitializeResult => {
     workspaceRoot = params.rootPath;
     return {
@@ -33,6 +36,7 @@ connection.onInitialize((params): InitializeResult => {
             codeActionProvider : true,
             codeLensProvider: { resolveProvider: true },
             definitionProvider: true,
+            documentFormattingProvider: true,
             renameProvider: true,
             textDocumentSync: documents.syncKind
         }
@@ -81,6 +85,10 @@ connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location
     } else {
         console.log("onDefinition: to early");
     }
+});
+
+connection.onDocumentFormatting((handler): Thenable<TextEdit[]> => {
+    return documentFormattingProvider.format(documents.get(handler.textDocument.uri), handler.options);
 });
 
 const MAX_RETRIES = 30;

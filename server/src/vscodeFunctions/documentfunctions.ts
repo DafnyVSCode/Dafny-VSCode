@@ -10,6 +10,10 @@ export class DocumentDecorator {
         this._lines = document.getText().split(/\r\n|\r|\n/);
     }
 
+    public getLines() {
+        return this._lines;
+    }
+
     public getText(_range: vscode.Range): string {
         const range = this.validateRange(_range);
 
@@ -38,7 +42,7 @@ export class DocumentDecorator {
         line = position.line;
 
         if (line < 0 || line >= this._lines.length) {
-            throw new Error("Illegal value for `line`");
+            throw new Error("Illegal value for `line` " + line);
         }
 
         return this._lines[line];
