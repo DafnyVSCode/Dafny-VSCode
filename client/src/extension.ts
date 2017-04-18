@@ -55,6 +55,30 @@ export function activate(context: vscode.ExtensionContext) {
     const disposable = languageServer.start();
     context.subscriptions.push(disposable);
 
+    vscode.commands.registerCommand(Commands.ShowReferences, (uri: vscode.Uri, position, locations) => {
+        function parsePosition(p: any): vscode.Position {
+            return new vscode.Position(p.line, p.character);
+        }
+        function parseRange(r: any): vscode.Range {
+            return new vscode.Range(parsePosition(r.start), parsePosition(r.end));
+        }
+        function parseLocation(l: any): vscode.Location {
+            return new vscode.Location(parseUri(l.uri), parseRange(l.range));
+        }
+        function parseUri(u: any): vscode.Uri {
+            return vscode.Uri.file(u);
+        }
+
+        const parsedUri = vscode.Uri.file(uri.fsPath);
+        const parsedPosition = parsePosition(position);
+        const parsedLocations = [];
+        for (const location of locations) {
+            parsedLocations.push(parseLocation(location));
+        }
+
+        vscode.commands.executeCommand("editor.action.showReferences", parsedUri, parsedPosition, parsedLocations);
+    });
+
     const restartServerCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.RestartServer, () => {
         languageServer.sendRequest(LanguageServerRequest.Reset).then(() => {
             return true;

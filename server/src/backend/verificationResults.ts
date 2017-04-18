@@ -28,7 +28,6 @@ export class VerificationResults {
     constructor(private connection: IConnection) { }
 
     public collect(log: string, req: VerificationRequest): VerificationResult {
-        console.log(log);
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
         const fileName: string = req.document.uri;
         this.latestResults[fileName] = verificationResult;
@@ -77,8 +76,7 @@ export class VerificationResults {
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
                 }
-                console.log(msgStr);
-
+                
                 const relatedRange = this.checkForRelatedLocation(lines, index, diags, relatedLocationCounter);
                 if (relatedRange) {
                     msgStr += " Related location " + relatedLocationCounter + ": Line: " +

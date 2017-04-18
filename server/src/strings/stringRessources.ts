@@ -34,6 +34,7 @@ export class Commands {
     public static RestartServer: string = "dafny.restartDafnyServer";
     public static InstallDafny: string = "dafny.installDafny";
     public static UninstallDafny: string = "dafny.uninstallDafny";
+    public static ShowReferences: string = "dafny.showReferences";
 }
 
 export class InfoMsg {
