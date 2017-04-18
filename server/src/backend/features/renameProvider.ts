@@ -46,8 +46,10 @@ export class DafnyRenameProvider {
                         if(!changes[s.document.uri]) {
                             changes[s.document.uri] = [];
                         }
-                        changes[s.document.uri].push(TextEdit.replace(s.range, newName));
-                        if(s.symbolType !== SymbolType.Method) {
+                        if(s.symbolType !== SymbolType.Call) {
+                            changes[s.document.uri].push(TextEdit.replace(s.range, newName));
+                        }
+
                             for (const ref of s.References) {
                                 if(!changes[ref.document.uri]) {
                                     changes[ref.document.uri] = [];
@@ -55,7 +57,6 @@ export class DafnyRenameProvider {
                                 changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
 
                             }
-                        }
                     }
                 }
             }
