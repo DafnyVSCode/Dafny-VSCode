@@ -47,10 +47,14 @@ export function ensureValidWordDefinition(wordDefinition?: RegExp): RegExp {
 
 function matchWordAtPosFast(column: number, text: string, textOffset: number): WordAtPosition {
     // find whitespace enclosed text around column and match from there
-
+    const endStrings: string[] = [" ", "(", ")", "}", "{"];
     const pos = column - 1 - textOffset;
-    const start = text.lastIndexOf(" ", pos - 1) + 1;
-    let end = text.indexOf(" ", pos);
+    const possibleStarts = endStrings.map((e: string) => text.lastIndexOf(e, pos - 1) + 1).filter((e: number) => e !== -1);
+    const start = Math.max.apply(null, possibleStarts);
+    //const start = text.lastIndexOf(" ", pos - 1) + 1;
+    const possibleEnds = endStrings.map((e: string) => text.indexOf(e, pos)).filter((e: number) => e !== -1);
+    let end = Math.min.apply(null, possibleEnds);
+    //let end = text.indexOf(" ", pos);
     if (end === -1) {
         end = text.length;
     }
