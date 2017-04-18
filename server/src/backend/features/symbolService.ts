@@ -97,10 +97,11 @@ export class SymbolService {
     }
     private parseReference(reference: any, document: TextDocument): Reference {
         const methodName = reference.MethodName;
+        const referencedName = reference.ReferencedName;
         const loc = reference.Position;
         const referenceLine = this.adjustDafnyLinePositionInfo(reference.Line);
         const referenceColumn = this.adjustDafnyColumnPositionInfo(reference.Column);
-        return new Reference(referenceColumn, referenceLine, loc, methodName, document);
+        return new Reference(referenceColumn, referenceLine, loc, methodName, document, referencedName);
     }
     private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
         this.server.addDocument(document, "symbols", (log) =>  {

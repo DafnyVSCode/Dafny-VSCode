@@ -75,14 +75,15 @@ export class Reference {
     public end: Position;
     public range: Range;
     public document: TextDocument;
-
-    constructor(column: number, line: number, position: number, methodName: string, document: TextDocument) {
+    public referencedName: string;
+    constructor(column: number, line: number, position: number, methodName: string, document: TextDocument, referencedName: string) {
         this.column = column;
         this.line = line;
         this.position = position;
         this.methodName = methodName;
+        this.referencedName = referencedName;
         this.start = Position.create(this.line, this.column);
-        this.end = Position.create(this.line, this.column + this.methodName.length);
+        this.end = Position.create(this.line, this.column + this.referencedName.length);
         this.range = Range.create(this.start, this.end);
         this.document = document;
     }
