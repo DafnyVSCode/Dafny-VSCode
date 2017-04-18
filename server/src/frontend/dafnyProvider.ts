@@ -1,4 +1,5 @@
 "use strict";
+import { CodeActionProvider } from "./../backend/features/codeActionProvider";
 
 import * as vscode from "vscode-languageserver";
 import {Context} from "../backend/context";
@@ -14,6 +15,7 @@ export class DafnyServerProvider {
     public referenceProvider: DafnyReferencesCodeLensProvider;
     public definitionProvider: DafnyDefinitionProvider;
     public renameProvider: DafnyRenameProvider;
+    public codeActionProvider: CodeActionProvider;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -30,6 +32,7 @@ export class DafnyServerProvider {
         this.referenceProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
         this.definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
         this.renameProvider = new DafnyRenameProvider(this.dafnyServer);
+        this.codeActionProvider = new CodeActionProvider();
     }
 
     public dispose(): void {
@@ -56,7 +59,6 @@ export class DafnyServerProvider {
 
     public doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
-            console.log("adding to queue");
             this.dafnyServer.addDocument(textDocument, "verify");
         }
     }

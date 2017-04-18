@@ -3,10 +3,10 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient";
+import { handlerApplyTextEdits } from "./commands";
 import { DafnyInstaller } from "./dafnyInstaller";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { Answer, Commands, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
-
 let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
 
@@ -64,6 +64,8 @@ export function activate(context: vscode.ExtensionContext) {
     });
     context.subscriptions.push(restartServerCommand);
 
+    const editTextCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.EditText, handlerApplyTextEdits(languageServer));
+    context.subscriptions.push(editTextCommand);
     const installDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.InstallDafny, () => {
         install();
     });

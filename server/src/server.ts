@@ -1,15 +1,15 @@
 "use strict";
-
+import { CodeActionProvider } from "./backend/features/codeActionProvider";
 import {
-    CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
+    CodeActionParams, CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
     createConnection, DefinitionRequest, Diagnostic, DiagnosticSeverity,
     IConnection, InitializeParams, InitializeResult, IPCMessageReader,
     IPCMessageWriter, Location, RenameParams, RequestHandler, TextEdit,
     TextDocument, TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
-import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
+import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
 import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
 import { Commands, LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
@@ -33,6 +33,7 @@ connection.onInitialize((params): InitializeResult => {
     workspaceRoot = params.rootPath;
     return {
         capabilities: {
+            codeActionProvider : true,
             codeLensProvider: { resolveProvider: true },
             definitionProvider: true,
             documentFormattingProvider: true,
@@ -105,13 +106,13 @@ function waitForServer(handler: CodeLensParams) {
         } else {
             reject();
         }
-    }).then(function () {
+    }).then(() => {
         console.log("onCodeLens: to early: load the shiiiit");
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
-        result.then((value) => {
-            value.forEach(element => {
-                console.log("added codelens" + JSON.stringify(getCodeLens(element)));
-                codeLenses[JSON.stringify(getCodeLens(element))] = element;
+        result.then((lenses: ReferencesCodeLens[]) => {
+            lenses.forEach((lens: ReferencesCodeLens) => {
+                console.log("added codelens" + JSON.stringify(getCodeLens(lens)));
+                codeLenses[JSON.stringify(getCodeLens(lens))] = lens;
             });
         });
         return result;
@@ -123,20 +124,18 @@ function getCodeLens(referenceCodeLens: ReferencesCodeLens): CodeLens {
 }
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
-
-
 
 connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> => {
 
     if (provider && provider.referenceProvider) {
         console.log("onCodeLens: " + handler.textDocument.uri);
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
-        result.then((value) => {
-            value.forEach(element => {
-                console.log("added codelens" + JSON.stringify(getCodeLens(element)));
-                codeLenses[JSON.stringify(getCodeLens(element))] = element;
+        result.then((lenses: ReferencesCodeLens[]) => {
+            lenses.forEach((lens: ReferencesCodeLens) => {
+                console.log("added codelens" + JSON.stringify(getCodeLens(lens)));
+                codeLenses[JSON.stringify(getCodeLens(lens))] = lens;
             });
         });
         return result;
@@ -193,6 +192,15 @@ connection.onNotification(LanguageServerNotification.Verify, (json: string) => {
         textDocumentItem.version, textDocumentItem.text);
     if (provider) {
         provider.doVerify(textDocument);
+    }
+});
+
+connection.onCodeAction((params: CodeActionParams) => {
+    if (provider && provider.codeActionProvider) {
+        console.log("onCodeAction: " + params.textDocument.uri);
+        return provider.codeActionProvider.provideCodeAction(params);
+    } else {
+        console.log("onCodeAction: to early");
     }
 });
 

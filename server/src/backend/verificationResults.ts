@@ -1,7 +1,9 @@
 "use strict";
 
 import * as vscode from "vscode-languageserver";
+
 import { IConnection } from "vscode-languageserver";
+
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import { VerificationRequest } from "./verificationRequest";
@@ -75,6 +77,7 @@ export class VerificationResults {
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
                 }
+                console.log(msgStr);
 
                 const relatedRange = this.checkForRelatedLocation(lines, index, diags, relatedLocationCounter);
                 if (relatedRange) {

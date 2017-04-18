@@ -58,10 +58,9 @@ export class DafnyRenameProvider {
             }
             const workSpaceEdit: WorkspaceEdit = {};
             workSpaceEdit.changes = changes;
-            console.log(JSON.stringify(workSpaceEdit));
             return workSpaceEdit;
 
-        }).catch((e: any) => { console.log(e); });
+        }).catch((e: any) => { console.error(e); });
     }
 
     private containsRange(range: Range, otherRange: Range): boolean {

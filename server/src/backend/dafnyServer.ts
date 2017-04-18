@@ -57,6 +57,7 @@ export class DafnyServer {
             this.serverProc = this.spawnNewProcess(dafnyCommand, environment.getStandardSpawnOptions());
             return true;
         } catch(e) {
+            console.error(e);
             return false;
         }
     }

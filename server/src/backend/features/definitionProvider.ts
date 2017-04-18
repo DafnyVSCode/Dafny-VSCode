@@ -72,9 +72,7 @@ export class DafnyDefinitionProvider {
         const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
 
         const call = documentDecorator.getText(wordRange);
-        console.log(call);
         const designator = documentDecorator.getText(wordRangeBeforeIdentifier);
-        console.log(designator);
         return designator + "." + call;
     }
     private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {
