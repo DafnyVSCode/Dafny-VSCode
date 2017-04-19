@@ -1,4 +1,5 @@
 "use strict";
+
 import {CodeLens, Command, Range, TextDocument} from "vscode-languageserver";
 import Uri from "vscode-uri";
 import { Reference, Symbol } from "./symbols";

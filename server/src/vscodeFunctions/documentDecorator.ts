@@ -1,3 +1,5 @@
+"use strict";
+
 import * as vscode from "vscode-languageserver";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 

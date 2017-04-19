@@ -1,6 +1,7 @@
 import { Position, Range, TextDocument, WorkspaceEdit } from "vscode-languageserver";
 import { TextDocumentEdit, TextEdit } from "vscode-languageserver-types";
-import { DocumentDecorator } from "../../vscodeFunctions/documentfunctions";
+import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
+import { containsPosition } from "../../vscodeFunctions/positionHelper";
 import { DafnyServer } from "./../dafnyServer";
 import { SymbolType } from "./symbols";
 import { Symbol, SymbolTable } from "./symbols";
@@ -29,7 +30,7 @@ export class DafnyRenameProvider {
         return this.server.symbolService.getSymbols(document).then((tables: SymbolTable[]) => {
             const allSymbols = [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
             const definingClasses: Symbol[] = allSymbols.filter((e: Symbol) => {
-                return e && e.range && e.symbolType && this.containsPosition(e.range, position) && e.symbolType === SymbolType.Class;
+                return e && e.range && e.symbolType && containsPosition(e.range, position) && e.symbolType === SymbolType.Class;
             });
             const changes: {
                 [uri: string]: TextEdit[];
@@ -65,35 +66,6 @@ export class DafnyRenameProvider {
             return workSpaceEdit;
 
         }).catch((e: any) => { console.error(e); });
-    }
-
-    private containsRange(range: Range, otherRange: Range): boolean {
-        if (otherRange.start.line < range.start.line || otherRange.end.line < range.start.line) {
-            return false;
-        }
-        if (otherRange.start.line > range.end.line || otherRange.end.line > range.end.line) {
-            return false;
-        }
-        if (otherRange.start.line === range.start.line && otherRange.start.character < range.start.character) {
-            return false;
-        }
-        if (otherRange.end.line === range.end.line && otherRange.end.character > range.end.character) {
-            return false;
-        }
-        return true;
-    }
-
-    private containsPosition(range: Range, position: Position): boolean {
-        if (position.line < range.start.line || position.line > range.end.line) {
-            return false;
-        }
-        if (position.line === range.start.line && position.character < range.start.character) {
-            return false;
-        }
-        if (position.line === range.end.line && position.character > range.end.character) {
-            return false;
-        }
-        return true;
     }
 
 }

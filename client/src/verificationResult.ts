@@ -1,3 +1,5 @@
+"use strict";
+
 export enum VerificationStatus {
     Verified = 0,
     NotVerified = 1,

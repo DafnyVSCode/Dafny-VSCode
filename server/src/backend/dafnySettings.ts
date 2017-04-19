@@ -1,4 +1,5 @@
 "use strict";
+
 export interface DafnySettings {
     basePath: string;
     useMono: boolean;

@@ -58,7 +58,6 @@ export class DafnyClientProvider {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
             const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
                 textDocument.languageId, textDocument.version, textDocument.getText()));
-            console.log("sending to language server " + tditem);
             this.languageServer.sendNotification(LanguageServerNotification.Verify, tditem);
         }
     }

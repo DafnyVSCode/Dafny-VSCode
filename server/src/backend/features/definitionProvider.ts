@@ -1,6 +1,8 @@
 "use strict";
+
 import * as vscode from "vscode-languageserver";
-import { DocumentDecorator } from "../../vscodeFunctions/documentfunctions";
+import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
+import { translate } from "../../vscodeFunctions/positionHelper";
 import { DafnyServer } from "../dafnyServer";
 import { dafnyKeywords } from "./../../languageDefinition/keywords";
 import { EnvironmentConfig } from "./../../strings/stringRessources";
@@ -69,19 +71,20 @@ export class DafnyDefinitionProvider {
     private getFullyQualifiedNameOfCalledMethod(document: vscode.TextDocument, position: vscode.Position): string {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.getWordRangeAtPosition(position);
-        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
+        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(translate(wordRange.start, 0, -1));
 
         const call = documentDecorator.getText(wordRange);
         const designator = documentDecorator.getText(wordRangeBeforeIdentifier);
         return designator + "." + call;
     }
+
     private isMethodCall(document: vscode.TextDocument, position: vscode.Position): boolean {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.getWordRangeAtPosition(position);
         if (!wordRange) {
             return false;
         }
-        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(this.translate(wordRange.start, 0, -1));
+        const wordRangeBeforeIdentifier = documentDecorator.getWordRangeAtPosition(translate(wordRange.start, 0, -1));
         if (!wordRangeBeforeIdentifier) {
             return false;
         }
@@ -105,29 +108,4 @@ export class DafnyDefinitionProvider {
             return null;
         }).catch((err: any) => err);
     }
-
-    private translate(position: vscode.Position, lineDeltaOrChange: number |
-        { lineDelta?: number; characterDelta?: number; },
-                      characterDelta: number = 0): vscode.Position {
-
-        if (lineDeltaOrChange === null || characterDelta === null) {
-            throw new Error("invalid params");
-        }
-
-        let lineDelta: number;
-        if (typeof lineDeltaOrChange === "undefined") {
-            lineDelta = 0;
-        } else if (typeof lineDeltaOrChange === "number") {
-            lineDelta = lineDeltaOrChange;
-        } else {
-            lineDelta = typeof lineDeltaOrChange.lineDelta === "number" ? lineDeltaOrChange.lineDelta : 0;
-            characterDelta = typeof lineDeltaOrChange.characterDelta === "number" ? lineDeltaOrChange.characterDelta : 0;
-        }
-
-        if (lineDelta === 0 && characterDelta === 0) {
-            return position;
-        }
-        return vscode.Position.create(position.line + lineDelta, position.character + characterDelta);
-    }
-
 }

@@ -1,6 +1,6 @@
 import {CodeActionParams, Command, Diagnostic} from "vscode-languageserver";
 import { Position, TextEdit, TextEditChange } from "vscode-languageserver-types/lib/main";
-import { DocumentDecorator } from "./../../vscodeFunctions/documentfunctions";
+import { DocumentDecorator } from "./../../vscodeFunctions/documentDecorator";
 export class CodeActionProvider {
 
     private static guardKeyWords: string[] = ["decreases", "increases"];

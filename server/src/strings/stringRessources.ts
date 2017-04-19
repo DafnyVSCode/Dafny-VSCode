@@ -1,3 +1,5 @@
+"use strict";
+
 export class Severity {
     public static Warning: string = "Warning";
     public static Error: string = "Error";

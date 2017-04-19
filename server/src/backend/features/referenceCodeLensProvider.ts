@@ -34,9 +34,6 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
 
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
         const locations = this.buildReferenceLocations(referenceInformation);
-        const title = locations.length === 1
-            ? "1 reference"
-            : `${locations.length} references`;
 
         codeLens.command = {
             arguments: [Uri.parse(codeLens.symbol.document.uri), codeLens.range.start, locations],

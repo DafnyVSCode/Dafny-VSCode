@@ -1,5 +1,7 @@
+"use strict";
+
 import * as vscode from "vscode-languageserver";
-import {DocumentDecorator} from "../vscodeFunctions/documentfunctions";
+import {DocumentDecorator} from "../vscodeFunctions/documentDecorator";
 
 export function isPositionInString(document: vscode.TextDocument, position: vscode.Position): boolean {
     const documentDecorator: DocumentDecorator = new DocumentDecorator(document);

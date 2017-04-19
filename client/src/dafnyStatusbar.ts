@@ -87,6 +87,7 @@ export class Statusbar {
         } else if (this.activeDocument && editor.document.uri === this.activeDocument) {
             this.currentDocumentStatucBar.text = StatusString.Verifying;
         } else if (this.queueContains(/*editor.document.fileName*/)) {
+            //DAF-154
             this.currentDocumentStatucBar.text = StatusString.Queued;
         } else {
             const res: undefined | VerificationResult = this.verificationResults[editor.document.uri.toString()];
