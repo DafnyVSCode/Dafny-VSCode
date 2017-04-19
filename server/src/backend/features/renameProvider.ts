@@ -1,5 +1,5 @@
 import { Position, Range, TextDocument, WorkspaceEdit } from "vscode-languageserver";
-import {TextDocumentEdit, TextEdit} from "vscode-languageserver-types";
+import { TextDocumentEdit, TextEdit } from "vscode-languageserver-types";
 import { DocumentDecorator } from "../../vscodeFunctions/documentfunctions";
 import { DafnyServer } from "./../dafnyServer";
 import { SymbolType } from "./symbols";
@@ -43,20 +43,20 @@ export class DafnyRenameProvider {
                 for (const s of relevantSymbols) {
                     if (s.symbolType === SymbolType.Field ||
                         (s.symbolType === SymbolType.Call) || s.symbolType === SymbolType.Method) {
-                        if(!changes[s.document.uri]) {
+                        if (!changes[s.document.uri]) {
                             changes[s.document.uri] = [];
                         }
-                        if(s.symbolType !== SymbolType.Call) {
+                        if (s.symbolType !== SymbolType.Call) {
                             changes[s.document.uri].push(TextEdit.replace(s.range, newName));
                         }
 
-                            for (const ref of s.References) {
-                                if(!changes[ref.document.uri]) {
-                                    changes[ref.document.uri] = [];
-                                }
-                                changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
-
+                        for (const ref of s.References) {
+                            if (!changes[ref.document.uri]) {
+                                changes[ref.document.uri] = [];
                             }
+                            changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
+
+                        }
                     }
                 }
             }

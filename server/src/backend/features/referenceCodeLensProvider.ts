@@ -1,11 +1,11 @@
 "use strict";
 import { CodeLens, Location, Position, TextDocument } from "vscode-languageserver";
 import Uri from "vscode-uri";
+import { Commands } from "../../strings/stringRessources";
 import { DafnyServer } from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
 import { SymbolTable } from "./symbols";
-import { Commands } from "../../strings/stringRessources";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {

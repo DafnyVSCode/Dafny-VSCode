@@ -10,10 +10,6 @@ export class DocumentDecorator {
         this._lines = document.getText().split(/\r\n|\r|\n/);
     }
 
-    public getLines() {
-        return this._lines;
-    }
-
     public getText(_range: vscode.Range): string {
         const range = this.validateRange(_range);
 

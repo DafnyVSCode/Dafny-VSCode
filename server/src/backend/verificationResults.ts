@@ -28,6 +28,7 @@ export class VerificationResults {
     constructor(private connection: IConnection) { }
 
     public collect(log: string, req: VerificationRequest): VerificationResult {
+        console.log(log);
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
         const fileName: string = req.document.uri;
         this.latestResults[fileName] = verificationResult;
@@ -76,7 +77,7 @@ export class VerificationResults {
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
                 }
-                
+
                 const relatedRange = this.checkForRelatedLocation(lines, index, diags, relatedLocationCounter);
                 if (relatedRange) {
                     msgStr += " Related location " + relatedLocationCounter + ": Line: " +
@@ -102,8 +103,9 @@ export class VerificationResults {
         return result;
     }
 
-    private checkForRelatedLocation(lines: string[], index: string, diags: vscode.Diagnostic[], relatedLocationCounter: number): vscode.Range {
-        const nextLine: string = lines[(parseInt(index) + 1).toString()];
+    private checkForRelatedLocation(lines: string[], index: string,
+                                    diags: vscode.Diagnostic[], relatedLocationCounter: number): vscode.Range {
+        const nextLine: string = lines[(parseInt(index, 10) + 1).toString()];
         const relatedLocations: RegExpExecArray = Verification.RelatedLocationRegex.exec(nextLine);
 
         if (relatedLocations) {

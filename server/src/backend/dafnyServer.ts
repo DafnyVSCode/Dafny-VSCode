@@ -17,7 +17,6 @@ import { SymbolService } from "./features/symbolService";
 import {VerificationRequest} from "./verificationRequest";
 
 // see DafnyServer/VerificationTask.cs in Dafny sources
-// it is very straightforwardly JSON serialized/deserialized
 export interface IVerificationTask {
     args: string[];
     filename: string;
