@@ -1,9 +1,10 @@
 "use strict";
-import {IConnection} from "vscode-languageserver";
-import {Context} from "../backend/context";
-import {VerificationRequest} from "../backend/verificationRequest";
-import {VerificationResult} from "../backend/verificationResults";
-import {EnvironmentConfig, LanguageServerNotification, StatusString} from "../strings/stringRessources";
+
+import { Context } from "../backend/context";
+import { VerificationRequest } from "../backend/verificationRequest";
+import { VerificationResult } from "../backend/verificationResults";
+import { NotificationService } from "../notificationService";
+import { EnvironmentConfig, LanguageServerNotification, StatusString } from "../strings/stringRessources";
 
 class Priority {
     public static low: number = 1;
@@ -13,15 +14,15 @@ class Priority {
 
 export class Statusbar {
 
-    constructor(private connection: IConnection) {
+    constructor(private notificationService: NotificationService) {
 
     }
 
     public hide(): void {
-        this.connection.sendNotification(LanguageServerNotification.HideStatusbar);
+        this.notificationService.sendHideStatusbar();
     }
 
     public changeServerStatus(status: string): void {
-        this.connection.sendNotification(LanguageServerNotification.ChangeServerStatus, status);
+        this.notificationService.sendChangeServerStatus(status);
     }
 }

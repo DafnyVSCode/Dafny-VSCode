@@ -1,16 +1,17 @@
 "use strict";
+
 import {
-    CodeActionParams, CodeLens, CodeLensParams, CompletionItem, CompletionItemKind,
-    createConnection, DefinitionRequest, Diagnostic, DiagnosticSeverity,
-    IConnection, InitializeParams, InitializeResult, IPCMessageReader,
-    IPCMessageWriter, Location, RenameParams, RequestHandler, TextDocument,
-    TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, TextEdit, WorkspaceEdit
+    CodeActionParams, CodeLens, CodeLensParams,
+    createConnection, IConnection, InitializeResult, IPCMessageReader,
+    IPCMessageWriter, Location, RenameParams, TextDocument,
+    TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { CodeActionProvider } from "./backend/features/codeActionProvider";
 import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
+import { NotificationService } from "./notificationService";
 import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
 import { Commands, LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
 
@@ -19,6 +20,7 @@ const documents: TextDocuments = new TextDocuments();
 const codeLenses: { [codeLens: string]: ReferencesCodeLens; } = {};
 let settings: Settings = null;
 let started: boolean = false;
+let notificationService: NotificationService = null;
 documents.listen(connection);
 
 let workspaceRoot: string;
@@ -26,9 +28,10 @@ let provider: DafnyServerProvider = null;
 
 connection.onInitialize((params): InitializeResult => {
     workspaceRoot = params.rootPath;
+    notificationService = new NotificationService(connection);
     return {
         capabilities: {
-            codeActionProvider : true,
+            codeActionProvider: true,
             codeLensProvider: { resolveProvider: true },
             definitionProvider: true,
             renameProvider: true,
@@ -39,7 +42,7 @@ connection.onInitialize((params): InitializeResult => {
 
 function verifyDependencies() {
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
-    dependencyVerifier.verifyDafnyServer(workspaceRoot, connection, settings.dafny, (serverVersion: string) => {
+    dependencyVerifier.verifyDafnyServer(workspaceRoot, notificationService, settings.dafny, (serverVersion: string) => {
         init(serverVersion);
     }, () => {
         connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyCantBeStarted);
@@ -52,7 +55,7 @@ function verifyDependencies() {
 function init(serverVersion: string) {
     try {
         if (!provider) {
-            provider = new DafnyServerProvider(connection, serverVersion, workspaceRoot, settings.dafny);
+            provider = new DafnyServerProvider(notificationService, serverVersion, workspaceRoot, settings.dafny);
             provider.resetServer();
         } else {
             provider.init();

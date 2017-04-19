@@ -1,20 +1,21 @@
 "use strict";
 import * as cp from "child_process";
-import {IConnection} from "vscode-languageserver";
 import * as vscode from "vscode-languageserver";
 import Uri from "vscode-uri";
-import {IncorrectPathExeption} from "../errorHandling/errors";
-import {Statusbar} from "../frontend/dafnyStatusbar";
+import { IncorrectPathExeption } from "../errorHandling/errors";
+import { Statusbar } from "../frontend/dafnyStatusbar";
+import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
 import { encodeBase64 } from "../strings/stringEncoding";
-import { ErrorMsg, InfoMsg, LanguageServerNotification, LanguageServerRequest,
-    ServerStatus, StatusString, WarningMsg } from "../strings/stringRessources";
-import {Context} from "./context";
-import {DafnySettings} from "./dafnySettings";
+import {
+    ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg
+} from "../strings/stringRessources";
+import { Context } from "./context";
+import { DafnySettings } from "./dafnySettings";
 import { Command } from "./environment";
 import { Environment } from "./environment";
 import { SymbolService } from "./features/symbolService";
-import {VerificationRequest} from "./verificationRequest";
+import { VerificationRequest } from "./verificationRequest";
 
 // see DafnyServer/VerificationTask.cs in Dafny sources
 export interface IVerificationTask {
@@ -31,18 +32,19 @@ export class DafnyServer {
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
     private retries: number = 0;
-    constructor(private connection: IConnection, private statusbar: Statusbar, private context: Context, private settings: DafnySettings) {
+    constructor(private notificationService: NotificationService, private statusbar: Statusbar,
+                private context: Context, private settings: DafnySettings) {
         this.symbolService = new SymbolService(this);
     }
 
     public reset(): boolean {
-        if(this.isRunning()) {
+        if (this.isRunning()) {
             this.serverProc.killServerProc();
             this.serverProc = null;
         }
         this.context.clear();
         this.statusbar.changeServerStatus(ServerStatus.Starting);
-        if(this.restart) {
+        if (this.restart) {
             return this.resetProcess();
         } else {
             return true;
@@ -50,12 +52,12 @@ export class DafnyServer {
     }
 
     public verify(): boolean {
-        const environment: Environment = new Environment(this.context.rootPath, this.connection, this.settings);
+        const environment: Environment = new Environment(this.context.rootPath, this.notificationService, this.settings);
         const dafnyCommand: Command = environment.getStartDafnyCommand();
         try {
             this.serverProc = this.spawnNewProcess(dafnyCommand, environment.getStandardSpawnOptions());
             return true;
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             return false;
         }
@@ -72,7 +74,7 @@ export class DafnyServer {
     public addDocument(doc: vscode.TextDocument, verb: string, callback?: ((data: any) => any), error?: ((data: any) => any)): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc, verb, callback, error);
         this.context.enqueueRequest(request);
-        this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size());
+        this.notificationService.sendQueueSize(this.context.queue.size());
         this.sendNextRequest();
     }
 
@@ -91,18 +93,18 @@ export class DafnyServer {
     }
 
     private resetProcess(): boolean {
-        const environment: Environment = new Environment(this.context.rootPath, this.connection, this.settings);
+        const environment: Environment = new Environment(this.context.rootPath, this.notificationService, this.settings);
         const dafnyCommand: Command = environment.getStartDafnyCommand();
 
         if (dafnyCommand.notFound) {
-            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.NoMono);
+            this.notificationService.sendError(ErrorMsg.NoMono);
             return false;
         }
         return this.resetServerProc(dafnyCommand, environment.getStandardSpawnOptions());
     }
 
     private handleProcessError(err: Error): void {
-        this.connection.sendNotification(LanguageServerNotification.Error, "DafnyServer process " + this.serverProc.pid + " error: " + err);
+        this.notificationService.sendError("DafnyServer process " + this.serverProc.pid + " error: " + err);
         console.error("dafny server stdout error:" + err.message);
         this.context.activeRequest.error(err);
 
@@ -115,12 +117,12 @@ export class DafnyServer {
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-            if(this.context.activeRequest && this.context.activeRequest.verb === "verify") {
+            if (this.context.activeRequest && this.context.activeRequest.verb === "verify") {
                 const result = this.context.collectRequest(log);
-                this.connection.sendNotification(LanguageServerNotification.VerificationResult,
-                    [this.context.activeRequest.document.uri.toString(), JSON.stringify(result)]);
+                this.notificationService.sendVerificationResult([this.context.activeRequest.document.uri.toString(),
+                    JSON.stringify(result)]);
                 this.context.activeRequest = null;
-            } else if(this.context.activeRequest) {
+            } else if (this.context.activeRequest) {
                 this.context.activeRequest.callback(log);
                 this.context.activeRequest = null;
             } else {
@@ -136,8 +138,8 @@ export class DafnyServer {
 
     private handleProcessExit() {
         this.serverProc = null;
-        this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerRestart);
-        if(this.context != null) {
+        this.notificationService.sendError(ErrorMsg.DafnyServerRestart);
+        if (this.context != null) {
             const crashedRequest: VerificationRequest = this.context.activeRequest;
             this.context.clear();
             this.context.addCrashedRequest(crashedRequest);
@@ -147,17 +149,17 @@ export class DafnyServer {
         this.retries++;
         this.active = false;
 
-        if(this.retries < this.MAX_RETRIES) {
+        if (this.retries < this.MAX_RETRIES) {
             setTimeout(() => {
                 if (this.reset()) {
-                    this.connection.sendNotification(LanguageServerNotification.Info, InfoMsg.DafnyServerRestartSucceded);
+                    this.notificationService.sendInfo(InfoMsg.DafnyServerRestartSucceded);
                 } else {
-                    this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerRestartFailed);
+                    this.notificationService.sendError(ErrorMsg.DafnyServerRestartFailed);
                 }
             }, 1000);
         } else {
             this.retries = 0;
-            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.MaxRetriesReached);
+            this.notificationService.sendError(ErrorMsg.MaxRetriesReached);
         }
 
         // this.statusbar.update();
@@ -167,14 +169,13 @@ export class DafnyServer {
             this.serverProc = this.spawnNewProcess(dafnyCommand, options);
             this.context.serverpid = this.serverProc.pid;
             this.statusbar.changeServerStatus(StatusString.Idle);
-            this.connection.sendNotification(LanguageServerNotification.ServerStarted,
-            [this.context.serverpid, this.context.serverversion]);
-            this.connection.sendNotification(LanguageServerNotification.Ready);
+            this.notificationService.sendServerStarted([this.context.serverpid, this.context.serverversion]);
+            this.notificationService.sendReady();
             return true;
-        } catch(e) {
+        } catch (e) {
             // this.statusbar.update();
             this.active = false;
-            this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyServerWrongPath);
+            this.notificationService.sendError(ErrorMsg.DafnyServerWrongPath);
             throw new IncorrectPathExeption();
         }
     }
@@ -183,12 +184,12 @@ export class DafnyServer {
         const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
         return new ProcessWrapper(process,
             (err: Error) => { this.handleProcessError(err); },
-            () => {this.handleProcessData(); },
+            () => { this.handleProcessData(); },
             () => { this.handleProcessExit(); });
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {
-        if(request.verb === "verify") {
+        if (request.verb === "verify") {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {
@@ -198,20 +199,20 @@ export class DafnyServer {
             sourceIsFile: false
         };
         const encoded: string = encodeBase64(task);
-        if(this.isRunning()) {
+        if (this.isRunning()) {
             this.serverProc.clearBuffer();
             this.serverProc.sendRequestToDafnyServer(encoded, request.verb);
         }
-        this.connection.sendNotification(LanguageServerNotification.ActiveVerifiyingDocument, request.document.uri);
+        this.notificationService.sendActiveVerifiyingDocument(request.document.uri);
         request.timeSent = Date.now();
     }
 
     private sendNextRequest(): void {
-        if(!this.active && (this.context.activeRequest === null)) {
-            if(this.context.queue.peek() != null) {
+        if (!this.active && (this.context.activeRequest === null)) {
+            if (this.context.queue.peek() != null) {
                 this.active = true;
                 const request: VerificationRequest = this.context.queue.dequeue();
-                this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size());
+                this.notificationService.sendQueueSize(this.context.queue.size());
                 this.context.activeRequest = request;
                 this.sendVerificationRequest(request);
             }

@@ -1,9 +1,9 @@
 "use strict";
 
-import * as vscode from "vscode-languageserver";
+import { Position, Range } from "vscode-languageserver";
 
-export function translate(position: vscode.Position, lineDeltaOrChange: number | { lineDelta?: number; characterDelta?: number; },
-                          characterDelta: number = 0): vscode.Position {
+export function translate(position: Position, lineDeltaOrChange: number | { lineDelta?: number; characterDelta?: number; },
+                          characterDelta: number = 0): Position {
 
     if (lineDeltaOrChange === null || characterDelta === null) {
         throw new Error("invalid params");
@@ -22,10 +22,10 @@ export function translate(position: vscode.Position, lineDeltaOrChange: number |
     if (lineDelta === 0 && characterDelta === 0) {
         return position;
     }
-    return vscode.Position.create(position.line + lineDelta, position.character + characterDelta);
+    return Position.create(position.line + lineDelta, position.character + characterDelta);
 }
 
-export function containsRange(range: vscode.Range, otherRange: vscode.Range): boolean {
+export function containsRange(range: Range, otherRange: Range): boolean {
     if (otherRange.start.line < range.start.line || otherRange.end.line < range.start.line) {
         return false;
     }
@@ -41,7 +41,7 @@ export function containsRange(range: vscode.Range, otherRange: vscode.Range): bo
     return true;
 }
 
-export function containsPosition(range: vscode.Range, position: vscode.Position): boolean {
+export function containsPosition(range: Range, position: Position): boolean {
     if (position.line < range.start.line || position.line > range.end.line) {
         return false;
     }

@@ -3,8 +3,8 @@
 import * as cp from "child_process";
 import * as os from "os";
 import * as vscode from "vscode-languageserver";
-import {IConnection} from "vscode-languageserver";
 import {IncorrectPathExeption} from "../errorHandling/errors";
+import {NotificationService} from "../notificationService";
 import {Application, Config, EnvironmentConfig, ErrorMsg, LanguageServerNotification, WarningMsg } from "../strings/stringRessources";
 import {DafnySettings} from "./dafnySettings";
 
@@ -16,7 +16,7 @@ export class Command {
 
 export class Environment {
 
-    constructor(private rootPath: string, private connection: IConnection, private dafnySettings: DafnySettings) {    }
+    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) {    }
 
     public testCommand(path: string): boolean {
         const process: cp.ChildProcess = cp.exec(path);
@@ -75,11 +75,11 @@ export class Environment {
             const monoAtConfigPath: boolean = this.dafnySettings.monoPath && this.testCommand(monoPath);
             if (monoInSystemPath && !monoAtConfigPath) {
                 if (this.dafnySettings.monoPath) {
-                    this.connection.sendNotification(LanguageServerNotification.Warning, WarningMsg.MonoPathWrong);
+                    this.notificationService.sendWarning(WarningMsg.MonoPathWrong);
                 }
                 monoPath = EnvironmentConfig.Mono;
             } else if (!monoInSystemPath && !monoAtConfigPath) {
-                this.connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.NoMono);
+                this.notificationService.sendError(ErrorMsg.NoMono);
                 const command: Command = new Command();
                 command.notFound = true;
                 return command;

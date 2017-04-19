@@ -1,3 +1,5 @@
+"use strict";
+
 import * as cp from "child_process";
 import {CommandEndFailedException, CommandFailedException,
     DafnyServerExeption, RequestFailedException} from "../errorHandling/errors";

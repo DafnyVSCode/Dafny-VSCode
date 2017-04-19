@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode-languageserver";
 
-import { IConnection } from "vscode-languageserver";
+import { NotificationService } from "../notificationService";
 
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
@@ -25,7 +25,7 @@ export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
     private diagCol: vscode.PublishDiagnosticsParams;
 
-    constructor(private connection: IConnection) { }
+    constructor(private notificationService: NotificationService) { }
 
     public collect(log: string, req: VerificationRequest): VerificationResult {
         console.log(log);
@@ -96,7 +96,7 @@ export class VerificationResults {
         }
 
         const publishDiagnosticsParams: vscode.PublishDiagnosticsParams = { uri: req.document.uri, diagnostics: diags };
-        this.connection.sendDiagnostics(publishDiagnosticsParams);
+        this.notificationService.sendDiagnostics(publishDiagnosticsParams);
 
         result.errorCount = errorCount;
         result.proofObligations = proofObligations;

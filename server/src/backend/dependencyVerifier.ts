@@ -1,7 +1,7 @@
 "use strict";
 
 import * as cp from "child_process";
-import {IConnection} from "vscode-languageserver";
+import {NotificationService} from "../notificationService";
 import { ProcessWrapper } from "../process/process";
 import {DafnySettings} from "./dafnySettings";
 import { Command } from "./environment";
@@ -18,10 +18,10 @@ export class DependencyVerifier {
     private upgradeCallback: () => any;
     private serverVersion: string;
 
-    public verifyDafnyServer(rootPath: string, connection: IConnection, dafnySettings: DafnySettings,
+    public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,
                              callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any,
                              upgradeCallback: () => any) {
-        const environment: Environment = new Environment(rootPath, connection, dafnySettings);
+        const environment: Environment = new Environment(rootPath, notificationService, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
         const dafnyCommand: Command = environment.getStartDafnyCommand();
         this.callbackError = callbackError;
