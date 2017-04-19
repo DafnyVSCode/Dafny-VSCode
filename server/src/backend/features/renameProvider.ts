@@ -25,7 +25,7 @@ export class DafnyRenameProvider {
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.matchWordRangeAtPosition(position);
-        const word = wordRange ? documentDecorator.getText(wordRange).replace("(", "").replace(")", "") : "";
+        const word = wordRange ? documentDecorator.getText(wordRange) : "";
         return this.server.symbolService.getSymbols(document).then((tables: SymbolTable[]) => {
             const allSymbols = [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
             const definingClasses: Symbol[] = allSymbols.filter((e: Symbol) => {
