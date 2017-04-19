@@ -72,7 +72,7 @@ export class DafnyServer {
     public addDocument(doc: vscode.TextDocument, verb: string, callback?: ((data: any) => any), error?: ((data: any) => any)): void {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc, verb, callback, error);
         this.context.enqueueRequest(request);
-        this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size);
+        this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size());
         this.sendNextRequest();
     }
 
@@ -211,6 +211,7 @@ export class DafnyServer {
             if(this.context.queue.peek() != null) {
                 this.active = true;
                 const request: VerificationRequest = this.context.queue.dequeue();
+                this.connection.sendNotification(LanguageServerNotification.QueueSize, this.context.queue.size());
                 this.context.activeRequest = request;
                 this.sendVerificationRequest(request);
             }

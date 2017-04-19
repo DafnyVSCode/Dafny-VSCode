@@ -12,7 +12,7 @@ class Priority {
 
 export class Statusbar {
     public serverStatus: string;
-    public queueSize: number;
+    public queueSize: number = 0;
     public serverpid: number;
     public serverversion: string;
     public activeDocument: vscode.Uri;
@@ -25,7 +25,7 @@ export class Statusbar {
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
 
         languageServer.onNotification(LanguageServerNotification.QueueSize, (queueSize: number) => {
-            this.queueSize = queueSize;
+            this.queueSize = queueSize === undefined ? 0 : queueSize;
             this.update();
         });
 
@@ -64,10 +64,6 @@ export class Statusbar {
         this.currentDocumentStatucBar.hide();
     }
 
-    public remainingRequests(): number {
-        return this.queueSize;
-    }
-
     public update(): void {
         const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         const editorsOpen: number = vscode.window.visibleTextEditors.length;
@@ -80,9 +76,8 @@ export class Statusbar {
         if (this.serverpid) {
             this.serverStatusBar.text = StatusString.ServerUp;
             this.serverStatusBar.text += " (pid " + this.serverpid + ")";
-            this.serverStatusBar.text += " | Version " + this.serverversion + ")";
-            this.serverStatusBar.text += " | " + this.serverStatus + " | ";
-            this.serverStatusBar.text += "Queue: " + this.remainingRequests() + " |";
+            this.serverStatusBar.text += " | Version " + this.serverversion.trim() + " | " + this.serverStatus + " | ";
+            this.serverStatusBar.text += "Queue: " + this.queueSize + " |";
         } else {
             this.serverStatusBar.text = StatusString.ServerDown;
         }
