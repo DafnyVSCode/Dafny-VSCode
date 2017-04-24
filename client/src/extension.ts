@@ -6,9 +6,13 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } f
 import { handlerApplyTextEdits } from "./commands";
 import { DafnyInstaller } from "./dafnyInstaller";
 import { DafnyClientProvider } from "./dafnyProvider";
+import { DafnyRunner } from "./dafnyRunner";
+import { CompilerResult } from "./serverHelper/compilerResult";
 import { Answer, Commands, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
+
 let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
+const runner: DafnyRunner = new DafnyRunner();
 
 export function activate(context: vscode.ExtensionContext) {
     const serverModule = context.asAbsolutePath(path.join("server", "server.js"));
@@ -106,6 +110,36 @@ export function activate(context: vscode.ExtensionContext) {
 
     });
     context.subscriptions.push(uninstallDafnyCommand);
+
+
+    const compileFile: vscode.Disposable = vscode.commands.registerCommand(Commands.Compile, () => {
+        vscode.window.showInformationMessage("Compilation started");
+        languageServer.sendRequest(LanguageServerRequest.Compile, vscode.window.activeTextEditor.document.uri).then(() => {
+            vscode.window.showInformationMessage("Compilation finished");
+            return true;
+        }, (error: any) => {
+            vscode.window.showErrorMessage("Can't compile: " + error.message);
+        });
+    });
+    context.subscriptions.push(compileFile);
+
+    const compileAndRun: vscode.Disposable = vscode.commands.registerCommand(Commands.CompileAndRun, () => {
+        vscode.window.showInformationMessage("Compilation started");
+        languageServer.sendRequest(LanguageServerRequest.Compile, vscode.window.activeTextEditor.document.uri).then(
+            (result: CompilerResult) => {
+                vscode.window.showInformationMessage("Compilation finished");
+                if (result.executable) {
+                    runner.run(vscode.window.activeTextEditor.document.fileName);
+                } else {
+                    vscode.window.showInformationMessage("Can't start a program without a Main method");
+                }
+                return true;
+            }, () => {
+                vscode.window.showErrorMessage("Can't compile dafny");
+            });
+    });
+    context.subscriptions.push(compileAndRun);
+
 
     function askToInstall(text: string) {
         vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {

@@ -1,13 +1,11 @@
 "use strict";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import {TextDocumentItem} from "vscode-languageserver-types";
-import {Statusbar} from "./dafnyStatusbar";
-import {Config,  EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
+import { TextDocumentItem } from "vscode-languageserver-types";
+import { Statusbar } from "./dafnyStatusbar";
+import { Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 
 export class DafnyClientProvider {
-    private diagCol: vscode.DiagnosticCollection = null;
-
     private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
     private docChangeVerify: boolean = false;
     private docChangeDelay: number = 0;
@@ -15,8 +13,6 @@ export class DafnyClientProvider {
     private dafnyStatusbar: Statusbar;
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
-        this.diagCol = vscode.languages.createDiagnosticCollection(EnvironmentConfig.Dafny);
-
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
         this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
@@ -33,19 +29,17 @@ export class DafnyClientProvider {
         this.subscriptions = subs;
         vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
 
-        if(this.docChangeVerify) {
+        if (this.docChangeVerify) {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.textDocuments.forEach(this.doVerify, this);
-     }
+    }
 
     public dispose(): void {
         this.dafnyStatusbar.hide();
-        this.diagCol.clear();
-        this.diagCol.dispose();
-        if(this.subscriptions && this.subscriptions.length > 0) {
-            for(let i: number = 0; i < this.subscriptions.length; i++) {
+        if (this.subscriptions && this.subscriptions.length > 0) {
+            for (let i: number = 0; i < this.subscriptions.length; i++) {
                 this.subscriptions[i].dispose();
             }
         }

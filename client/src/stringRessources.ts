@@ -38,6 +38,8 @@ export class Commands {
     public static UninstallDafny: string = "dafny.uninstallDafny";
     public static EditText: string = "dafny.editText";
     public static ShowReferences: string = "dafny.showReferences";
+    public static Compile: string = "dafny.compile";
+    public static CompileAndRun: string = "dafny.compileAndRun";
 }
 
 export class InfoMsg {
@@ -82,6 +84,7 @@ export class StatusString {
 export class LanguageServerRequest {
     public static Reset: string = "reset";
     public static Stop: string = "stop";
+    public static Compile: string = "compile";
 }
 
 export class LanguageServerNotification {

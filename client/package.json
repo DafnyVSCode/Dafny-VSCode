@@ -22,6 +22,20 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "keybindings": [
+            {
+                "command": "dafny.compile",
+                "key": "ctrl+shift+b",
+                "mac": "⇧⌘B",
+                "when": "editorTextFocus && editorLangId == dafny"
+            },
+            {
+                "command": "dafny.compileAndRun",
+                "key": "f5",
+                "mac": "f5",
+                "when": "editorTextFocus && editorLangId == dafny"
+            }
+        ],
         "snippets": [
             {
                 "language": "dafny",
@@ -77,15 +91,15 @@
                     "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
                 },
                 "dafny.trace.server": {
-                "type": "string",
-                "enum": [
-                    "off",
-                    "messages",
-                    "verbose"
-                ],
-                "default": "verbose",
-                "description": "Traces the communication between VSCode and the LanguageServer service."
-                }  
+                    "type": "string",
+                    "enum": [
+                        "off",
+                        "messages",
+                        "verbose"
+                    ],
+                    "default": "verbose",
+                    "description": "Traces the communication between VSCode and the LanguageServer service."
+                }
             }
         },
         "commands": [

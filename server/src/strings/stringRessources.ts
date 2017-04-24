@@ -30,6 +30,7 @@ export class Config {
 
 export class Application {
     public static DafnyServer: string = "DafnyServer.exe";
+    public static Dafny: string = "Dafny.exe";
 }
 
 export class Commands {
@@ -81,6 +82,7 @@ export class StatusString {
 export class LanguageServerRequest {
     public static Reset: string = "reset";
     public static Stop: string = "stop";
+    public static Compile: string = "compile";
 }
 
 export class LanguageServerNotification {
