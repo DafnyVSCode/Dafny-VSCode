@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
+import { LocalQueue } from "./serverHelper/localQueue";
 
 class Priority {
     public static low: number = 1;
@@ -20,7 +21,7 @@ export class Statusbar {
     private serverStatusBar: vscode.StatusBarItem = null;
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
-    constructor(languageServer: LanguageClient) {
+    constructor(languageServer: LanguageClient, private localQueue: LocalQueue) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
 
@@ -42,6 +43,7 @@ export class Statusbar {
 
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
             (docPathName: string, json: string) => {
+                localQueue.remove(docPathName);
                 console.log("notificiation: " + docPathName);
                 const verificationResult: VerificationResult = JSON.parse(json);
                 this.verificationResults[docPathName] = verificationResult;
@@ -86,8 +88,7 @@ export class Statusbar {
             this.currentDocumentStatucBar.text = StatusString.Pending;
         } else if (this.activeDocument && editor.document.uri === this.activeDocument) {
             this.currentDocumentStatucBar.text = StatusString.Verifying;
-        } else if (this.queueContains(/*editor.document.fileName*/)) {
-            //DAF-154
+        } else if (this.queueContains(editor.document.uri.toString())) {
             this.currentDocumentStatucBar.text = StatusString.Queued;
         } else {
             const res: undefined | VerificationResult = this.verificationResults[editor.document.uri.toString()];
@@ -120,14 +121,8 @@ export class Statusbar {
         return response;
     }
 
-    private queueContains(/*filename: string*/): boolean {
-        const found: boolean = false;
-        /*this.context.queue.forEach((request: VerificationRequest): void => {
-            if(request.document.fileName === filename) {
-                found = true;
-            }
-        });*/
-        return found;
+    private queueContains(filename: string): boolean {
+        return this.localQueue.contains(filename);
     }
 }
 
