@@ -32,16 +32,12 @@ export class DafnyClientProvider {
         }, this);
         this.subscriptions = subs;
         vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
-        vscode.workspace.onDidCloseTextDocument((textDocument) => {
-            this.diagCol.delete(textDocument.uri);
-        }, this);
 
         if(this.docChangeVerify) {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.textDocuments.forEach(this.doVerify, this);
-
      }
 
     public dispose(): void {

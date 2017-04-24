@@ -163,6 +163,10 @@ connection.onDidChangeConfiguration((change) => {
     }
 });
 
+connection.onDidCloseTextDocument(handler => {
+    connection.sendDiagnostics({diagnostics:[], uri:handler.textDocument.uri});
+});
+
 connection.onRequest<void, void>(LanguageServerRequest.Stop, () => {
     if (provider) {
         provider.stop();
