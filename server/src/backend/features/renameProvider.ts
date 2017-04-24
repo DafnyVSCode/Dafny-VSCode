@@ -39,7 +39,7 @@ export class DafnyRenameProvider {
                 const definingClass = definingClasses[0];
                 const relevantSymbols: Symbol[] = allSymbols.filter((e: Symbol) => {
                     return (e.symbolType === SymbolType.Call || e.symbolType === SymbolType.Field
-                        || e.symbolType === SymbolType.Method) && e.name.includes(word);
+                        || e.symbolType === SymbolType.Method) && e.name.includes(word) && e.parentClass === definingClass.name;
                 });
                 for (const s of relevantSymbols) {
                     if (s.symbolType === SymbolType.Field ||

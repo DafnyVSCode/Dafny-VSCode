@@ -35,6 +35,10 @@ connection.onInitialize((params): InitializeResult => {
         capabilities: {
             codeActionProvider: true,
             codeLensProvider: { resolveProvider: true },
+            completionProvider: {
+                resolveProvider: true,
+                triggerCharacters: ["."]
+            },
             definitionProvider: true,
             renameProvider: true,
             textDocumentSync: documents.syncKind
@@ -210,5 +214,15 @@ connection.onCodeAction((params: CodeActionParams) => {
         console.log("onCodeAction: to early");
     }
 });
+
+connection.onCompletion((handler: TextDocumentPositionParams) => {
+    if(provider && provider.completionProvider) {
+        console.log("onComplection: " + handler.position);
+        console.log(handler);
+        return provider.completionProvider.provideCompletion(handler);
+    } else {
+        console.log("onComplection: to early");
+    }
+})
 
 connection.listen();
