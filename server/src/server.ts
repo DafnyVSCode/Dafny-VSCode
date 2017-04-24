@@ -6,6 +6,8 @@ import {
     IPCMessageWriter, Location, RenameParams, TextDocument,
     TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
 } from "vscode-languageserver";
+import Uri from "vscode-uri";
+import { CompilerResult } from "./backend/dafnyCompiler";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { CodeActionProvider } from "./backend/features/codeActionProvider";
@@ -167,8 +169,18 @@ connection.onDidChangeConfiguration((change) => {
     }
 });
 
-connection.onDidCloseTextDocument(handler => {
-    connection.sendDiagnostics({diagnostics:[], uri:handler.textDocument.uri});
+connection.onDidCloseTextDocument((handler) => {
+    connection.sendDiagnostics({ diagnostics: [], uri: handler.textDocument.uri });
+});
+
+connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: Uri): Thenable<CompilerResult> => {
+    if (provider && provider.compiler) {
+        console.log("Compiiling:..");
+        return provider.compiler.compile(uri);
+    } else {
+        console.log("not ready");
+        return;
+    }
 });
 
 connection.onRequest<void, void>(LanguageServerRequest.Stop, () => {

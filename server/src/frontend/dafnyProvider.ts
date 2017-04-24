@@ -1,6 +1,7 @@
 "use strict";
 import { Disposable, TextDocument } from "vscode-languageserver";
 import { Context } from "../backend/context";
+import { DafnyCompiler } from "../backend/dafnyCompiler";
 import { DafnyServer } from "../backend/dafnyServer";
 import { DafnySettings } from "../backend/dafnySettings";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
@@ -18,6 +19,8 @@ export class DafnyServerProvider {
     public renameProvider: DafnyRenameProvider;
     public codeActionProvider: CodeActionProvider;
     public completionProvider: DafnyCompletionProvider;
+    public compiler: DafnyCompiler;
+
     private subscriptions: Disposable[];
     private dafnyStatusbar: Statusbar;
     private dafnyServer: DafnyServer;
@@ -36,6 +39,7 @@ export class DafnyServerProvider {
         this.renameProvider = new DafnyRenameProvider(this.dafnyServer);
         this.codeActionProvider = new CodeActionProvider();
         this.completionProvider = new DafnyCompletionProvider(this.dafnyServer);
+        this.compiler = new DafnyCompiler(this.notificationService, this.context, settings);
     }
 
     public dispose(): void {

@@ -6,9 +6,13 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } f
 import { handlerApplyTextEdits } from "./commands";
 import { DafnyInstaller } from "./dafnyInstaller";
 import { DafnyClientProvider } from "./dafnyProvider";
-import { Answer, Commands, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
+import { DafnyRunner } from "./dafnyRunner";
+import { CompilerResult } from "./serverHelper/compilerResult";
+import { Answer, Commands, ErrorMsg, InfoMsg, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
+
 let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
+const runner: DafnyRunner = new DafnyRunner();
 
 export function activate(context: vscode.ExtensionContext) {
     const serverModule = context.asAbsolutePath(path.join("server", "server.js"));
@@ -106,6 +110,32 @@ export function activate(context: vscode.ExtensionContext) {
 
     });
     context.subscriptions.push(uninstallDafnyCommand);
+
+
+    const compileFile: vscode.Disposable = vscode.commands.registerCommand(Commands.Compile, () => {
+        compile(vscode.window.activeTextEditor.document.uri);
+    });
+    context.subscriptions.push(compileFile);
+
+    const compileAndRun: vscode.Disposable = vscode.commands.registerCommand(Commands.CompileAndRun, () => {
+        compile(vscode.window.activeTextEditor.document.uri, true);
+    });
+    context.subscriptions.push(compileAndRun);
+
+    function compile(uri: vscode.Uri, run: boolean = false) {
+        vscode.window.showInformationMessage(InfoMsg.CompilationStarted);
+        languageServer.sendRequest(LanguageServerRequest.Compile, uri).then((result: CompilerResult) => {
+            vscode.window.showInformationMessage(InfoMsg.CompilationFinished);
+            if (run && result.executable) {
+                runner.run(vscode.window.activeTextEditor.document.fileName);
+            } else if (run) {
+                vscode.window.showErrorMessage(ErrorMsg.NoMainMethod);
+            }
+            return true;
+        }, (error: any) => {
+            vscode.window.showErrorMessage("Can't compile: " + error.message);
+        });
+    }
 
     function askToInstall(text: string) {
         vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {

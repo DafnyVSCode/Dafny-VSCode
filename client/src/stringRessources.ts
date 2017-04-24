@@ -18,6 +18,7 @@ export class ErrorMsg {
     public static DafnyInstallationFailed: string = "Automatic installation failed. Please install manually.";
     public static MaxRetriesReached: string = "Maximum retries to start the server reached. Please restart the server manually";
     public static DafnyCantBeStarted: string = "DafnyServer.exe can not be started. Either it is not installed or the basepath is wrong";
+    public static NoMainMethod: string = "Can't start a program without a Main method";
 }
 
 export class Config {
@@ -38,6 +39,8 @@ export class Commands {
     public static UninstallDafny: string = "dafny.uninstallDafny";
     public static EditText: string = "dafny.editText";
     public static ShowReferences: string = "dafny.showReferences";
+    public static Compile: string = "dafny.compile";
+    public static CompileAndRun: string = "dafny.compileAndRun";
 }
 
 export class InfoMsg {
@@ -46,6 +49,8 @@ export class InfoMsg {
     public static DafnyUninstallationSucceeded: string = "Uninstallation complete";
     public static DafnyUpdateAvailable: string = "Update of Dafny is available. Would you like to update it?";
     public static AskInstallDafny: string = "Would you like to install Dafny?";
+    public static CompilationStarted: string = "Compilation started";
+    public static CompilationFinished: string = "Compilation finished";
 }
 export class ServerStatus {
     public static Starting: string = "Starting";
@@ -82,6 +87,7 @@ export class StatusString {
 export class LanguageServerRequest {
     public static Reset: string = "reset";
     public static Stop: string = "stop";
+    public static Compile: string = "compile";
 }
 
 export class LanguageServerNotification {
