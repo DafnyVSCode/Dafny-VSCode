@@ -1,7 +1,7 @@
 import {Position, Range, TextDocument} from "vscode-languageserver";
 
 export enum SymbolType {
-    Unknown, Class, Method, Function, Field, Call
+    Unknown, Class, Method, Function, Field, Call, Definition
 }
 export class SymbolTable {
     public symbols: Symbol[];
@@ -52,6 +52,7 @@ export class Symbol {
             case "Function": this.symbolType = SymbolType.Function; break;
             case "Field": this.symbolType = SymbolType.Field; break;
             case "Call": this.symbolType = SymbolType.Call; break;
+            case "Definition": this.symbolType = SymbolType.Definition; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
     }

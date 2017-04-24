@@ -7,23 +7,29 @@ import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { Reference, Symbol, SymbolTable, SymbolType } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
-
+    private documentTable: {[fileName: string]: TextDocument} = {};
     public constructor(public server: DafnyServer) {}
 
     public addSymbols(doc: TextDocument, symbols: SymbolTable, forceAddition: boolean = false): void {
         const hash = hashString(doc.getText());
-        if(forceAddition) {
+        if(forceAddition && symbols.symbols.length > 0) {
             this.symbolTable[doc.uri] = symbols;
+            this.documentTable[doc.uri] = doc;
         } else {
             this.getSymbols(doc).then((sym: any) => {
-                if(!sym || sym.hash !== hash) {
+                if(symbols.symbols.length > 0 && (!sym || sym.hash !== hash)) {
                     this.symbolTable[doc.uri] = symbols;
+                    this.documentTable[doc.uri] = doc;
                 }
             });
         }
     }
 
-    public getSymbols(doc: TextDocument): Promise<SymbolTable[]> {
+    public getTextDocument(uri: string): TextDocument {
+        return this.documentTable[uri];
+    }
+    public getSymbols(doc: TextDocument, forceOld: boolean = false): Promise<SymbolTable[]> {
+        console.log(this.symbolTable);
         const hash = hashString(doc.getText());
         const symbolTables: SymbolTable[] = [];
         for(const key in this.symbolTable) {
@@ -32,11 +38,16 @@ export class SymbolService {
             }
         }
         const symbols = this.symbolTable[doc.uri];
-        if(!symbols || hash !== symbols.hash) {
+        if(!symbols || (!forceOld && hash !== symbols.hash)) {
             return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
-                symb.hash = hashString(doc.getText());
-                this.addSymbols(doc, symb, true);
-                symbolTables.push(symb);
+                if(symb.symbols.length >  0) {
+                    symb.hash = hashString(doc.getText());
+                    this.addSymbols(doc, symb, true);
+                    symbolTables.push(symb);
+                }else {
+                    symbolTables.push(symbols);
+                }
+
                 return Promise.resolve(symbolTables);
             });
         } else {
@@ -78,7 +89,7 @@ export class SymbolService {
         const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call, document);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
-            if(parsedSymbol.symbolType === SymbolType.Class) {
+            if(parsedSymbol.symbolType === SymbolType.Class || parsedSymbol.symbolType == SymbolType.Definition) {
                 parsedSymbol.setBodyEnd(
                     this.adjustDafnyLinePositionInfo(symbol.EndLine),
                     symbol.EndPosition,
