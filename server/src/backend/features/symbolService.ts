@@ -89,11 +89,15 @@ export class SymbolService {
         const parsedSymbol = new Symbol(column, line, mod, name, position, parentClass, call, document);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
-            if(parsedSymbol.symbolType === SymbolType.Class || parsedSymbol.symbolType == SymbolType.Definition) {
+            if(parsedSymbol.symbolType === SymbolType.Class || parsedSymbol.symbolType === SymbolType.Definition) {
                 parsedSymbol.setBodyEnd(
                     this.adjustDafnyLinePositionInfo(symbol.EndLine),
                     symbol.EndPosition,
                     this.adjustDafnyColumnPositionInfo(symbol.EndColumn));
+            }
+            if(parsedSymbol.symbolType ===  SymbolType.Method) {
+                parsedSymbol.addEnsuresClauses(symbol.Ensures);
+                parsedSymbol.addRequiresClauses(symbol.Requires);
             }
             if(symbol.References && symbol.References.length && symbol.References.length > 0) {
                 for(const reference of symbol.References) {

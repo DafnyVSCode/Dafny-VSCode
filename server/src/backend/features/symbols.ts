@@ -29,7 +29,8 @@ export class Symbol {
     public range: Range;
     public call: string;
     public document: TextDocument;
-
+    public requires: string[];
+    public ensures: string[];
     constructor(column: number, line: number, module: string, name: string,
                 position: number, parentClass: string, call: string, document: TextDocument) {
         this.column = column;
@@ -44,6 +45,8 @@ export class Symbol {
         this.end = Position.create(this.line, this.column + Number(this.name.length));
         this.range = Range.create(this.start, this.end);
         this.document = document;
+        this.requires = [];
+        this.ensures = [];
     }
     public setSymbolType(type: string): void {
         switch(type) {
@@ -65,6 +68,20 @@ export class Symbol {
     }
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.name !== "" && this.name !== undefined;
+    }
+    public addEnsuresClauses(clauses: any) {
+        if(clauses && clauses.length) {
+            for(const clause of clauses) {
+                this.ensures.push("Ensures " + clause);
+            }
+        }
+    }
+    public addRequiresClauses(clauses: any) {
+        if(clauses && clauses.length) {
+            for(const clause of clauses) {
+                this.requires.push("Requires " + clause);
+            }
+        }
     }
 }
 export class Reference {
