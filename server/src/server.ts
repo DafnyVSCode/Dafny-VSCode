@@ -223,6 +223,6 @@ connection.onCompletion((handler: TextDocumentPositionParams) => {
     } else {
         console.log("onComplection: to early");
     }
-})
+});
 
 connection.listen();

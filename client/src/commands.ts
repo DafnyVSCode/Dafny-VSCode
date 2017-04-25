@@ -46,5 +46,6 @@ function getInsertionPosition(insertBefore: string, startRange: Range): Position
         currentPosition = new Range(start, end);
         currentText = textEditor.document.getText(currentPosition);
     }
-    return currentPosition.start.translate(0, currentText.indexOf(insertBefore) - 1);
+    const translation = currentPosition.start.character > 0 ? currentText.indexOf(insertBefore) - 1 : 0;
+    return currentPosition.start.translate(0, translation);
 }

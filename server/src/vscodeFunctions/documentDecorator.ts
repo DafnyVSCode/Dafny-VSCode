@@ -87,7 +87,22 @@ export class DocumentDecorator {
         return vscode.Position.create(line, character);
     }
 
-    public matchWordRangeAtPosition(_position: vscode.Position): vscode.Range {
+    public findInsertPositionRange(_position: vscode.Position, insertBefore: string): vscode.Range {
+        let currentLine = _position.line;
+        let currentPosition = _position.character;
+        while(currentLine >= 0 && this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore) < 0) {
+            currentLine -= 1;
+            currentPosition = this._lines[currentLine].length;
+        }
+        let positionOfInsertion =  this._lines[currentLine].substr(0,currentPosition).lastIndexOf(insertBefore);
+        if(positionOfInsertion < 0) {
+            positionOfInsertion = 0;
+        }
+        return vscode.Range.create(vscode.Position.create(currentLine, positionOfInsertion),
+            vscode.Position.create(currentLine, positionOfInsertion +  insertBefore.length));
+
+    }
+    public matchWordRangeAtPosition(_position: vscode.Position, adjust: boolean = true): vscode.Range {
         const position = this.validatePosition(_position);
         const wordAtText = matchWordAtText(
             position.character + 1,
@@ -96,7 +111,13 @@ export class DocumentDecorator {
         );
 
         if (wordAtText) {
-            return vscode.Range.create(position.line, wordAtText.startColumn - 1, position.line, wordAtText.endColumn - 1);
+            let start = wordAtText.startColumn;
+            let end = wordAtText.endColumn;
+            if(adjust) {
+                start -= 1;
+                end -= 1;
+            }
+            return vscode.Range.create(position.line, start, position.line, end);
         }
         return undefined;
     }
