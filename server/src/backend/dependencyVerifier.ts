@@ -1,9 +1,9 @@
 "use strict";
 
 import * as cp from "child_process";
-import {NotificationService} from "../notificationService";
+import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
-import {DafnySettings} from "./dafnySettings";
+import { DafnySettings } from "./dafnySettings";
 import { Command } from "./environment";
 import { Environment } from "./environment";
 
@@ -20,8 +20,7 @@ export class DependencyVerifier {
     private serverVersion: string;
 
     public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,
-                             callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any,
-                             upgradeCallback: () => any) {
+        callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
         const environment: Environment = new Environment(rootPath, notificationService, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
         const dafnyCommand: Command = environment.getStartDafnyCommand();
@@ -36,30 +35,33 @@ export class DependencyVerifier {
         try {
             this.serverProc = this.spawnNewProcess(command, spawnOptions);
             this.serverProc.sendRequestToDafnyServer("", "version");
-        } catch(e) {
+        } catch (e) {
             this.callbackError(e);
         }
     }
 
     private spawnNewProcess(dafnyCommand: Command, options: cp.SpawnOptions): ProcessWrapper {
         const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
+        process.on("error", (e) => { this.callbackError(e); });
+        process.on("exit", (e) => { this.handleProcessExit(e); });
+
         return new ProcessWrapper(process,
             (err: Error) => { this.callbackError(err); },
             () => {
                 try {
-                    if(this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
+                    if (this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
                         this.upgradeCallback();
                         this.serverProc.sendQuit();
-                    } else if(this.serverProc.outBuf.indexOf(this.version) > -1) {
+                    } else if (this.serverProc.outBuf.indexOf(this.version) > -1) {
                         const start = this.serverProc.outBuf.indexOf(this.version);
                         const end = this.serverProc.outBuf.indexOf("\n", start);
                         this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
                         this.serverProc.clearBuffer();
                         this.serverProc.sendRequestToDafnyServer("", "versioncheck");
-                    } else if(this.serverProc.outBuf.indexOf(this.latestInstalled) > -1) {
+                    } else if (this.serverProc.outBuf.indexOf(this.latestInstalled) > -1) {
                         this.serverProc.sendQuit();
                     }
-                } catch(e) {
+                } catch (e) {
                     this.callbackError(e);
                 }
             },
@@ -67,7 +69,7 @@ export class DependencyVerifier {
     }
 
     private handleProcessExit(code: number) {
-        if(code !== 0) {
+        if (code !== 0) {
             this.callbackError(code);
         } else {
             this.callbackSuccess(this.serverVersion);

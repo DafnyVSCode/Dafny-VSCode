@@ -47,8 +47,8 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(message);
         });
 
-        languageServer.onNotification(LanguageServerNotification.DafnyMissing, (message: string) => {
-            askToInstall(message);
+        languageServer.onRequest(LanguageServerNotification.DafnyMissing, (message: string) => {
+            return askToInstall(message);
         });
 
         languageServer.onNotification(LanguageServerNotification.Ready, () => {
@@ -137,24 +137,22 @@ export function activate(context: vscode.ExtensionContext) {
         });
     }
 
-    function askToInstall(text: string) {
-        vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
-            if (Answer.Yes === value) {
-                install();
-            }
+    function askToInstall(text: string): Thenable<void> {
+        return new Promise<void>((resolve, reject) => {
+            vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
+                if (Answer.Yes === value) {
+                    install().then(resolve, reject);
+                } else {
+                    reject();
+                }
+            });
         });
     }
 
     function install(): Thenable<void> {
-
-        const promise = new Promise<void>((resolve, reject) => {
-
-            const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath, () => {
-                resolve();
-            }, () => {
-                installer.install();
-            });
-
+        return new Promise<void>((resolve, reject) => {
+            const installer: DafnyInstaller =
+                new DafnyInstaller(context.extensionPath, () => { resolve(); }, () => { installer.install(); });
             languageServer.sendRequest(LanguageServerRequest.Stop).then(() => {
                 installer.uninstall(false);
             }, () => {
@@ -162,6 +160,5 @@ export function activate(context: vscode.ExtensionContext) {
                 reject();
             });
         });
-        return promise;
     }
 }
