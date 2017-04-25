@@ -16,7 +16,11 @@ export class Command {
 
 export class Environment {
 
-    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) {    }
+    public usesMono: boolean;
+
+    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) { 
+        this.usesMono = this.dafnySettings.useMono || os.platform() !== EnvironmentConfig.Win32;
+    }
 
     public testCommand(path: string): boolean {
         const process: cp.ChildProcess = cp.exec(path);
@@ -70,7 +74,7 @@ export class Environment {
         if(commandName === undefined || commandName === "") {
             throw new IncorrectPathExeption();
         }
-        if (!this.dafnySettings.useMono) {
+        if (!this.usesMono) {
             baseCommand = commandName;
             args = [];
             return new Command(baseCommand, args);
