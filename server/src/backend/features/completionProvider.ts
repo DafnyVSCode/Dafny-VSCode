@@ -37,6 +37,7 @@ export class DafnyCompletionProvider {
                     } else if(e.symbolType === SymbolType.Method) {
                         completionItem.kind = CompletionItemKind.Method;
                         completionItem.label += "()";
+                        completionItem.detail = e.requires.join("\n");
                     }
                     return completionItem;
                 });
