@@ -33,7 +33,7 @@ export class CodeActionProvider {
      private getCodeActions(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
         const commands: Command[] = [];
         for(const guard of this.guardKeyWords) {
-            if(diagnostic.message.indexOf(guard) < 0) {
+            if(diagnostic.message.indexOf(guard) < 0 || diagnostic.message.startsWith("decreases expression")) {
                 continue;
             }
             const endPosition = params.range.end;
