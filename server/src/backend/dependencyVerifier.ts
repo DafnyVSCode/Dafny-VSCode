@@ -10,6 +10,7 @@ import { Environment } from "./environment";
 export class DependencyVerifier {
 
     private upgradeNecessary = "UPDATE_NECESSARY";
+    private latestInstalled = "Latest version installed";
     private version = "VERSION:";
 
     private serverProc: ProcessWrapper;
@@ -55,7 +56,7 @@ export class DependencyVerifier {
                         this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
                         this.serverProc.clearBuffer();
                         this.serverProc.sendRequestToDafnyServer("", "versioncheck");
-                    } else {
+                    } else if(this.serverProc.outBuf.indexOf(this.latestInstalled) > -1) {
                         this.serverProc.sendQuit();
                     }
                 } catch(e) {
