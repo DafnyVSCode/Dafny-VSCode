@@ -208,6 +208,6 @@ connection.onCompletion((handler: TextDocumentPositionParams) => {
         console.log("onComplection: " + handler.position);
         return provider.completionProvider.provideCompletion(handler);
     }
-})
+});
 
 connection.listen();

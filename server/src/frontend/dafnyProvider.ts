@@ -37,7 +37,7 @@ export class DafnyServerProvider {
         this.referenceProvider = new DafnyReferencesCodeLensProvider(this.dafnyServer);
         this.definitionProvider = new DafnyDefinitionProvider(this.dafnyServer);
         this.renameProvider = new DafnyRenameProvider(this.dafnyServer);
-        this.codeActionProvider = new CodeActionProvider();
+        this.codeActionProvider = new CodeActionProvider(this.dafnyServer);
         this.completionProvider = new DafnyCompletionProvider(this.dafnyServer);
         this.compiler = new DafnyCompiler(this.notificationService, this.context, settings);
     }
