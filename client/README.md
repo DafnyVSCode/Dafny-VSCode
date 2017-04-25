@@ -69,3 +69,7 @@ The following are optional:
 * 0.0.2: Fixed readme and license, added use animation.
 * 0.0.1: Initial release, some half baked features turned off.
 
+
+
+
+[![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
