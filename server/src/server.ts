@@ -76,8 +76,6 @@ connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
     if (provider && provider.renameProvider) {
         console.log("onRename: " + handler.textDocument.uri);
         return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
-    } else {
-        console.log("onRename: too early");
     }
 });
 
@@ -95,7 +93,6 @@ function waitForServer(handler: CodeLensParams) {
     return new Promise(async (resolve, reject) => {
         let tries = 0;
         while (!(provider && provider.referenceProvider) && tries < MAX_RETRIES) {
-            console.log("onCodeLens: to early: waiiting");
             await sleep(2000);
             tries++;
         }
@@ -105,7 +102,6 @@ function waitForServer(handler: CodeLensParams) {
             reject();
         }
     }).then(() => {
-        console.log("onCodeLens: to early: load the shiiiit");
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
         result.then((lenses: ReferencesCodeLens[]) => {
             lenses.forEach((lens: ReferencesCodeLens) => {
@@ -150,10 +146,8 @@ connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
         if (item !== null && item as ReferencesCodeLens) {
             return provider.referenceProvider.resolveCodeLens(item);
         } else {
-            console.log("key not found ");
+            console.error("key not found ");
         }
-    } else {
-        console.log("onCodeLensResolve: to early");
     }
 });
 
@@ -175,11 +169,7 @@ connection.onDidCloseTextDocument((handler) => {
 
 connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: Uri): Thenable<CompilerResult> => {
     if (provider && provider.compiler) {
-        console.log("Compiiling:..");
         return provider.compiler.compile(uri);
-    } else {
-        console.log("not ready");
-        return;
     }
 });
 
@@ -210,18 +200,13 @@ connection.onCodeAction((params: CodeActionParams) => {
     if (provider && provider.codeActionProvider) {
         console.log("onCodeAction: " + params.textDocument.uri);
         return provider.codeActionProvider.provideCodeAction(params);
-    } else {
-        console.log("onCodeAction: to early");
     }
 });
 
 connection.onCompletion((handler: TextDocumentPositionParams) => {
-    if(provider && provider.completionProvider) {
+    if (provider && provider.completionProvider) {
         console.log("onComplection: " + handler.position);
-        console.log(handler);
         return provider.completionProvider.provideCompletion(handler);
-    } else {
-        console.log("onComplection: to early");
     }
 });
 

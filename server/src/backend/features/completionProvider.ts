@@ -10,17 +10,13 @@ export class DafnyCompletionProvider {
     public constructor(public server: DafnyServer) { }
 
     public provideCompletion(handler: TextDocumentPositionParams): Promise<CompletionItem[]> {
-        console.log("Helloooo");
         const document =  this.server.symbolService.getTextDocument(handler.textDocument.uri);
-        console.log(document);
-
+        
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const wordRange = documentDecorator.matchWordRangeAtPosition(handler.position);
         const word = wordRange ? documentDecorator.getText(wordRange).replace(".", "") : "";
-        console.log(word);
         return this.server.symbolService.getSymbols(document, true).then((tables: SymbolTable[]) => {
             const allSymbols = [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
-            console.log(allSymbols);
             const  definition: Symbol = allSymbols.find((e: Symbol) => {
                 return e.symbolType === SymbolType.Definition && e.name === word && containsPosition(e.range, handler.position);
             });
