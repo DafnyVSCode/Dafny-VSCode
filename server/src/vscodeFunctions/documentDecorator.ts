@@ -1,8 +1,8 @@
 "use strict";
-
+import {EOL} from "os";
 import * as vscode from "vscode-languageserver";
+import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
-
 export class DocumentDecorator {
 
     protected _lines: string[];
@@ -20,7 +20,7 @@ export class DocumentDecorator {
                 range.end.character).trim();
         }
 
-        const lineEnding = "\n";  // TODO: set this correctly
+        const lineEnding = EOL;
         const startLineIndex = range.start.line;
         const endLineIndex = range.end.line;
         const resultLines: string[] = [];
@@ -123,9 +123,6 @@ export class DocumentDecorator {
     }
     public getWordRangeAtPosition(_position: vscode.Position, regexp?: RegExp): vscode.Range {
         const position = this.validatePosition(_position);
-        /*if (!regexp || regExpLeadsToEndlessLoop(regexp)) {
-            regexp = getWordDefinitionFor(this._languageId);
-        }*/
         const wordAtText = getWordAtText(
             position.character + 1,
             ensureValidWordDefinition(regexp),
@@ -139,4 +136,29 @@ export class DocumentDecorator {
         return undefined;
     }
 
+    public isMethodCall(position: vscode.Position): boolean {
+        const wordRange = this.getWordRangeAtPosition(position);
+        if (!wordRange) {
+            return false;
+        }
+        const wordRangeBeforeIdentifier = this.getWordRangeAtPosition(translate(wordRange.start, 0, -1));
+        if (!wordRangeBeforeIdentifier) {
+            return false;
+        }
+        const seperator = this.getText(vscode.Range.create(wordRangeBeforeIdentifier.end, wordRange.start));
+        if (!seperator) {
+            return false;
+        }
+        // matches if a point is between the identifer and the word before it -> its a method call
+        const match = seperator.match(/\w*\.\w*/);
+        return match && match.length > 0;
+    }
+
+    public getFullyQualifiedNameOfCalledMethod(position: vscode.Position): string {
+        const wordRange = this.getWordRangeAtPosition(position);
+        const wordRangeBeforeIdentifier = this.getWordRangeAtPosition(translate(wordRange.start, 0, -1));
+        const call = this.getText(wordRange);
+        const designator = this.getText(wordRangeBeforeIdentifier);
+        return designator + "." + call;
+    }
 }
