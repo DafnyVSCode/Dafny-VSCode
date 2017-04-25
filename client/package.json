@@ -7,7 +7,7 @@
     "homepage": "https://github.com/FunctionalCorrectness/",
     "repository": {
         "type": "git",
-        "url": "https://github.com/FunctionalCorrectness/dafny-vscode.git"
+        "url": "https://github.com/FunctionalCorrectness/VS-Code-Language-Server-for-Dafny.git"
     },
     "galleryBanner": {
         "color": "#639ECA",
