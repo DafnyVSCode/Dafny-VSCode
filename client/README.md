@@ -1,10 +1,11 @@
 # dafny-vscode
 Dafny support for Visual Studio Code.
 
-
 ## Features
-* **NEW** Update notification if there is a newer release of Dafny. **Needs Dafny 1.9.11+**
-* **NEW** CodeLens showing method references
+* **NEW** IntelliSense for classes
+* **NEW** Compile and Run dfy file
+* Update notification if there is a newer release of Dafny. 
+* CodeLens showing method references
 * DafnyDefinition provider to support refactorings in the future 
 * Automatic verification as one types, 
 * Automatic installation of DafnyServer (windows, osx and ubuntu)
@@ -16,6 +17,11 @@ Dafny support for Visual Studio Code.
 * Right hand size status bar item relates to the state of the DafnyServer.
 
 ![assertions animation](example.gif)
+
+## Shortcuts
+
+* `Ctrl+Shift+B` or `⇧⌘B` Compile dfy file to dll or exe, if there is a Main method
+* `F5` Compile and Run if it has a Main method. 
 
 ## Tasks
 * `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
@@ -47,6 +53,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
 * 0.8.0 CodeLens showing method references, Go to Definition, version checking for newer Dafny release. 
 * 0.6.0 DafnyDef allows to get SymbolInformation from DafnyServer, which will allow in the future to implement Refactorings. Go to Definition is already implemented. 
 * 0.5.5 Fallback to wget, if curl is not found.
@@ -62,8 +69,3 @@ The following are optional:
 * 0.0.2: Fixed readme and license, added use animation.
 * 0.0.1: Initial release, some half baked features turned off.
 
-
-## TODO
-* CodeLens
-* Context aware suggestions.
-* Full context awareness, code completion.
