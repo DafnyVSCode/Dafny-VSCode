@@ -27,19 +27,15 @@ export class DafnyCompiler {
             console.log(dafnyCommand.command + " " + args);
             const process = cp.spawn(dafnyCommand.command, args, environment.getStandardSpawnOptions());
             process.on("exit", (code, signal) => {
-                console.log("resolve");
                 resolve({ error: false, executable });
             });
             process.stdout.on("error", (data: Buffer) => {
-                console.log("stdout error reject");
                 reject({ error: true, message: data.toString() });
             });
             process.stdout.on("data", (data: Buffer) => {
                 const str = data.toString();
-                console.log(str);
 
                 if (str.toLowerCase().indexOf("error") !== -1 && !(str.toLowerCase().indexOf("0 errors") !== -1)) {
-                    console.log("error reject");
                     reject({ error: true, message: str });
                 }
                 if (str.toLowerCase().indexOf(".exe") !== -1) {

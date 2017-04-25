@@ -29,7 +29,6 @@ export class SymbolService {
         return this.documentTable[uri];
     }
     public getSymbols(doc: TextDocument, forceOld: boolean = false): Promise<SymbolTable[]> {
-        console.log(this.symbolTable);
         const hash = hashString(doc.getText());
         const symbolTables: SymbolTable[] = [];
         for(const key in this.symbolTable) {
