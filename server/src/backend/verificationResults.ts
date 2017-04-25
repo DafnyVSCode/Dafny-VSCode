@@ -28,7 +28,6 @@ export class VerificationResults {
     constructor(private notificationService: NotificationService) { }
 
     public collect(log: string, req: VerificationRequest): VerificationResult {
-        console.log(log);
         const verificationResult: VerificationResult = this.parseVerifierLog(log, req);
         const fileName: string = req.document.uri;
         this.latestResults[fileName] = verificationResult;
@@ -88,7 +87,9 @@ export class VerificationResults {
                 lastDiagnostic = vscode.Diagnostic.create(range, msgStr, severity);
                 lastDiagnostic.source = "Dafny VSCode";
 
-                diags.push(lastDiagnostic);
+                if(!msgStr.startsWith("Selected triggers:")) {
+                    diags.push(lastDiagnostic);
+                }
 
             } else if (proofObligationLine) {
                 proofObligations += parseInt(proofObligationLine[1], 10);
