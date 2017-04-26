@@ -1,13 +1,15 @@
 "use strict";
 import {EOL} from "os";
 import * as vscode from "vscode-languageserver";
+import { dafnyKeywords } from "./../languageDefinition/keywords";
+import { isPositionInString } from "./../strings/stringUtils";
 import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 export class DocumentDecorator {
 
     protected _lines: string[];
 
-    constructor(private document: vscode.TextDocument) {
+    constructor(public document: vscode.TextDocument) {
 
         this._lines = document.getText().split(/\r\n|\r|\n/);
     }
@@ -94,7 +96,7 @@ export class DocumentDecorator {
             currentLine -= 1;
             currentPosition = this._lines[currentLine].length;
         }
-        let positionOfInsertion =  this._lines[currentLine].substr(0,currentPosition).lastIndexOf(insertBefore);
+        let positionOfInsertion =  this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore);
         if(positionOfInsertion < 0) {
             positionOfInsertion = 0;
         }
@@ -160,5 +162,21 @@ export class DocumentDecorator {
         const call = this.getText(wordRange);
         const designator = this.getText(wordRangeBeforeIdentifier);
         return designator + "." + call;
+    }
+
+    public getValidIdentifierOrNull(position: vscode.Position): string {
+        const lineText = this.lineAt(position);
+        const wordRange = this.getWordRangeAtPosition(position);
+        const word = wordRange ? this.getText(wordRange) : "";
+        if (!wordRange || lineText.startsWith("//") || isPositionInString(this.document, position)
+            || word.match(/^\d+.?\d+$/) || dafnyKeywords.indexOf(word) > 0) {
+            return null;
+        }
+        return word;
+    }
+
+    public getWordAtPosition(position: vscode.Position): string {
+        const wordRange = this.matchWordRangeAtPosition(position);
+        return wordRange ? this.getText(wordRange) : "";
     }
 }
