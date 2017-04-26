@@ -54,6 +54,11 @@ export class SymbolService {
             return Promise.resolve(symbolTables);
         }
     }
+    public getAllSymbols(document: TextDocument): Promise<Symbol[]> {
+        return this.getSymbols(document, true).then((tables: SymbolTable[]) => {
+            return [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
+        });
+    }
 
     public getSymbolsFromDafny(document: TextDocument): Promise<SymbolTable> {
         if (!document) {

@@ -38,6 +38,7 @@ export class Commands {
     public static InstallDafny: string = "dafny.installDafny";
     public static UninstallDafny: string = "dafny.uninstallDafny";
     public static ShowReferences: string = "dafny.showReferences";
+    public static EditTextCommand: string = "dafny.editText";
 }
 
 export class InfoMsg {
@@ -98,4 +99,15 @@ export class LanguageServerNotification {
     public static HideStatusbar: string = "hideStatusbar";
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
+}
+
+export class DafnyReports {
+    public static UnresolvedDecreaseWarning: string = "decreases expression";
+    public static NullWarning: string = "target object may be null";
+}
+
+export class DafnyKeyWords {
+    public static GuardKeyWords: string[] = ["decreases", "increases"];
+    public static DefaultModuleName: string = "_default";
+    public static ConstructorMethod: string = "_ctor";
 }

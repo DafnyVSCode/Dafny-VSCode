@@ -1,5 +1,6 @@
 import {Position, Range, TextDocument} from "vscode-languageserver";
-
+import { DafnyKeyWords } from "./../../strings/stringRessources";
+import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 export enum SymbolType {
     Unknown, Class, Method, Function, Field, Call, Definition
 }
@@ -81,6 +82,22 @@ export class Symbol {
             for(const clause of clauses) {
                 this.requires.push("Requires " + clause);
             }
+        }
+    }
+    public needsCodeLens(): boolean {
+        return !(this.name === DafnyKeyWords.DefaultModuleName && this.symbolType === SymbolType.Class) &&
+                    (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call);
+    }
+    public canProvideCodeCompletion(parentClass: string) {
+        return this.parentClass === parentClass &&
+            (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
+            this.name !== DafnyKeyWords.ConstructorMethod;
+    }
+    public isDefinitionFor(word: string, position: Position = null): boolean {
+        if(position !== null) {
+            return this.symbolType === SymbolType.Definition && this.name === word && containsPosition(this.range, position);
+        } else {
+            return this.symbolType === SymbolType.Definition && this.name === word;
         }
     }
 }
