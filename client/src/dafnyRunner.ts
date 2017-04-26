@@ -1,5 +1,6 @@
 "use strict";
 
+import * as os from "os";
 import * as vscode from "vscode";
 import { Config, EnvironmentConfig } from "./stringRessources";
 
@@ -18,7 +19,7 @@ export class DafnyRunner {
     private getCommand(filename: string): string {
         const executable = filename.replace(".dfy", ".exe");
         const monoPath: string = this.config.get<string>(Config.MonoPath);
-        const useMono: boolean = this.config.get<boolean>(Config.UseMono);
+        const useMono: boolean = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;;
         if (!useMono) {
             return executable;
         } else {
