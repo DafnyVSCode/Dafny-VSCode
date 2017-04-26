@@ -20,7 +20,8 @@ export class DependencyVerifier {
     private serverVersion: string;
 
     public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,
-        callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any, upgradeCallback: () => any) {
+                             callbackSuccess: (serverVersion: string) => any,
+                             callbackError: (error: any) => any, upgradeCallback: () => any) {
         const environment: Environment = new Environment(rootPath, notificationService, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
         const dafnyCommand: Command = environment.getStartDafnyCommand();

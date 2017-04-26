@@ -18,7 +18,7 @@ export class Environment {
 
     public usesMono: boolean;
 
-    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) { 
+    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) {
         this.usesMono = this.dafnySettings.useMono || os.platform() !== EnvironmentConfig.Win32;
     }
 

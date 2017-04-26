@@ -65,7 +65,7 @@ export class ProcessWrapper {
         return this.outBuf.search(this.commandEndRegex);
     }
     private writeRequestToServer(request: string, verb: string, serverEndTag: string,
-        commandFailedMessage: string, requestFailedMessage: string): void {
+                                 commandFailedMessage: string, requestFailedMessage: string): void {
         let good: boolean = this.serverProc.stdin.write(verb + "\n", () => {
             if (!good) {
                 throw new CommandFailedException(commandFailedMessage);

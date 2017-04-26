@@ -53,10 +53,10 @@ function verifyDependencies() {
     }, () => {
         connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyCantBeStarted);
         connection.sendRequest(LanguageServerNotification.DafnyMissing, InfoMsg.AskInstallDafny).then(verifyDependencies,
-            () => { console.log("still not working correctly") });
+            () => { console.log("still not working correctly"); });
     }, () => {
         connection.sendRequest(LanguageServerNotification.DafnyMissing, InfoMsg.DafnyUpdateAvailable).then(verifyDependencies,
-            () => { console.log("update is not working") });
+            () => { console.log("update is not working"); });
     });
 }
 
