@@ -32,16 +32,15 @@ export class Symbol {
     public document: TextDocument;
     public requires: string[];
     public ensures: string[];
-    constructor(column: number, line: number, module: string, name: string,
-                position: number, parentClass: string, call: string, document: TextDocument) {
-        this.column = column;
-        this.line = line;
-        this.module = module;
-        this.name = name;
-        this.position = position;
-        this.parentClass = parentClass;
+    constructor(symbol: any, document: TextDocument) {
+        this.column = adjustDafnyColumnPositionInfo(symbol.Column);
+        this.line = adjustDafnyLinePositionInfo(symbol.Line);
+        this.module = symbol.Module;
+        this.name = symbol.Name;
+        this.position = symbol.Position;
+        this.parentClass = symbol.ParentClass;
         this.References = [];
-        this.call = call;
+        this.call = symbol.Call;
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + Number(this.name.length));
         this.range = Range.create(this.start, this.end);
@@ -60,10 +59,10 @@ export class Symbol {
             default: this.symbolType = SymbolType.Unknown; break;
         }
     }
-    public setBodyEnd(endLine: number, endPos: number, endColumn: number) {
-        this.endLine = endLine;
+    public setBodyEnd(endLine: string, endPos: number, endColumn: string) {
+        this.endLine = adjustDafnyLinePositionInfo(endLine);
         this.endPosition = endPos;
-        this.endColumn = endColumn;
+        this.endColumn = adjustDafnyColumnPositionInfo(endColumn);
         this.end = Position.create(this.endLine, this.endColumn);
         this.range = Range.create(this.start, this.end);
     }
@@ -100,6 +99,19 @@ export class Symbol {
             return this.symbolType === SymbolType.Definition && this.name === word;
         }
     }
+    public isFuzzyDefinitionForSymbol(symbol: Symbol): boolean {
+        return this.module === symbol.module && this.parentClass === symbol.parentClass
+            && this.name === symbol.name && this.symbolType !== SymbolType.Call;
+    }
+
+    public isDefiningClassForPosition(position: Position): boolean {
+        return this.range && this.symbolType && containsPosition(this.range, position) && this.symbolType === SymbolType.Class;
+    }
+
+    public isCompletableMemberOfClass(word: string, parentClass: string): boolean {
+        return (this.symbolType === SymbolType.Call || this.symbolType === SymbolType.Field
+            || this.symbolType === SymbolType.Method) && this.name.includes(word) && this.parentClass === parentClass;
+    }
 }
 export class Reference {
     public column: number;
@@ -111,12 +123,12 @@ export class Reference {
     public range: Range;
     public document: TextDocument;
     public referencedName: string;
-    constructor(column: number, line: number, position: number, methodName: string, document: TextDocument, referencedName: string) {
-        this.column = column;
-        this.line = line;
-        this.position = position;
-        this.methodName = methodName;
-        this.referencedName = referencedName;
+    constructor(reference: any, document: TextDocument) {
+        this.column = adjustDafnyColumnPositionInfo(reference.Column);
+        this.line = adjustDafnyLinePositionInfo(reference.Line);
+        this.position = reference.Position;
+        this.methodName = reference.MethodName;
+        this.referencedName = reference.ReferencedName;
         this.start = Position.create(this.line, this.column);
         this.end = Position.create(this.line, this.column + this.referencedName.length);
         this.range = Range.create(this.start, this.end);
@@ -125,4 +137,11 @@ export class Reference {
     public isValid(): boolean {
         return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";
     }
+}
+
+export function adjustDafnyColumnPositionInfo(col: string): number {
+    return Math.max(0, parseInt(col, 10) - 1); // 1 based, but 0 can appear in some cases
+}
+export function adjustDafnyLinePositionInfo(line: string): number {
+    return Math.max(0, parseInt(line, 10) - 1); // 1 based
 }

@@ -39,6 +39,7 @@ export class Commands {
     public static UninstallDafny: string = "dafny.uninstallDafny";
     public static ShowReferences: string = "dafny.showReferences";
     public static EditTextCommand: string = "dafny.editText";
+    public static EmptyCommand: string = "";
 }
 
 export class InfoMsg {
@@ -66,6 +67,8 @@ export class EnvironmentConfig {
     public static Ubuntu: string = "linux";
     public static DafnySuccess: string = "[SUCCESS]";
     public static DafnyFailure: string = "[FAILURE]";
+    public static SymbolStart: string = "SYMBOLS_START ";
+    public static SymbolEnd: string = " SYMBOLS_END";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";
@@ -110,4 +113,12 @@ export class DafnyKeyWords {
     public static GuardKeyWords: string[] = ["decreases", "increases"];
     public static DefaultModuleName: string = "_default";
     public static ConstructorMethod: string = "_ctor";
+}
+
+export class ToolTipText {
+    public static NoReferences: string = "Could not determine references";
+}
+
+export class DafnyVerbs {
+    public static Symbols: string = "symbols";
 }

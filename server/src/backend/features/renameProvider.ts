@@ -1,17 +1,13 @@
-import { Position, Range, TextDocument, WorkspaceEdit } from "vscode-languageserver";
-import { TextDocumentEdit, TextEdit } from "vscode-languageserver-types";
+import { Position, TextDocument, WorkspaceEdit } from "vscode-languageserver";
+import { TextEdit } from "vscode-languageserver-types";
 import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
-import { containsPosition } from "../../vscodeFunctions/positionHelper";
 import { DafnyServer } from "./../dafnyServer";
 import { SymbolType } from "./symbols";
-import { Symbol, SymbolTable } from "./symbols";
+import { Symbol} from "./symbols";
 
 export class DafnyRenameProvider {
     public constructor(public server: DafnyServer) { }
-    public provideRenameEdits(
-        document: TextDocument, position: Position,
-        newName: string):
-        Thenable<WorkspaceEdit> {
+    public provideRenameEdits(document: TextDocument, position: Position, newName: string): Thenable<WorkspaceEdit> {
         return this.provideRenameInternal(newName, document, position).then((definitionInfo: WorkspaceEdit) => {
             if (definitionInfo != null) {
                 return definitionInfo;
@@ -25,39 +21,26 @@ export class DafnyRenameProvider {
 
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
-        const wordRange = documentDecorator.matchWordRangeAtPosition(position);
-        const word = wordRange ? documentDecorator.getText(wordRange) : "";
-        return this.server.symbolService.getSymbols(document).then((tables: SymbolTable[]) => {
-            const allSymbols = [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
-            const definingClasses: Symbol[] = allSymbols.filter((e: Symbol) => {
-                return e && e.range && e.symbolType && containsPosition(e.range, position) && e.symbolType === SymbolType.Class;
-            });
+        const word = documentDecorator.getWordAtPosition(position);
+        return this.server.symbolService.getAllSymbols(document).then((symbols: Symbol[]) => {
+            const definingClass: Symbol = symbols.find((s: Symbol) => s.isDefiningClassForPosition(position));
             const changes: {
                 [uri: string]: TextEdit[];
             } = {};
-            if (definingClasses && definingClasses.length && definingClasses[0]) {
-                const definingClass = definingClasses[0];
-                const relevantSymbols: Symbol[] = allSymbols.filter((e: Symbol) => {
-                    return (e.symbolType === SymbolType.Call || e.symbolType === SymbolType.Field
-                        || e.symbolType === SymbolType.Method) && e.name.includes(word) && e.parentClass === definingClass.name;
-                });
-                for (const s of relevantSymbols) {
-                    if (s.symbolType === SymbolType.Field ||
-                        (s.symbolType === SymbolType.Call) || s.symbolType === SymbolType.Method) {
-                        if (!changes[s.document.uri]) {
-                            changes[s.document.uri] = [];
+            if (definingClass) {
+                const relevantSymbols: Symbol[] = symbols.filter((s: Symbol) => s.isCompletableMemberOfClass(word, definingClass.name));
+                for (const symbol of relevantSymbols) {
+                    if (!changes[symbol.document.uri]) {
+                        changes[symbol.document.uri] = [];
+                    }
+                    if (symbol.symbolType !== SymbolType.Call) {
+                        changes[symbol.document.uri].push(TextEdit.replace(symbol.range, newName));
+                    }
+                    for (const ref of symbol.References) {
+                        if (!changes[ref.document.uri]) {
+                            changes[ref.document.uri] = [];
                         }
-                        if (s.symbolType !== SymbolType.Call) {
-                            changes[s.document.uri].push(TextEdit.replace(s.range, newName));
-                        }
-
-                        for (const ref of s.References) {
-                            if (!changes[ref.document.uri]) {
-                                changes[ref.document.uri] = [];
-                            }
-                            changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
-
-                        }
+                        changes[ref.document.uri].push(TextEdit.replace(ref.range, newName));
                     }
                 }
             }
@@ -67,5 +50,4 @@ export class DafnyRenameProvider {
 
         }).catch((e: any) => { console.error(e); });
     }
-
 }

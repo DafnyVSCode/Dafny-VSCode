@@ -1,11 +1,11 @@
 "use strict";
-import { CodeLens, Location, Position, TextDocument } from "vscode-languageserver";
+import { CodeLens, Location} from "vscode-languageserver";
 import Uri from "vscode-uri";
-import { Commands } from "../../strings/stringRessources";
+import { Commands, ToolTipText } from "../../strings/stringRessources";
 import { DafnyServer } from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
-import { SymbolTable } from "./symbols";
+import { Symbol, SymbolTable } from "./symbols";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {
@@ -54,32 +54,21 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
 
     private buildEmptyCommand(): any {
         return {
-            command: "",
-            title: "Could not determine references"
+            command: Commands.EmptyCommand,
+            title: ToolTipText.NoReferences
         };
     }
-    private getReferences(codeLens: ReferencesCodeLens): PromiseLike<ReferenceInformation[]> {
-        return this.server.symbolService.getSymbols(codeLens.symbol.document).then((tables: SymbolTable[]) => {
-            if (!tables) {
-                const emptyRefs: ReferenceInformation[] = [];
-                return emptyRefs;
-            }
-            return this.parseReferenceResponse(tables, codeLens);
-
-        });
-    }
-
-    private parseReferenceResponse(symbolsTables: SymbolTable[], codeLens: ReferencesCodeLens): ReferenceInformation[] {
-        const references: ReferenceInformation[] = [];
-        for (const symbolTable of symbolsTables) {
-            for (const symbol of symbolTable.symbols) {
+    private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
+        return this.server.symbolService.getAllSymbols(codeLens.symbol.document).then((symbols: Symbol[]) => {
+            const references: ReferenceInformation[] = [];
+            for (const symbol of symbols) {
                 for (const reference of symbol.References) {
                     if (symbol.name === codeLens.symbol.name) {
-                        references.push(new ReferenceInformation(reference, Uri.parse(symbolTable.fileName)));
+                        references.push(new ReferenceInformation(reference, Uri.parse(symbol.document.uri)));
                     }
                 }
             }
-        }
-        return references;
+            return references;
+        });
     }
 }
