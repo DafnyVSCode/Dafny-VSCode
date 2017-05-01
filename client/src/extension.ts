@@ -111,7 +111,6 @@ export function activate(context: vscode.ExtensionContext) {
     });
     context.subscriptions.push(uninstallDafnyCommand);
 
-
     const compileFile: vscode.Disposable = vscode.commands.registerCommand(Commands.Compile, () => {
         compile(vscode.window.activeTextEditor.document.uri);
     });

@@ -1,9 +1,9 @@
 "use strict";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
+import { LocalQueue } from "./serverHelper/localQueue";
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
-import { LocalQueue } from "./serverHelper/localQueue";
 
 class Priority {
     public static low: number = 1;
@@ -125,24 +125,3 @@ export class Statusbar {
         return this.localQueue.contains(filename);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

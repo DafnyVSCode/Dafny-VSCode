@@ -12,7 +12,7 @@ export class DafnyClientProvider {
     private docChangeDelay: number = 0;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
-    private localQueue: LocalQueue = new LocalQueue;
+    private localQueue: LocalQueue = new LocalQueue();
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);

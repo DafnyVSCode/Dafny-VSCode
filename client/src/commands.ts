@@ -25,7 +25,7 @@ export function handlerApplyTextEdits(client: LanguageClient): (uri: string, doc
                 }
             });
         }
-    }
+    };
 }
 
 function updateEditsWithActualLocations(edits: TextEdit[], diagnosisPosition: Range, insertBefore: string): TextEdit[] {
