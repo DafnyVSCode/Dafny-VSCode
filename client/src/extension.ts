@@ -123,6 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(compileAndRun);
 
     function compile(uri: vscode.Uri, run: boolean = false) {
+        vscode.window.activeTextEditor.document.save();
         vscode.window.showInformationMessage(InfoMsg.CompilationStarted);
         languageServer.sendRequest(LanguageServerRequest.Compile, uri).then((result: CompilerResult) => {
             vscode.window.showInformationMessage(InfoMsg.CompilationFinished);
