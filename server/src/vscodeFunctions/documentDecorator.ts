@@ -92,7 +92,7 @@ export class DocumentDecorator {
     public findInsertPositionRange(_position: vscode.Position, insertBefore: string): vscode.Range {
         let currentLine = _position.line;
         let currentPosition = _position.character;
-        while(currentLine >= 0 && this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore) < 0) {
+        while(currentLine > 0 && this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore) < 0) {
             currentLine -= 1;
             currentPosition = this._lines[currentLine].length;
         }
