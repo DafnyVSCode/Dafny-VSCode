@@ -11,12 +11,6 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {
         super(server);
     }
-    public provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
-        if (!codeLens.symbol) {
-            return null;
-        }
-        return Promise.resolve(this.getReferences(codeLens));
-    }
 
     public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
@@ -30,6 +24,13 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
             console.error(err);
             return codeLens;
         });
+    }
+
+     private provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
+        if (!codeLens.symbol) {
+            return null;
+        }
+        return Promise.resolve(this.getReferences(codeLens));
     }
 
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {
@@ -47,7 +48,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildReferenceLocations(referenceInformation: ReferenceInformation[]): Location[] {
         const locations: Location[] = [];
         for (const info of referenceInformation) {
-            locations.push(Location.create(info.fileName.fsPath, info.reference.range));
+            locations.push(Location.create(info.fileName.fsPath, info.range));
         }
         return locations;
     }
@@ -59,13 +60,17 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
-        return this.server.symbolService.getAllSymbols(codeLens.symbol.document).then((symbols: Symbol[]) => {
+        const lensSymbol = codeLens.symbol;
+        return this.server.symbolService.getAllSymbols(lensSymbol.document).then((symbols: Symbol[]) => {
             const references: ReferenceInformation[] = [];
             for (const symbol of symbols) {
-                for (const reference of symbol.References) {
-                    if (symbol.name === codeLens.symbol.name) {
-                        references.push(new ReferenceInformation(reference, Uri.parse(symbol.document.uri)));
+                if(symbol.name === lensSymbol.name && symbol.document.uri === lensSymbol.document.uri) {
+                    for (const reference of symbol.References) {
+                        references.push(new ReferenceInformation(reference.range, Uri.parse(symbol.document.uri)));
                     }
+                } else if(symbol.name === lensSymbol.name && symbol.parentClass ===
+                        lensSymbol.parentClass && symbol.module === lensSymbol.module) {
+                    references.push(new ReferenceInformation(symbol.range, Uri.parse(symbol.document.uri)));
                 }
             }
             return references;

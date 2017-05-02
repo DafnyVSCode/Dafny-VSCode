@@ -130,7 +130,6 @@ connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> =
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
         result.then((lenses: ReferencesCodeLens[]) => {
             lenses.forEach((lens: ReferencesCodeLens) => {
-                console.log("added codelens" + JSON.stringify(getCodeLens(lens)));
                 codeLenses[JSON.stringify(getCodeLens(lens))] = lens;
             });
         });

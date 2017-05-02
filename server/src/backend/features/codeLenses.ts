@@ -15,9 +15,9 @@ export class ReferencesCodeLens implements CodeLens {
 
 export class ReferenceInformation {
     public fileName: Uri;
-    public reference: Reference;
-    constructor(dafnyReference: Reference, file: Uri) {
-        this.reference = dafnyReference;
+    public range: Range;
+    constructor(range: Range, file: Uri) {
+        this.range = range;
         this.fileName = file;
     }
 }
