@@ -93,6 +93,10 @@ export class SymbolService {
                 parsedSymbol.addEnsuresClauses(symbol.Ensures);
                 parsedSymbol.addRequiresClauses(symbol.Requires);
             }
+            if(parsedSymbol.symbolType === SymbolType.Field) {
+                parsedSymbol.referencedClass = symbol.ReferencedClass;
+                parsedSymbol.referencedModule = symbol.ReferencedModule;
+            }
             if(symbol.References && symbol.References.length && symbol.References.length > 0) {
                 for(const reference of symbol.References) {
                     const parsedReference = new Reference(reference, document);

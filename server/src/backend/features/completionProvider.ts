@@ -15,8 +15,23 @@ export class DafnyCompletionProvider {
             const  definition: Symbol = allSymbols.find((e: Symbol) => e.isDefinitionFor(word));
             if(definition) {
                 const possibleSymbolForCompletion: Symbol[] = allSymbols.filter(
-                    (symbol: Symbol) => symbol.canProvideCodeCompletion(definition));
+                    (symbol: Symbol) => symbol.canProvideCodeCompletionForDefinition(definition));
                 return possibleSymbolForCompletion.map((e: Symbol) => this.buildCompletion(e));
+            } else {
+                const fields: Symbol[] = allSymbols.filter((e: Symbol) => e.isField(word));
+                const definingClass: Symbol = allSymbols.find((e: Symbol) => {
+                    for(const field of fields) {
+                        if(e.isDefiningClassForFieldType(field)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                if(definingClass) {
+                    const possibleSymbolForCompletion: Symbol[] = allSymbols.filter(
+                        (symbol: Symbol) => symbol.canProvideCodeCompletionForClass(definingClass));
+                    return possibleSymbolForCompletion.map((e: Symbol) => this.buildCompletion(e));
+                }
             }
             return [];
         });

@@ -32,6 +32,8 @@ export class Symbol {
     public document: TextDocument;
     public requires: string[];
     public ensures: string[];
+    public referencedClass: string;
+    public referencedModule: string;
     constructor(symbol: any, document: TextDocument) {
         this.column = adjustDafnyColumnPositionInfo(symbol.Column);
         this.line = adjustDafnyLinePositionInfo(symbol.Line);
@@ -87,8 +89,14 @@ export class Symbol {
         return !(this.name === DafnyKeyWords.DefaultModuleName && this.symbolType === SymbolType.Class) &&
                     (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call);
     }
-    public canProvideCodeCompletion(symbol: Symbol) {
+    public canProvideCodeCompletionForDefinition(symbol: Symbol) {
         return this.parentClass === symbol.parentClass &&
+            this.module === symbol.module &&
+            (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
+            this.name !== DafnyKeyWords.ConstructorMethod;
+    }
+    public canProvideCodeCompletionForClass(symbol: Symbol) {
+        return this.parentClass === symbol.name &&
             this.module === symbol.module &&
             (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
@@ -99,6 +107,19 @@ export class Symbol {
         } else {
             return this.symbolType === SymbolType.Definition && this.name === word;
         }
+    }
+    public isField(word: string, position: Position = null): boolean {
+        if(position !== null) {
+            return this.symbolType === SymbolType.Field && this.name === word && containsPosition(this.range, position);
+        } else {
+            return this.symbolType === SymbolType.Field && this.name === word;
+        }
+    }
+    public isDefiningClassForFieldType(symbol: Symbol): boolean {
+        return this.symbolType === SymbolType.Class && this.name === symbol.referencedClass && this.module === symbol.referencedModule;
+    }
+    public containsPosition(uri: string, position: Position): boolean {
+        return this.document.uri === uri && containsPosition(this.range, position);
     }
     public isFuzzyDefinitionForSymbol(symbol: Symbol): boolean {
         return this.module === symbol.module && this.parentClass === symbol.parentClass
