@@ -87,7 +87,8 @@ export class Symbol {
     }
     public needsCodeLens(): boolean {
         return !(this.name === DafnyKeyWords.DefaultModuleName && this.symbolType === SymbolType.Class) &&
-                    (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call);
+                    (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call
+                    && this.symbolType !== SymbolType.Definition);
     }
     public canProvideCodeCompletionForDefinition(symbol: Symbol) {
         return this.parentClass === symbol.parentClass &&
