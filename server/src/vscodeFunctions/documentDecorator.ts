@@ -157,11 +157,9 @@ export class DocumentDecorator {
     }
 
     public getFullyQualifiedNameOfCalledMethod(position: vscode.Position): string {
-        const wordRange = this.getWordRangeAtPosition(position);
-        const wordRangeBeforeIdentifier = this.getWordRangeAtPosition(translate(wordRange.start, 0, -1));
+        const wordRange = this.matchWordRangeAtPosition(position, false);
         const call = this.getText(wordRange);
-        const designator = this.getText(wordRangeBeforeIdentifier);
-        return designator + "." + call;
+        return call;
     }
 
     public getValidIdentifierOrNull(position: vscode.Position): string {
