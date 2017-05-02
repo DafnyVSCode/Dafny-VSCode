@@ -21,10 +21,10 @@ export class DafnyRunner {
         const monoPath: string = this.config.get<string>(Config.MonoPath);
         const useMono: boolean = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;
         if (!useMono) {
-            return executable;
+            return "& " + '"' + executable + '"';
         } else {
             if (monoPath) {
-                return monoPath + " " + executable;
+                return monoPath + " " + '"' + executable + '"';
             }
             return "mono " + executable;
         }
