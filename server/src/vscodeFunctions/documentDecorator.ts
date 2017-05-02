@@ -173,8 +173,8 @@ export class DocumentDecorator {
         return word;
     }
 
-    public getWordAtPosition(position: vscode.Position): string {
-        const wordRange = this.matchWordRangeAtPosition(position);
+    public getWordAtPosition(position: vscode.Position, adjust: boolean = true): string {
+        const wordRange = this.matchWordRangeAtPosition(position, adjust);
         return wordRange ? this.getText(wordRange) : "";
     }
 }

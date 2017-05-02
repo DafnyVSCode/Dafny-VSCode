@@ -86,54 +86,68 @@ export class Symbol {
         }
     }
     public needsCodeLens(): boolean {
-        return !(this.name === DafnyKeyWords.DefaultModuleName && this.symbolType === SymbolType.Class) &&
-                    (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call
-                    && this.symbolType !== SymbolType.Definition);
+        return !(this.name === DafnyKeyWords.DefaultModuleName && this.isOfType([SymbolType.Class])) &&
+                    !this.isOfType([SymbolType.Unknown, SymbolType.Call, SymbolType.Definition]);
     }
     public canProvideCodeCompletionForDefinition(symbol: Symbol) {
-        return this.parentClass === symbol.parentClass &&
-            this.module === symbol.module &&
-            (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
+        return this.isDefinedInSameClass(symbol) &&
+            this.isOfType([SymbolType.Field, SymbolType.Method]) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
     }
     public canProvideCodeCompletionForClass(symbol: Symbol) {
-        return this.parentClass === symbol.name &&
-            this.module === symbol.module &&
-            (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
+        return this.hasParentClass(symbol.name) &&
+            this.hasModule(symbol.module) &&
+            this.isOfType([SymbolType.Field, SymbolType.Method]) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
     }
     public isDefinitionFor(word: string, position: Position = null): boolean {
-        if(position !== null) {
-            return this.symbolType === SymbolType.Definition && this.name === word && containsPosition(this.range, position);
-        } else {
-            return this.symbolType === SymbolType.Definition && this.name === word;
-        }
+        return this.isTypeAt(word, SymbolType.Definition, position);
+
     }
     public isField(word: string, position: Position = null): boolean {
-        if(position !== null) {
-            return this.symbolType === SymbolType.Field && this.name === word && containsPosition(this.range, position);
-        } else {
-            return this.symbolType === SymbolType.Field && this.name === word;
-        }
+        return this.isTypeAt(word, SymbolType.Field, position);
     }
     public isDefiningClassForFieldType(symbol: Symbol): boolean {
-        return this.symbolType === SymbolType.Class && this.name === symbol.referencedClass && this.module === symbol.referencedModule;
+        return this.isOfType([SymbolType.Class]) && this.hasName(symbol.referencedClass) && this.hasModule(symbol.referencedModule);
     }
     public containsPosition(uri: string, position: Position): boolean {
         return this.document.uri === uri && containsPosition(this.range, position);
     }
     public isFuzzyDefinitionForSymbol(symbol: Symbol): boolean {
-        return this.module === symbol.module && this.parentClass === symbol.parentClass
-            && this.name === symbol.name && this.symbolType !== SymbolType.Call;
+        return this.isDefinedInSameClass(symbol)
+            && this.hasName(symbol.name) && !this.isOfType([SymbolType.Call]);
     }
 
     public isDefiningClassForPosition(position: Position): boolean {
-        return this.range && this.symbolType && containsPosition(this.range, position) && this.symbolType === SymbolType.Class;
+        return this.range && containsPosition(this.range, position) && this.isOfType([SymbolType.Class]);
     }
 
     public isCompletableMemberOfClass(word: string, parentClass: string): boolean {
-        return (this.symbolType === SymbolType.Call || this.symbolType === SymbolType.Field
-            || this.symbolType === SymbolType.Method) && this.name.includes(word) && this.parentClass === parentClass;
+        return this.isOfType([SymbolType.Call, SymbolType.Field, SymbolType.Method])
+            && this.name.includes(word) && this.hasParentClass(parentClass);
+    }
+    private isDefinedInSameClass(symbol: Symbol): boolean {
+        return this.hasParentClass(symbol.parentClass) && this.hasModule(symbol.module);
+    }
+    private isOfType(types: SymbolType[]): boolean {
+        return types.includes(this.symbolType);
+    }
+    private hasParentClass(parentClass: string): boolean {
+        return this.parentClass === parentClass;
+    }
+    private hasModule(module: string): boolean {
+        return this.module === module;
+    }
+    private hasName(name: string): boolean {
+        return this.name === name;
+    }
+
+    private isTypeAt(word: string, type: SymbolType, position: Position = null): boolean {
+        const isTypeOfName = this.isOfType([type]) && this.hasName(word);
+        if(position !== null) {
+            return isTypeOfName && containsPosition(this.range, position);
+        }
+        return isTypeOfName;
     }
 }
 export class Reference {

@@ -21,7 +21,7 @@ export class DafnyRenameProvider {
 
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
-        const word = documentDecorator.getWordAtPosition(position);
+        const word = documentDecorator.getWordAtPosition(position, false);
         return this.server.symbolService.getAllSymbols(document).then((symbols: Symbol[]) => {
             const definingClass: Symbol = symbols.find((s: Symbol) => s.isDefiningClassForPosition(position));
             const changes: {
