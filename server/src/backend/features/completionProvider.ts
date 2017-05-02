@@ -12,10 +12,10 @@ export class DafnyCompletionProvider {
         const document =  this.server.symbolService.getTextDocument(handler.textDocument.uri);
         const word = this.parseWordForCompletion(document, handler.position);
         return this.server.symbolService.getAllSymbols(document).then((allSymbols: Symbol[]) => {
-            const  definition: Symbol = allSymbols.find((e: Symbol) => e.isDefinitionFor(word, handler.position));
+            const  definition: Symbol = allSymbols.find((e: Symbol) => e.isDefinitionFor(word));
             if(definition) {
                 const possibleSymbolForCompletion: Symbol[] = allSymbols.filter(
-                    (symbol: Symbol) => symbol.canProvideCodeCompletion(definition.parentClass));
+                    (symbol: Symbol) => symbol.canProvideCodeCompletion(definition));
                 return possibleSymbolForCompletion.map((e: Symbol) => this.buildCompletion(e));
             }
             return [];

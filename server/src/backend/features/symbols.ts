@@ -87,8 +87,9 @@ export class Symbol {
         return !(this.name === DafnyKeyWords.DefaultModuleName && this.symbolType === SymbolType.Class) &&
                     (this.symbolType !== SymbolType.Unknown && this.symbolType !== SymbolType.Call);
     }
-    public canProvideCodeCompletion(parentClass: string) {
-        return this.parentClass === parentClass &&
+    public canProvideCodeCompletion(symbol: Symbol) {
+        return this.parentClass === symbol.parentClass &&
+            this.module === symbol.module &&
             (this.symbolType === SymbolType.Field || this.symbolType === SymbolType.Method) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
     }
