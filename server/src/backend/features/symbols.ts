@@ -1,5 +1,5 @@
 import {Position, Range, TextDocument} from "vscode-languageserver";
-import { DafnyKeyWords } from "./../../strings/stringRessources";
+import { DafnyKeyWords, SymbolString } from "./../../strings/stringRessources";
 import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 export enum SymbolType {
     Unknown, Class, Method, Function, Field, Call, Definition
@@ -52,12 +52,12 @@ export class Symbol {
     }
     public setSymbolType(type: string): void {
         switch(type) {
-            case "Class": this.symbolType = SymbolType.Class; break;
-            case "Method": this.symbolType = SymbolType.Method; break;
-            case "Function": this.symbolType = SymbolType.Function; break;
-            case "Field": this.symbolType = SymbolType.Field; break;
-            case "Call": this.symbolType = SymbolType.Call; break;
-            case "Definition": this.symbolType = SymbolType.Definition; break;
+            case SymbolString.Class: this.symbolType = SymbolType.Class; break;
+            case SymbolString.Method: this.symbolType = SymbolType.Method; break;
+            case SymbolString.Function: this.symbolType = SymbolType.Function; break;
+            case SymbolString.Field: this.symbolType = SymbolType.Field; break;
+            case SymbolString.Call: this.symbolType = SymbolType.Call; break;
+            case SymbolString.Definition: this.symbolType = SymbolType.Definition; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
     }
@@ -74,16 +74,22 @@ export class Symbol {
     public addEnsuresClauses(clauses: any) {
         if(clauses && clauses.length) {
             for(const clause of clauses) {
-                this.ensures.push("Ensures " + clause);
+                this.ensures.push(clause);
             }
         }
     }
     public addRequiresClauses(clauses: any) {
         if(clauses && clauses.length) {
             for(const clause of clauses) {
-                this.requires.push("Requires " + clause);
+                this.requires.push(clause);
             }
         }
+    }
+    public prettyEnsures(): string[] {
+        return this.ensures.map((e: string) => "Ensures " + e);
+    }
+    public prettyRequires(): string[] {
+        return this.requires.map((e: string) => "Requires " + e);
     }
     public needsCodeLens(): boolean {
         return !(this.name === DafnyKeyWords.DefaultModuleName && this.isOfType([SymbolType.Class])) &&

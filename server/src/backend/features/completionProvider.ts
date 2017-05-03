@@ -49,7 +49,7 @@ export class DafnyCompletionProvider {
         } else if(symbol.symbolType === SymbolType.Method) {
             completionItem.kind = CompletionItemKind.Method;
             completionItem.label += "()";
-            completionItem.detail = symbol.requires.join(EOL);
+            completionItem.detail = symbol.prettyRequires().join(EOL);
         }
         return completionItem;
     }

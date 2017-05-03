@@ -122,3 +122,12 @@ export class ToolTipText {
 export class DafnyVerbs {
     public static Symbols: string = "symbols";
 }
+
+export class SymbolString {
+    public static Class: string = "Class";
+    public static Method: string = "Method";
+    public static Function: string = "Function";
+    public static Field: string = "Field";
+    public static Call: string = "Call";
+    public static Definition: string = "Definition";
+}
