@@ -21,7 +21,7 @@ Dafny support for Visual Studio Code.
 ## Shortcuts
 
 * `Ctrl+Shift+B` or `⇧⌘B` Compile dfy file to dll or exe, if there is a Main method
-* `F5` Compile and Run if it has a Main method. 
+* `F5` Compile and Run if the source file has a Main method. 
 
 ## Tasks
 * `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly

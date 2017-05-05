@@ -7,7 +7,7 @@ import { DafnySettings } from "../backend/dafnySettings";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
 import { NotificationService } from "../notificationService";
-import { Config, EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
+import { Config, DafnyVerbs, EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
 import { CodeActionProvider } from "./../backend/features/codeActionProvider";
 import { DafnyCompletionProvider } from "./../backend/features/completionProvider";
 import { DafnyRenameProvider } from "./../backend/features/renameProvider";
@@ -66,7 +66,7 @@ export class DafnyServerProvider {
 
     public doVerify(textDocument: TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
-            this.dafnyServer.addDocument(textDocument, "verify");
+            this.dafnyServer.addDocument(textDocument, DafnyVerbs.CounterExample);
         }
     }
 }

@@ -19,6 +19,7 @@ export class VerificationResult {
     public proofObligations: number;
     public errorCount: number;
     public crashed: boolean = false;
+    public counterModel: any;
 };
 
 export class VerificationResults {
@@ -51,6 +52,8 @@ export class VerificationResults {
         let proofObligations: number = 0;
         let lastDiagnostic = null;
         let relatedLocationCounter = 1;
+
+        this.addCounterModel(log, result);
 
         // tslint:disable-next-line:forin
         for (const index in lines) {
@@ -102,6 +105,21 @@ export class VerificationResults {
         result.errorCount = errorCount;
         result.proofObligations = proofObligations;
         return result;
+    }
+
+    private addCounterModel(log: string, result: VerificationResult) {
+         if(log && log.indexOf(EnvironmentConfig.CounterExampleStart) > -1 && log.indexOf(EnvironmentConfig.CounterExampleEnd) > -1) {
+            const startOfSymbols: number = log.indexOf(EnvironmentConfig.CounterExampleStart) +
+                EnvironmentConfig.CounterExampleStart.length;
+            const endOfSymbols: number = log.indexOf(EnvironmentConfig.CounterExampleEnd);
+            const info: string = log.substring(startOfSymbols, endOfSymbols);
+            try {
+                result.counterModel = JSON.parse(info);
+            } catch(exception) {
+                console.error("Failure  to parse response: " + exception + ", json: " + info);
+                result.counterModel = null;
+            }
+        }
     }
 
     private checkForRelatedLocation(lines: string[], index: string,

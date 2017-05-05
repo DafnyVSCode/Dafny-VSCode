@@ -69,6 +69,8 @@ export class EnvironmentConfig {
     public static DafnyFailure: string = "[FAILURE]";
     public static SymbolStart: string = "SYMBOLS_START ";
     public static SymbolEnd: string = " SYMBOLS_END";
+    public static CounterExampleStart: string = "COUNTEREXAMPLE_START ";
+    public static CounterExampleEnd: string = " COUNTEREXAMPLE_END";
 }
 export class StatusString {
     public static Crashed: string = "$(alert) Crashed";
@@ -122,6 +124,8 @@ export class ToolTipText {
 
 export class DafnyVerbs {
     public static Symbols: string = "symbols";
+    public static CounterExample: string = "counterExample";
+    
 }
 
 export class SymbolString {
