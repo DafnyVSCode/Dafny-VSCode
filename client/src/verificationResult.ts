@@ -11,4 +11,5 @@ export class VerificationResult {
     public proofObligations: number;
     public errorCount: number;
     public crashed: boolean = false;
+    public counterModel: any;
 };

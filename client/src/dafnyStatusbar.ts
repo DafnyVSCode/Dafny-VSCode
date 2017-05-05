@@ -116,7 +116,8 @@ export class Statusbar {
         } else {
             response = StatusString.NotVerified;
         }
-        response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount + " | ";
+        response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount;
+        if(result.counterModel && result.counterModel.States) {response += " | CM: " + result.counterModel.States.length;}
 
         return response;
     }
