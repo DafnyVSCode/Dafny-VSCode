@@ -8,7 +8,7 @@ import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
 import { encodeBase64 } from "../strings/stringEncoding";
 import {
-    ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg
+    DafnyVerbs, ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg
 } from "../strings/stringRessources";
 import { Context } from "./context";
 import { DafnySettings } from "./dafnySettings";
@@ -117,7 +117,7 @@ export class DafnyServer {
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-            if (this.context.activeRequest && this.context.activeRequest.verb === "verify") {
+            if (this.context.activeRequest && this.context.activeRequest.verb === DafnyVerbs.CounterExample) {
                 const result = this.context.collectRequest(log);
                 this.notificationService.sendVerificationResult([this.context.activeRequest.document.uri.toString(),
                     JSON.stringify(result)]);
@@ -193,7 +193,7 @@ export class DafnyServer {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {
-            args: [],
+            args: ["/mv:-"],
             filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
             sourceIsFile: false

@@ -121,6 +121,8 @@ export class ToolTipText {
 
 export class DafnyVerbs {
     public static Symbols: string = "symbols";
+    public static CounterExample: string = "counterExample";
+    
 }
 
 export class SymbolString {
