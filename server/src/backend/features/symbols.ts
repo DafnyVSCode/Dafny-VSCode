@@ -124,8 +124,8 @@ export class Symbol {
             && this.hasName(symbol.name) && !this.isOfType([SymbolType.Call]);
     }
 
-    public isDefiningClassForPosition(position: Position): boolean {
-        return this.range && containsPosition(this.range, position) && this.isOfType([SymbolType.Class]);
+    public isClassDefinedAtPosition(position: Position): boolean {
+        return containsPosition(this.range, position) && this.isOfType([SymbolType.Class]);
     }
 
     public isCompletableMemberOfClass(word: string, parentClass: string): boolean {

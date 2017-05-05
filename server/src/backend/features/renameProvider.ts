@@ -23,7 +23,7 @@ export class DafnyRenameProvider {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
         const word = documentDecorator.getWordAtPosition(position, false);
         return this.server.symbolService.getAllSymbols(document).then((symbols: Symbol[]) => {
-            const definingClass: Symbol = symbols.find((s: Symbol) => s.isDefiningClassForPosition(position));
+            const definingClass: Symbol = symbols.find((s: Symbol) => s.isClassDefinedAtPosition(position));
             const changes: {
                 [uri: string]: TextEdit[];
             } = {};
