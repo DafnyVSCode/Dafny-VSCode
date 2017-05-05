@@ -1,9 +1,10 @@
 "use strict";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import { LocalQueue } from "./serverHelper/localQueue";
+
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
+import {Context} from "./context";
 
 class Priority {
     public static low: number = 1;
@@ -17,11 +18,10 @@ export class Statusbar {
     public serverpid: number;
     public serverversion: string;
     public activeDocument: vscode.Uri;
-    public verificationResults: { [docPathName: string]: VerificationResult } = {};
     private serverStatusBar: vscode.StatusBarItem = null;
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
-
-    constructor(languageServer: LanguageClient, private localQueue: LocalQueue) {
+    
+    constructor(languageServer: LanguageClient, private context: Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
 
@@ -40,16 +40,6 @@ export class Statusbar {
             this.activeDocument = activeDocument;
             this.update();
         });
-
-        languageServer.onNotification(LanguageServerNotification.VerificationResult,
-            (docPathName: string, json: string) => {
-                localQueue.remove(docPathName);
-                console.log("notificiation: " + docPathName);
-                const verificationResult: VerificationResult = JSON.parse(json);
-                this.verificationResults[docPathName] = verificationResult;
-                console.log(verificationResult);
-                this.update();
-            });
 
         languageServer.onNotification(LanguageServerNotification.HideStatusbar, () => {
             this.hide();
@@ -91,7 +81,7 @@ export class Statusbar {
         } else if (this.queueContains(editor.document.uri.toString())) {
             this.currentDocumentStatucBar.text = StatusString.Queued;
         } else {
-            const res: undefined | VerificationResult = this.verificationResults[editor.document.uri.toString()];
+            const res: undefined | VerificationResult = this.context.verificationResults[editor.document.uri.toString()];
             if (res !== undefined) {
                 const displayText: string = this.verificationResultToString(res);
                 this.currentDocumentStatucBar.text = displayText;
@@ -123,6 +113,6 @@ export class Statusbar {
     }
 
     private queueContains(filename: string): boolean {
-        return this.localQueue.contains(filename);
+        return this.context.localQueue.contains(filename);
     }
 }

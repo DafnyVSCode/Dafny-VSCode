@@ -2,9 +2,11 @@
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { TextDocumentItem } from "vscode-languageserver-types";
+import { Context } from "./context";
+import { CounterModelProvider } from "./CounterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
-import { LocalQueue } from "./serverHelper/localQueue";
 import { Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
+import { VerificationResult } from "./verificationResult";
 
 export class DafnyClientProvider {
     private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
@@ -12,14 +14,28 @@ export class DafnyClientProvider {
     private docChangeDelay: number = 0;
     private subscriptions: vscode.Disposable[];
     private dafnyStatusbar: Statusbar;
-    private localQueue: LocalQueue = new LocalQueue();
+
+    private counterModelProvider: CounterModelProvider;
+    private context: Context;
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
         this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
         this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
+        this.context = new Context();
+        this.dafnyStatusbar = new Statusbar(this.languageServer, this.context);
+        this.counterModelProvider = new CounterModelProvider(this.context);
 
-        this.dafnyStatusbar = new Statusbar(this.languageServer, this.localQueue);
+        languageServer.onNotification(LanguageServerNotification.VerificationResult,
+            (docPathName: string, json: string) => {
+                this.context.localQueue.remove(docPathName);
+                console.log("notificiation: " + docPathName);
+                const verificationResult: VerificationResult = JSON.parse(json);
+                this.context.verificationResults[docPathName] = verificationResult;
+                console.log(verificationResult);
+                this.dafnyStatusbar.update();
+                this.counterModelProvider.update();
+            });
     }
 
     public activate(subs: vscode.Disposable[]): void {
@@ -32,6 +48,7 @@ export class DafnyClientProvider {
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) {
                 this.dafnyStatusbar.update();
+                this.counterModelProvider.update();
             }
         }, this);
         this.subscriptions = subs;
@@ -54,7 +71,7 @@ export class DafnyClientProvider {
     }
     private doVerify(textDocument: vscode.TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
-            this.localQueue.add(textDocument.uri.toString());
+            this.context.localQueue.add(textDocument.uri.toString());
             const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
                 textDocument.languageId, textDocument.version, textDocument.getText()));
             this.languageServer.sendNotification(LanguageServerNotification.Verify, tditem);
