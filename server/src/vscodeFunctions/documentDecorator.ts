@@ -104,6 +104,49 @@ export class DocumentDecorator {
             vscode.Position.create(currentLine, positionOfInsertion +  insertBefore.length));
 
     }
+    public readArrayExpression(_position: vscode.Position): vscode.Range {
+        const position = this.validatePosition(_position);
+        let lineIndex = position.line;
+        let line = this._lines[lineIndex];
+        const exprStartChar = "[";
+        const exprEndChar = "]";
+        let openCount = 0;
+        let closedCount = 0;
+        let start: vscode.Position = null;
+        let end: vscode.Position = null;
+        let range: vscode.Range = null;
+        let charIndex = line.indexOf(exprStartChar);
+        if( charIndex > -1 ) {
+            openCount = 1;
+            start = vscode.Position.create(lineIndex, charIndex + 1);
+        } else {
+            return range;
+        }
+        let currentChar = line.charAt(charIndex);
+        while(openCount !== closedCount) {
+            charIndex++;
+            if(charIndex >= line.length) {
+                lineIndex++;
+                if(lineIndex >= this._lines.length) {
+                    return range;
+                }
+                line = this._lines[lineIndex];
+                charIndex = 0;
+            }
+            currentChar =  line.charAt(charIndex);
+            if(currentChar === exprStartChar) {
+                openCount++;
+            }
+            if(currentChar === exprEndChar) {
+                closedCount++;
+            }
+            if(openCount === closedCount) {
+                end = vscode.Position.create(lineIndex, charIndex--);
+                return vscode.Range.create(start, end);
+            }
+        }
+        return range;
+    }
     public matchWordRangeAtPosition(_position: vscode.Position, adjust: boolean = true): vscode.Range {
         const position = this.validatePosition(_position);
         const wordAtText = matchWordAtText(

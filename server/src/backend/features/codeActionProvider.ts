@@ -68,7 +68,19 @@ export class CodeActionProvider {
         if(diagnostic.message === DafnyReports.IndexBounding) {
             const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
             const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
-            const word = documentDecorator.matchWordRangeAtPosition(diagnostic.range.start);
+            const arrayExprRange = documentDecorator.readArrayExpression(diagnostic.range.start);
+            const arrExpr = documentDecorator.getText(arrayExprRange);
+            const arrId = documentDecorator.matchWordRangeAtPosition(Position.create(arrayExprRange.start.line,
+                arrayExprRange.start.character));
+            const arrIdText = documentDecorator.getText(arrId);
+            if(arrExpr !== "" && arrIdText !== "") {
+                const rangeOfMethodStart = documentDecorator.findInsertPositionRange(diagnostic.range.start, "{");
+                const editLower = TextEdit.insert(this.dummyPosition, " requires " + arrExpr + " >= 0\n");
+                const editHigher = TextEdit.insert(this.dummyPosition, " requires " + arrExpr + " < " + arrIdText + ".Length");
+                commands.push(Command.create("Add bound check",
+                    Commands.EditTextCommand, params.textDocument.uri,
+                    this.dummyDocId, [editLower, editHigher], rangeOfMethodStart, this.methodBlockStartSymbol));
+            }
             const w = 2;
         }
         return commands;
@@ -94,6 +106,7 @@ export class CodeActionProvider {
         let commands: Command[] = [];
         commands = commands.concat(this.getGuardCommands(diagnostic, params));
         commands = commands.concat(this.getNullCheckCommand(diagnostic, params));
+        commands = commands.concat(this.getIndexCheckCommand(diagnostic, params));
         return commands;
     }
 }
