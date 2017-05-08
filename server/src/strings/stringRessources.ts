@@ -101,7 +101,6 @@ export class LanguageServerNotification {
     public static ServerStarted: string = "serverStarted";
     public static ActiveVerifiyingDocument: string = "activeVerifiyingDocument";
     public static VerificationResult: string = "verificationResult";
-    public static HideStatusbar: string = "hideStatusbar";
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
 }
@@ -125,7 +124,6 @@ export class ToolTipText {
 export class DafnyVerbs {
     public static Symbols: string = "symbols";
     public static CounterExample: string = "counterExample";
-    
 }
 
 export class SymbolString {

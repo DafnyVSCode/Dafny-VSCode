@@ -35,10 +35,6 @@ export class NotificationService {
         this.connection.sendNotification(LanguageServerNotification.Ready);
     }
 
-    public sendHideStatusbar(): void {
-        this.connection.sendNotification(LanguageServerNotification.HideStatusbar);
-    }
-
     public sendDafnyMissing(): void {
         this.connection.sendNotification(LanguageServerNotification.DafnyMissing);
     }
