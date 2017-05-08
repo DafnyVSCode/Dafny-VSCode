@@ -103,4 +103,5 @@ export class LanguageServerNotification {
     public static VerificationResult: string = "verificationResult";
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
+    public static Progress: string = "progress";
 }

@@ -4,7 +4,7 @@ import { LanguageClient } from "vscode-languageclient";
 
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
-import {Context} from "./context";
+import { Context } from "./context";
 
 class Priority {
     public static low: number = 1;
@@ -19,10 +19,12 @@ export class Statusbar {
     public serverversion: string;
     public activeDocument: vscode.Uri;
     private serverStatusBar: vscode.StatusBarItem = null;
+    private progressBar: vscode.StatusBarItem = null;
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
-    
+
     constructor(languageServer: LanguageClient, private context: Context) {
         this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
+        this.progressBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
         this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
 
         languageServer.onNotification(LanguageServerNotification.QueueSize, (queueSize: number) => {
@@ -45,6 +47,34 @@ export class Statusbar {
             this.serverStatus = status;
             this.update();
         });
+
+        languageServer.onNotification(LanguageServerNotification.Progress, (data: any) => {
+            if (!data) return;
+
+            const progress = (data.progress !== undefined) ? data.progress : 100.0 * data.current / data.total;
+            const label = data.domain + ": " + this.progressBarText(progress) + (data.postfix ? ' ' + data.postfix : '');
+            this.progressBar.text = label;
+            this.progressBar.color = 'orange';
+            this.progressBar.show();
+        });
+
+
+    }
+
+    public hideProgress() {
+        this.progressBar.hide();
+    }
+
+    public formatProgress(progress: number): string {
+        if (!progress) return "0%";
+        return progress.toFixed(0) + "%";
+    }
+
+    public progressBarText(progress: number): string {
+        if (progress < 0) progress = 0;
+        if (progress > 100) progress = 100;
+        let completed = Math.floor(progress / 10);
+        return "⚫".repeat(completed) + "⚪".repeat(10 - completed);
     }
 
     public hide(): void {
@@ -102,7 +132,7 @@ export class Statusbar {
             response = StatusString.NotVerified;
         }
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount;
-        if(result.counterModel && result.counterModel.States) {response += " | CM: " + result.counterModel.States.length;}
+        if (result.counterModel && result.counterModel.States) { response += " | CM: " + result.counterModel.States.length; }
 
         return response;
     }

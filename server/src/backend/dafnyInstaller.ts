@@ -11,13 +11,14 @@ import { DafnySettings } from "./dafnySettings";
 const DecompressZip = require("decompress-zip");
 const semver = require("semver");
 import * as pathHelper from "path";
+import { NotificationService } from "../notificationService";
 
 export class DafnyInstaller {
 
     private basePath = this.resolvePath("~/.dafny");
     private downloadFile = this.resolvePath("~/dafny.zip");
 
-    constructor(private dafnySettings: DafnySettings) {
+    constructor(private notificationService: NotificationService, private dafnySettings: DafnySettings) {
     }
 
     public latestVersionInstalled(localVersion: string): Promise<boolean> {
@@ -170,7 +171,7 @@ export class DafnyInstaller {
         console.log("downloading: " + url);
         return new Promise<any>((resolve, reject) => {
             try {
-                //console.startProgress();
+                this.notificationService.startProgress();
                 const options: https.RequestOptions = {
                     host: uri.parse(url).authority,
                     path: uri.parse(url).path,
@@ -183,12 +184,11 @@ export class DafnyInstaller {
                 const request = redirect.get(options, (response) => {
                     response.pipe(file);
 
-                    //download progress 
-                    let len = parseInt(response.headers["content-length"], 10);
+                    const len = parseInt(response.headers["content-length"], 10);
                     let cur = 0;
                     response.on("data", (chunk) => {
                         cur += chunk.length;
-                        //console.progress("Download Viper Tools", cur, len, LogLevel.Debug);
+                        this.notificationService.progress("Downloading Dafny ", cur, len);
                     });
 
                     file.on("finish", () => {
@@ -197,12 +197,12 @@ export class DafnyInstaller {
                     });
                     request.on("error", (err) => {
                         fs.unlink(filePath);
-                        console.error("Error downloading viper tools: " + err.message);
+                        console.error("Error downloading dafny: " + err.message);
                         return reject(false);
                     });
                 });
             } catch (e) {
-                console.error("Error downloading viper tools: " + e);
+                console.error("Error downloading dafny: " + e);
                 return reject(false);
             }
         });
@@ -214,13 +214,12 @@ export class DafnyInstaller {
             try {
                 //extract files
                 console.log("Extracting files..."/*, LogLevel.Info*/)
-                //console.startProgress();
+                this.notificationService.startProgress();
 
-                let unzipper = new DecompressZip(filePath);
+                const unzipper = new DecompressZip(filePath);
 
-                unzipper.on("progress", function (fileIndex, fileCount) {
-                    //console.progress("Extracting Viper Tools", fileIndex + 1, fileCount, LogLevel.Debug);
-                    //console.log("Extracting Viper Tools" + (fileIndex + 1) + " " + fileCount);
+                unzipper.on("progress", (fileIndex, fileCount) => {
+                    this.notificationService.progress("Extracting Dafny ", fileIndex + 1, fileCount);
                 });
 
                 unzipper.on("error", (e) => {
@@ -248,7 +247,7 @@ export class DafnyInstaller {
                     }
                 });
             } catch (e) {
-                console.error("Error extracting viper tools: " + e);
+                console.error("Error extracting dafny: " + e);
                 return reject(false);
             }
         });

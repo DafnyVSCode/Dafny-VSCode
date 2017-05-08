@@ -51,7 +51,7 @@ connection.onInitialize((params): InitializeResult => {
 
 function verifyDependencies() {
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
-    dafnyInstaller = new DafnyInstaller(settings.dafny);
+    dafnyInstaller = new DafnyInstaller(notificationService, settings.dafny);
     dependencyVerifier.verifyDafnyServer(workspaceRoot, notificationService, settings.dafny, (serverVersion: string) => {
         init(serverVersion);
         dafnyInstaller.latestVersionInstalled(serverVersion).then((latest) => {

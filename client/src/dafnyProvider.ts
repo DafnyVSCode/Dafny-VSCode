@@ -9,11 +9,11 @@ import { Config, EnvironmentConfig, LanguageServerNotification } from "./stringR
 import { VerificationResult } from "./verificationResult";
 
 export class DafnyClientProvider {
+    public dafnyStatusbar: Statusbar;
     private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
     private docChangeVerify: boolean = false;
     private docChangeDelay: number = 0;
     private subscriptions: vscode.Disposable[];
-    private dafnyStatusbar: Statusbar;
 
     private counterModelProvider: CounterModelProvider;
     private context: Context;

@@ -150,9 +150,11 @@ export function activate(context: vscode.ExtensionContext) {
             const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
             config.update(Config.DafnyBasePath, basePath).then(() => {
                 vscode.window.showInformationMessage("Installation finished");
+                provider.dafnyStatusbar.hideProgress();
             });
         }, (e) => {
             vscode.window.showErrorMessage("Installing error: " + e);
+            provider.dafnyStatusbar.hideProgress();
         });
     }
 }
