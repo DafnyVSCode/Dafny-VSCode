@@ -63,6 +63,17 @@ export class CodeActionProvider {
         return commands;
     }
 
+    private getIndexCheckCommand(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
+        const commands: Command[] = [];
+        if(diagnostic.message === DafnyReports.IndexBounding) {
+            const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
+            const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
+            const word = documentDecorator.matchWordRangeAtPosition(diagnostic.range.start);
+            const w = 2;
+        }
+        return commands;
+    }
+
     private removeMemberAcces(designator: string): string {
         if(designator.lastIndexOf(".") > 0) {
             designator = designator.substr(0, designator.lastIndexOf("."));

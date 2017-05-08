@@ -108,6 +108,7 @@ export class LanguageServerNotification {
 export class DafnyReports {
     public static UnresolvedDecreaseWarning: string = "decreases expression";
     public static NullWarning: string = "target object may be null";
+    public static IndexBounding: string = "index out of range";
 }
 
 export class DafnyKeyWords {
