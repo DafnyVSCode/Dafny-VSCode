@@ -10,6 +10,11 @@
   },
   "dependencies": {
     "base64-js": "*",
+    "decompress-zip": "^0.3.0",
+    "follow-redirects": "^1.2.3",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "semver": "^5.3.0",
     "typescript-collections": "^1.2.3",
     "utf8": "*",
     "vscode-languageserver": "^3.1.0",

@@ -58,6 +58,11 @@ export class Answer {
     public static No: string = "No";
 }
 
+export class Installer {
+    public static Repository = "FunctionalCorrectness/dafny-microsoft";
+    public static ReleaseUrl = "https://api.github.com/repos/" + Installer.Repository + "/releases";
+}
+
 export class EnvironmentConfig {
     public static Dafny: string = "dafny";
     public static Mono: string = "mono";
@@ -87,8 +92,9 @@ export class StatusString {
 
 export class LanguageServerRequest {
     public static Reset: string = "reset";
-    public static Stop: string = "stop";
     public static Compile: string = "compile";
+    public static Install: string = "install";
+    public static Uninstall: string = "uninstall";
 }
 
 export class LanguageServerNotification {

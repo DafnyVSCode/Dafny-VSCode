@@ -8,6 +8,7 @@ import {
 } from "vscode-languageserver";
 import Uri from "vscode-uri";
 import { CompilerResult } from "./backend/dafnyCompiler";
+import { DafnyInstaller } from "./backend/dafnyInstaller";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { CodeActionProvider } from "./backend/features/codeActionProvider";
@@ -23,6 +24,8 @@ const codeLenses: { [codeLens: string]: ReferencesCodeLens; } = {};
 let settings: Settings = null;
 let started: boolean = false;
 let notificationService: NotificationService = null;
+let dafnyInstaller: DafnyInstaller = null;
+
 documents.listen(connection);
 
 let workspaceRoot: string;
@@ -48,15 +51,19 @@ connection.onInitialize((params): InitializeResult => {
 
 function verifyDependencies() {
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
+    dafnyInstaller = new DafnyInstaller(settings.dafny);
     dependencyVerifier.verifyDafnyServer(workspaceRoot, notificationService, settings.dafny, (serverVersion: string) => {
         init(serverVersion);
+        dafnyInstaller.latestVersionInstalled(serverVersion).then((latest) => {
+            if (!latest) {
+                connection.sendNotification(LanguageServerNotification.DafnyMissing, InfoMsg.DafnyUpdateAvailable);
+            }
+        }).catch(() => {
+            console.log("can't access github");
+        });
     }, () => {
         connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyCantBeStarted);
-        connection.sendRequest(LanguageServerNotification.DafnyMissing, InfoMsg.AskInstallDafny).then(verifyDependencies,
-            () => { console.log("still not working correctly"); });
-    }, () => {
-        connection.sendRequest(LanguageServerNotification.DafnyMissing, InfoMsg.DafnyUpdateAvailable).then(verifyDependencies,
-            () => { console.log("update is not working"); });
+        connection.sendNotification(LanguageServerNotification.DafnyMissing, InfoMsg.AskInstallDafny);
     });
 }
 
@@ -174,11 +181,41 @@ connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: 
     }
 });
 
-connection.onRequest<void, void>(LanguageServerRequest.Stop, () => {
-    if (provider) {
-        provider.stop();
-    }
-    return;
+connection.onRequest<string, void>(LanguageServerRequest.Install, () => {
+    return new Promise<string>((resolve, reject) => {
+        if (provider) {
+            provider.stop();
+        }
+        if (dafnyInstaller) {
+            dafnyInstaller.uninstall();
+            dafnyInstaller.install().then((basePath) => {
+                console.log("verify again");
+                console.log(basePath);
+                settings.dafny.basePath = basePath;
+                console.log(settings.dafny.basePath);
+                verifyDependencies();
+                resolve(basePath);
+            }).catch(() => {
+                console.log("errrroooorrr");
+            });
+        } else {
+            reject();
+        }
+    });
+});
+
+connection.onRequest<void, void>(LanguageServerRequest.Uninstall, () => {
+    return new Promise<void>((resolve, reject) => {
+        if (provider) {
+            provider.stop();
+        }
+        if (dafnyInstaller) {
+            dafnyInstaller.uninstall();
+            resolve();
+        } else {
+            reject();
+        }
+    });
 });
 
 connection.onRequest<void, void>(LanguageServerRequest.Reset, () => {
