@@ -41,10 +41,6 @@ export class Statusbar {
             this.update();
         });
 
-        languageServer.onNotification(LanguageServerNotification.HideStatusbar, () => {
-            this.hide();
-        });
-
         languageServer.onNotification(LanguageServerNotification.ChangeServerStatus, (status: string) => {
             this.serverStatus = status;
             this.update();
@@ -60,8 +56,7 @@ export class Statusbar {
         const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         const editorsOpen: number = vscode.window.visibleTextEditors.length;
         if (!editor || editorsOpen === 0 || editor.document.languageId !== EnvironmentConfig.Dafny) {
-            this.serverStatusBar.hide();
-            this.currentDocumentStatucBar.hide();
+            this.hide();
             return;
         }
 

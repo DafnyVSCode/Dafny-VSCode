@@ -18,10 +18,6 @@ export class Statusbar {
 
     }
 
-    public hide(): void {
-        this.notificationService.sendHideStatusbar();
-    }
-
     public changeServerStatus(status: string): void {
         this.notificationService.sendChangeServerStatus(status);
     }
