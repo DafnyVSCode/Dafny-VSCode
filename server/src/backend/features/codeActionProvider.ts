@@ -2,8 +2,12 @@ import {CodeActionParams, Command, Diagnostic} from "vscode-languageserver";
 import { Position, TextEdit, TextEditChange } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyKeyWords, DafnyReports } from "./../../strings/stringRessources";
 import { DocumentDecorator } from "./../../vscodeFunctions/documentDecorator";
+import { containsRange } from "./../../vscodeFunctions/positionHelper";
 import { translate } from "./../../vscodeFunctions/positionHelper";
+import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 import { DafnyServer } from "./../dafnyServer";
+import { SymbolType } from "./symbols";
+import { Symbol } from "./symbols";
 export class CodeActionProvider {
 
     private methodBlockStartSymbol: string = "{";
@@ -16,36 +20,49 @@ export class CodeActionProvider {
     public provideCodeAction(params: CodeActionParams): Thenable<Command[]> {
         const range = params.range;
         const doc = params.textDocument;
-        const commands: Command[] = [];
-        for(const diagnostic of params.context.diagnostics) {
-            const actions = this.getCodeActions(diagnostic, params);
-            if(actions) {
-                for(const action of actions) {
-                    commands.push(action);
+        return new Promise<Command[]>((resolve, reject) => {
+            return resolve(params.context.diagnostics.map((e: Diagnostic) => {
+               return this.getCodeActions(e, params);
+            }).reduceRight((prev, next) => prev.then((a) => next.then((b) => a.concat(b))), Promise.resolve([])));
+        });
+
+    }
+
+    private getGuardCommands(diagnostic: Diagnostic, params: CodeActionParams): Promise<Command[]> {
+        const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
+        const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
+        return this.server.symbolService.getAllSymbols(doc).then((symbols: Symbol[]) => {
+            const commands: Command[] = [];
+            const message = diagnostic.message;
+            for(const guardKeyWord of DafnyKeyWords.GuardKeyWords) {
+                if(message.indexOf(guardKeyWord) < 0 || message.startsWith(DafnyReports.UnresolvedDecreaseWarning)) {
+                    continue;
+                }
+                const definingMethod = symbols.find((e: Symbol) => {
+                    return (e.symbolType === SymbolType.Method || e.symbolType === SymbolType.Function)
+                        && containsPosition(e.range, diagnostic.range.start);
+                });
+                let insertPosition: Position = this.dummyPosition;
+                if(definingMethod) {
+                    insertPosition = documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+                }
+                if(!insertPosition || insertPosition === this.dummyPosition) {
+                    insertPosition = documentDecorator.tryFindBeginOfBlock(diagnostic.range.start);
+                }
+                if(insertPosition && insertPosition !== this.dummyPosition) {
+                    const guardedExpression = this.parseGuardedExpression(message, guardKeyWord);
+                    const edit = TextEdit.insert(insertPosition, " " + guardKeyWord + " " + guardedExpression);
+                    const command = Command.create(`Add ${guardKeyWord} guard`,
+                        Commands.EditTextCommand, params.textDocument.uri,
+                        this.dummyDocId, [edit]);
+                    commands.push(command);
                 }
             }
-        }
-        return Promise.resolve(commands);
+            return commands;
+        });
     }
 
-    private getGuardCommands(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
-        const commands: Command[] = [];
-        const message = diagnostic.message;
-        for(const guardKeyWord of DafnyKeyWords.GuardKeyWords) {
-            if(message.indexOf(guardKeyWord) < 0 || message.startsWith(DafnyReports.UnresolvedDecreaseWarning)) {
-                continue;
-            }
-            const guardedExpression = this.parseGuardedExpression(message, guardKeyWord);
-            const edit = TextEdit.insert(this.dummyPosition, " " + guardKeyWord + " " + guardedExpression);
-            const command = Command.create(`Add ${guardKeyWord} guard`,
-                Commands.EditTextCommand, params.textDocument.uri,
-                this.dummyDocId, [edit], params.range, this.methodBlockStartSymbol);
-            commands.push(command);
-        }
-        return commands;
-    }
-
-    private getNullCheckCommand(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
+    private getNullCheckCommand(diagnostic: Diagnostic, params: CodeActionParams): Promise<Command[]> {
         const commands: Command[] = [];
         if(diagnostic.message.indexOf(DafnyReports.NullWarning) > -1) {
             const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
@@ -53,17 +70,35 @@ export class CodeActionProvider {
             const expression = this.parseExpressionWhichMayBeNull(documentDecorator, diagnostic.range.start);
             const designator = this.removeMemberAcces(expression);
             if(designator !== "") {
-                const rangeOfMethodStart = documentDecorator.findInsertPositionRange(diagnostic.range.start, "{");
-                const edit = TextEdit.insert(this.dummyPosition, " requires " + designator + " != null");
-                commands.push(Command.create("Add null check",
-                    Commands.EditTextCommand, params.textDocument.uri,
-                    this.dummyDocId, [edit], rangeOfMethodStart, this.methodBlockStartSymbol));
+                return this.server.symbolService.getAllSymbols(doc).then((symbols: Symbol[]) => {
+                    const definingMethod = symbols.find((e: Symbol) => {
+                        return (e.symbolType === SymbolType.Method || e.symbolType === SymbolType.Function)
+                            && containsPosition(e.range, diagnostic.range.start);
+                        });
+                    let insertPosition: Position = this.dummyPosition;
+                    if(definingMethod) {
+                        insertPosition = documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+                    }
+                    if(!insertPosition || insertPosition === this.dummyPosition) {
+                        insertPosition = documentDecorator.tryFindBeginOfBlock(diagnostic.range.start);
+                    }
+                    if(insertPosition && insertPosition !== this.dummyPosition) {
+                         const edit = TextEdit.insert(insertPosition, " requires " + designator + " != null");
+                         commands.push(Command.create("Add null check",
+                            Commands.EditTextCommand, params.textDocument.uri,
+                            this.dummyDocId, [edit]));
+                    }
+                    return commands;
+                });
+            } else {
+                return Promise.resolve(commands);
             }
+        } else {
+            return Promise.resolve(commands);
         }
-        return commands;
     }
 
-    private getIndexCheckCommand(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
+    private getIndexCheckCommand(diagnostic: Diagnostic, params: CodeActionParams): Promise<Command[]> {
         const commands: Command[] = [];
         if(diagnostic.message === DafnyReports.IndexBounding) {
             const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
@@ -74,16 +109,33 @@ export class CodeActionProvider {
                 arrayExprRange.start.character));
             const arrIdText = documentDecorator.getText(arrId);
             if(arrExpr !== "" && arrIdText !== "") {
-                const rangeOfMethodStart = documentDecorator.findInsertPositionRange(diagnostic.range.start, "{");
-                const editLower = TextEdit.insert(this.dummyPosition, " requires " + arrExpr + " >= 0\n");
-                const editHigher = TextEdit.insert(this.dummyPosition, " requires " + arrExpr + " < " + arrIdText + ".Length");
-                commands.push(Command.create("Add bound check",
-                    Commands.EditTextCommand, params.textDocument.uri,
-                    this.dummyDocId, [editLower, editHigher], rangeOfMethodStart, this.methodBlockStartSymbol));
+                return this.server.symbolService.getAllSymbols(doc).then((symbols: Symbol[]) => {
+                    const definingMethod = symbols.find((e: Symbol) => {
+                        return (e.symbolType === SymbolType.Method || e.symbolType === SymbolType.Function)
+                            && containsPosition(e.range, diagnostic.range.start);
+                        });
+                    let insertPosition: Position = this.dummyPosition;
+                    if(definingMethod) {
+                        insertPosition = documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+                    }
+                    if(!insertPosition || insertPosition === this.dummyPosition) {
+                        insertPosition = documentDecorator.tryFindBeginOfBlock(diagnostic.range.start);
+                    }
+                    if(insertPosition && insertPosition !== this.dummyPosition) {
+                         const editLower = TextEdit.insert(insertPosition, " requires " + arrExpr + " >= 0\n");
+                         const editHigher = TextEdit.insert(insertPosition, " requires " + arrExpr + " < " + arrIdText + ".Length");
+                         commands.push(Command.create("Add bound check",
+                            Commands.EditTextCommand, params.textDocument.uri,
+                            this.dummyDocId, [editLower, editHigher]));
+                        }
+                    return commands;
+                });
+            } else {
+                return Promise.resolve(commands);
             }
-            const w = 2;
+        } else {
+            return Promise.resolve(commands);
         }
-        return commands;
     }
 
     private removeMemberAcces(designator: string): string {
@@ -102,11 +154,16 @@ export class CodeActionProvider {
         return message.substr(lastIndexOfGuardKeyword + guardKeyword.length);
     }
 
-    private getCodeActions(diagnostic: Diagnostic, params: CodeActionParams): Command[] {
+    private getCodeActions(diagnostic: Diagnostic, params: CodeActionParams): Promise<Command[]> {
         let commands: Command[] = [];
-        commands = commands.concat(this.getGuardCommands(diagnostic, params));
-        commands = commands.concat(this.getNullCheckCommand(diagnostic, params));
-        commands = commands.concat(this.getIndexCheckCommand(diagnostic, params));
-        return commands;
+        return this.getGuardCommands(diagnostic, params).then((guardCommands: Command[]) => {
+            commands = commands.concat(guardCommands);
+            return this.getNullCheckCommand(diagnostic, params).then((nullComands: Command[]) => {
+                commands = commands.concat(nullComands);
+                return this.getIndexCheckCommand(diagnostic, params).then((indCommands: Command[]) => {
+                    return commands.concat(indCommands);
+                });
+            });
+        });
     }
 }

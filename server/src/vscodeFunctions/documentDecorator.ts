@@ -220,4 +220,81 @@ export class DocumentDecorator {
         const wordRange = this.matchWordRangeAtPosition(position, adjust);
         return wordRange ? this.getText(wordRange) : "";
     }
+
+    public findBeginOfContractsOfMethod(_position: vscode.Position): vscode.Position {
+        const position = this.validatePosition(_position);
+        let lineIndex = position.line;
+        let line = this._lines[lineIndex];
+        const paramsEndToken = ")";
+        const paramsStartToken = "(";
+        let openCount = 0;
+        let closedCount = 0;
+        let start: vscode.Position = null;
+        let foundStartOfParams: boolean = false;
+        let charIndex = line.indexOf(paramsStartToken);
+        let currentChar: string;
+        if( charIndex > -1 ) {
+            openCount = 1;
+            start = vscode.Position.create(lineIndex, charIndex + 1);
+        } else {
+            while(!foundStartOfParams) {
+                lineIndex++;
+                if(lineIndex >= this._lines.length) {
+                    return start;
+                }
+                line = this._lines[lineIndex];
+                charIndex = line.indexOf(paramsStartToken);
+                openCount = 1;
+                foundStartOfParams = true;
+            }
+        }
+        while(openCount !== closedCount) {
+            charIndex++;
+            if(charIndex >= line.length) {
+                lineIndex++;
+                if(lineIndex >= this._lines.length) {
+                    return start;
+                }
+                line = this._lines[lineIndex];
+                charIndex = 0;
+            }
+            currentChar =  line.charAt(charIndex);
+            if(currentChar === paramsStartToken) {
+                openCount++;
+            }
+            if(currentChar === paramsEndToken) {
+                closedCount++;
+            }
+            if(openCount === closedCount) {
+                return vscode.Position.create(lineIndex, ++charIndex);
+            }
+        }
+        return start;
+    }
+
+    public tryFindBeginOfBlock(_position: vscode.Position): vscode.Position {
+        const position = this.validatePosition(_position);
+        let lineIndex = position.line;
+        let line = this._lines[lineIndex];
+        const blockStartToken = ")";
+        const start: vscode.Position = null;
+        let charIndex = position.character;
+        let currentChar: string;
+        while(lineIndex >= 0) {
+            charIndex--;
+            if(charIndex < 0) {
+                lineIndex--;
+                if(lineIndex < 0) {
+                    return start;
+                }
+                line = this._lines[lineIndex];
+                charIndex = line.length - 1;
+            }
+            currentChar =  line.charAt(charIndex);
+            if(currentChar === blockStartToken) {
+                return vscode.Position.create(lineIndex, ++charIndex);
+            }
+        }
+        return start;
+    }
 }
