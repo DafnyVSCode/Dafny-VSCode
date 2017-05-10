@@ -57,8 +57,6 @@ export class Statusbar {
             this.progressBar.color = 'orange';
             this.progressBar.show();
         });
-
-
     }
 
     public hideProgress() {
@@ -74,7 +72,7 @@ export class Statusbar {
         if (progress < 0) progress = 0;
         if (progress > 100) progress = 100;
         let completed = Math.floor(progress / 10);
-        return "⚫".repeat(completed)+ " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
+        return "⚫".repeat(completed) + " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
     }
 
     public hide(): void {

@@ -148,7 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
         languageServer.sendRequest(LanguageServerRequest.Install).then((basePath) => {
             console.log("BasePath: " + basePath);
             const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-            config.update(Config.DafnyBasePath, basePath).then(() => {
+            config.update(Config.DafnyBasePath, basePath, true).then(() => {
                 vscode.window.showInformationMessage("Installation finished");
                 provider.dafnyStatusbar.hideProgress();
             });
