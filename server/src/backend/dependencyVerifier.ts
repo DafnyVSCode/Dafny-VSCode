@@ -20,14 +20,13 @@ export class DependencyVerifier {
     private serverVersion: string;
 
     public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,
-                             callbackSuccess: (serverVersion: string) => any,
-                             callbackError: (error: any) => any, upgradeCallback: () => any) {
+        callbackSuccess: (serverVersion: string) => any,
+        callbackError: (error: any) => any) {
         const environment: Environment = new Environment(rootPath, notificationService, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
         const dafnyCommand: Command = environment.getStartDafnyCommand();
         this.callbackError = callbackError;
         this.callbackSuccess = callbackSuccess;
-        this.upgradeCallback = upgradeCallback;
 
         this.verify(dafnyCommand, spawnOptions);
     }
@@ -51,16 +50,16 @@ export class DependencyVerifier {
             (err: Error) => { this.callbackError(err); },
             () => {
                 try {
-                    if (this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
+                    /*if (this.serverProc.outBuf.indexOf(this.upgradeNecessary) > -1 || this.serverProc.outBuf.indexOf("FAILURE") > -1) {
                         this.upgradeCallback();
                         this.serverProc.sendQuit();
-                    } else if (this.serverProc.outBuf.indexOf(this.version) > -1) {
+                    } else*/ if (this.serverProc.outBuf.indexOf(this.version) > -1) {
                         const start = this.serverProc.outBuf.indexOf(this.version);
                         const end = this.serverProc.outBuf.indexOf("\n", start);
                         this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
-                        this.serverProc.clearBuffer();
-                        this.serverProc.sendRequestToDafnyServer("", "versioncheck");
-                    } else if (this.serverProc.outBuf.indexOf(this.latestInstalled) > -1) {
+                        /*    this.serverProc.clearBuffer();
+                            this.serverProc.sendRequestToDafnyServer("", "versioncheck");
+                        } else if (this.serverProc.outBuf.indexOf(this.latestInstalled) > -1) {*/
                         this.serverProc.sendQuit();
                     }
                 } catch (e) {

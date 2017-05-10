@@ -4,10 +4,10 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient";
 import { handlerApplyTextEdits } from "./commands";
-import { DafnyInstaller } from "./dafnyInstaller";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
 import { CompilerResult } from "./serverHelper/compilerResult";
+import { Config, EnvironmentConfig } from "./stringRessources";
 import { Answer, Commands, ErrorMsg, InfoMsg, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
 
 let languageServer: LanguageClient = null;
@@ -47,8 +47,8 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage(message);
         });
 
-        languageServer.onRequest(LanguageServerNotification.DafnyMissing, (message: string) => {
-            return askToInstall(message);
+        languageServer.onNotification(LanguageServerNotification.DafnyMissing, (message: string) => {
+            askToInstall(message);
         });
 
         languageServer.onNotification(LanguageServerNotification.Ready, () => {
@@ -100,10 +100,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(installDafnyCommand);
 
     const uninstallDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.UninstallDafny, () => {
-        const installer: DafnyInstaller = new DafnyInstaller(context.extensionPath);
-
-        languageServer.sendRequest(LanguageServerRequest.Stop).then(() => {
-            installer.uninstall();
+        languageServer.sendRequest(LanguageServerRequest.Uninstall).then(() => {
+            vscode.window.showInformationMessage("Uninstall complete");
         }, () => {
             vscode.window.showErrorMessage("Can't uninstall dafny");
         });
@@ -137,28 +135,26 @@ export function activate(context: vscode.ExtensionContext) {
         });
     }
 
-    function askToInstall(text: string): Thenable<void> {
-        return new Promise<void>((resolve, reject) => {
-            vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
-                if (Answer.Yes === value) {
-                    install().then(resolve, reject);
-                } else {
-                    reject();
-                }
-            });
+    function askToInstall(text: string) {
+        vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
+            if (Answer.Yes === value) {
+                install();
+            }
         });
+
     }
 
-    function install(): Thenable<void> {
-        return new Promise<void>((resolve, reject) => {
-            const installer: DafnyInstaller =
-                new DafnyInstaller(context.extensionPath, () => { resolve(); }, () => { installer.install(); });
-            languageServer.sendRequest(LanguageServerRequest.Stop).then(() => {
-                installer.uninstall(false);
-            }, () => {
-                vscode.window.showErrorMessage("Can't stop dafny");
-                reject();
+    function install() {
+        languageServer.sendRequest(LanguageServerRequest.Install).then((basePath) => {
+            console.log("BasePath: " + basePath);
+            const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
+            config.update(Config.DafnyBasePath, basePath).then(() => {
+                vscode.window.showInformationMessage("Installation finished");
+                provider.dafnyStatusbar.hideProgress();
             });
+        }, (e) => {
+            vscode.window.showErrorMessage("Installing error: " + e);
+            provider.dafnyStatusbar.hideProgress();
         });
     }
 }

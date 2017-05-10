@@ -86,8 +86,9 @@ export class StatusString {
 
 export class LanguageServerRequest {
     public static Reset: string = "reset";
-    public static Stop: string = "stop";
     public static Compile: string = "compile";
+    public static Install: string = "install";
+    public static Uninstall: string = "uninstall";
 }
 
 export class LanguageServerNotification {
@@ -102,4 +103,5 @@ export class LanguageServerNotification {
     public static VerificationResult: string = "verificationResult";
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
+    public static Progress: string = "progress";
 }

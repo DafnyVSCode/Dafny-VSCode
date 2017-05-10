@@ -50,4 +50,18 @@ export class NotificationService {
     public sendDiagnostics(params: PublishDiagnosticsParams) {
         this.connection.sendDiagnostics(params);
     }
+
+    public startProgress() {
+        this.lastProgress = 0;
+    }
+
+    private lastProgress: number;
+
+    public progress(domain, current, total) {
+        const progress = 100.0 * current / total;
+        if (Math.floor(progress) > this.lastProgress) {
+            this.lastProgress = progress;
+            this.connection.sendNotification(LanguageServerNotification.Progress, { domain, current, total });
+        }
+    }
 }
