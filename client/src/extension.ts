@@ -102,8 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
     const uninstallDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.UninstallDafny, () => {
         languageServer.sendRequest(LanguageServerRequest.Uninstall).then(() => {
             vscode.window.showInformationMessage("Uninstall complete");
-        }, () => {
-            vscode.window.showErrorMessage("Can't uninstall dafny");
+        }, (e) => {
+            vscode.window.showErrorMessage("Can't uninstall dafny:" + e);
         });
 
     });

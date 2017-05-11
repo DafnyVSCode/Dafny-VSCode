@@ -20,10 +20,10 @@ export class DafnyServerProvider {
     public codeActionProvider: CodeActionProvider;
     public completionProvider: DafnyCompletionProvider;
     public compiler: DafnyCompiler;
+    public dafnyServer: DafnyServer;
 
     private subscriptions: Disposable[];
     private dafnyStatusbar: Statusbar;
-    private dafnyServer: DafnyServer;
     private context: Context;
 
     constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: DafnySettings) {

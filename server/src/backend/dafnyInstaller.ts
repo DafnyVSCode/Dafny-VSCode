@@ -94,9 +94,7 @@ export class DafnyInstaller {
     }
 
     public prepareDafny(): Promise<string> {
-        //console.log("Extracting ViperTools finished " + (success ? "" : "un") + "successfully"/*, LogLevel.Info*/);
-
-        //chmod to allow the execution of ng and zg files
+       
         if (os.platform() !== EnvironmentConfig.Win32) {
             fs.chmodSync(pathHelper.join(this.basePath, "z3", "bin", "z3"), "755");
             fs.chmodSync(pathHelper.join(this.basePath, "DafnyServer.exe"), "755");
@@ -106,18 +104,18 @@ export class DafnyInstaller {
         //delete archive
         fs.unlink(this.downloadFile, (err) => {
             if (err) {
-                console.error("Error deleting archive after ViperToolsUpdate: " + err);
+                console.error("Error deleting archive: " + err);
             }
-            //Server.connection.sendNotification(Commands.ViperUpdateComplete, true);//success
         });
         //trigger a restart of the backend
         //Settings.initiateBackendRestartIfNeeded(null, null, true);
-        console.log("prepared dafny")
+        console.log("prepared dafny");
 
         return Promise.resolve(pathHelper.join(this.basePath, "dafny"));
     }
 
     public install(): Promise<string> {
+        this.notificationService.progressText("Fetching GitHub release data");
         return this.getReleaseInformation().then((json) => {
             return this.downloadRelease(json).then(() => {
                 return this.extract(this.downloadFile).then(() => {
@@ -127,13 +125,14 @@ export class DafnyInstaller {
         }).catch(e => {
             console.error(e);
             return Promise.reject(e);
-            //Server.connection.sendNotification(Commands.ViperUpdateComplete, false);//update failed
         });
     }
 
-    public uninstall(showUninstallMessage: boolean = true): void {
-        console.log("remove " + this.basePath);
-        this.deleteFolderRecursive(this.basePath);
+    public uninstall(): void {
+        if (this.dafnySettings.basePath && this.dafnySettings.basePath.length > 10) {
+            console.log("remove " + this.dafnySettings.basePath);
+            this.deleteFolderRecursive(this.dafnySettings.basePath);
+        }
     }
 
     private resolvePath(str: string) {
@@ -154,12 +153,13 @@ export class DafnyInstaller {
 
 
     private deleteFolderRecursive(path) {
+        this.notificationService.progressText("Removing existing files");
         if (fs.existsSync(path)) {
             fs.readdirSync(path).forEach((file, index) => {
                 const curPath = path + "/" + file;
-                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                if (fs.lstatSync(curPath).isDirectory()) {
                     this.deleteFolderRecursive(curPath);
-                } else { // delete file
+                } else {
                     fs.unlinkSync(curPath);
                 }
             });
@@ -212,7 +212,6 @@ export class DafnyInstaller {
     private extract(filePath: string): Promise<boolean> {
         return new Promise<any>((resolve, reject) => {
             try {
-                //extract files
                 console.log("Extracting files..."/*, LogLevel.Info*/)
                 this.notificationService.startProgress();
 
@@ -223,9 +222,9 @@ export class DafnyInstaller {
                 });
 
                 unzipper.on("error", (e) => {
-                    if (e.code && e.code == "ENOENT") {
-                        console.error("Error updating the Viper Tools, missing create file permission in the viper tools directory: " + e);
-                    } else if (e.code && e.code == "EACCES") {
+                    if (e.code && e.code === "ENOENT") {
+                        console.error("Error updating Dafny, missing create file permission in the dafny directory: " + e);
+                    } else if (e.code && e.code === "EACCES") {
                         console.error("Error extracting " + filePath + ": " + e + " | " + e.message);
                     } else {
                         console.error("Error extracting " + filePath + ": " + e);
