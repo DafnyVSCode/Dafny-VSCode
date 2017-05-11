@@ -32,8 +32,7 @@ export class DafnyServer {
     private serverProc: ProcessWrapper;
     private restart: boolean = true;
     private retries: number = 0;
-    constructor(private notificationService: NotificationService, private statusbar: Statusbar,
-                private context: Context, private settings: DafnySettings) {
+    constructor(private notificationService: NotificationService, private statusbar: Statusbar, private context: Context, private settings: DafnySettings) {
         this.symbolService = new SymbolService(this);
     }
 
@@ -43,10 +42,11 @@ export class DafnyServer {
             this.serverProc = null;
         }
         this.context.clear();
-        this.statusbar.changeServerStatus(ServerStatus.Starting);
         if (this.restart) {
+            this.statusbar.changeServerStatus(ServerStatus.Starting);
             return this.resetProcess();
         } else {
+            this.statusbar.changeServerStatus(ServerStatus.Stopped);
             return true;
         }
     }
@@ -120,7 +120,7 @@ export class DafnyServer {
             if (this.context.activeRequest && this.context.activeRequest.verb === DafnyVerbs.CounterExample) {
                 const result = this.context.collectRequest(log);
                 this.notificationService.sendVerificationResult([this.context.activeRequest.document.uri.toString(),
-                    JSON.stringify(result)]);
+                JSON.stringify(result)]);
                 this.context.activeRequest = null;
             } else if (this.context.activeRequest) {
                 this.context.activeRequest.callback(log);

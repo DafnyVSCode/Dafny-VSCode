@@ -51,6 +51,7 @@ export class InfoMsg {
 }
 export class ServerStatus {
     public static Starting: string = "Starting";
+    public static Stopped: string = "Stopped";
 }
 
 export class Answer {

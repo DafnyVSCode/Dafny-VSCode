@@ -55,6 +55,17 @@ export class VerificationResults {
 
         this.addCounterModel(log, result);
 
+        if (log.indexOf("Unknown verb") !== -1) {
+            errorCount++;
+            diags.push({
+                message: "Please upgrade Dafny. The verification can't be executed.",
+                range: {
+                    start: { character: 0, line: 0 }, end: { character: Number.MAX_VALUE, line: Number.MAX_VALUE }
+                },
+                severity: vscode.DiagnosticSeverity.Error, source: "Dafny VSCode"
+            });
+        }
+
         // tslint:disable-next-line:forin
         for (const index in lines) {
             const sourceLine: string = lines[index];
@@ -90,7 +101,7 @@ export class VerificationResults {
                 lastDiagnostic = vscode.Diagnostic.create(range, msgStr, severity);
                 lastDiagnostic.source = "Dafny VSCode";
 
-                if(!msgStr.startsWith("Selected triggers:")) {
+                if (!msgStr.startsWith("Selected triggers:")) {
                     diags.push(lastDiagnostic);
                 }
 
@@ -108,14 +119,14 @@ export class VerificationResults {
     }
 
     private addCounterModel(log: string, result: VerificationResult) {
-         if(log && log.indexOf(EnvironmentConfig.CounterExampleStart) > -1 && log.indexOf(EnvironmentConfig.CounterExampleEnd) > -1) {
+        if (log && log.indexOf(EnvironmentConfig.CounterExampleStart) > -1 && log.indexOf(EnvironmentConfig.CounterExampleEnd) > -1) {
             const startOfSymbols: number = log.indexOf(EnvironmentConfig.CounterExampleStart) +
                 EnvironmentConfig.CounterExampleStart.length;
             const endOfSymbols: number = log.indexOf(EnvironmentConfig.CounterExampleEnd);
             const info: string = log.substring(startOfSymbols, endOfSymbols);
             try {
                 result.counterModel = JSON.parse(info);
-            } catch(exception) {
+            } catch (exception) {
                 console.error("Failure  to parse response: " + exception + ", json: " + info);
                 result.counterModel = null;
             }
@@ -123,7 +134,7 @@ export class VerificationResults {
     }
 
     private checkForRelatedLocation(lines: string[], index: string,
-                                    diags: vscode.Diagnostic[], relatedLocationCounter: number): vscode.Range {
+        diags: vscode.Diagnostic[], relatedLocationCounter: number): vscode.Range {
         const nextLine: string = lines[(parseInt(index, 10) + 1).toString()];
         const relatedLocations: RegExpExecArray = Verification.RelatedLocationRegex.exec(nextLine);
 

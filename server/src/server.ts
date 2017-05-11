@@ -182,41 +182,54 @@ connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: 
 });
 
 connection.onRequest<string, void>(LanguageServerRequest.Install, () => {
-    return new Promise<string>((resolve, reject) => {
-        if (provider) {
-            provider.stop();
-        }
-        if (dafnyInstaller) {
-            dafnyInstaller.uninstall();
-            dafnyInstaller.install().then((basePath) => {
-                console.log("verify again");
-                console.log(basePath);
-                settings.dafny.basePath = basePath;
-                console.log(settings.dafny.basePath);
-                verifyDependencies();
-                resolve(basePath);
-            }).catch(() => {
-                console.log("errrroooorrr");
-            });
-        } else {
-            reject();
-        }
+    return new Promise<string>(async (resolve, reject) => {
+        uninstallDafny().then(() => {
+            if (dafnyInstaller) {
+                dafnyInstaller.install().then((basePath) => {
+                    settings.dafny.basePath = basePath;
+                    verifyDependencies();
+                    resolve(basePath);
+                }).catch((e) => {
+                    console.log("errrroooorrr: " + e);
+                });
+            } else {
+                reject();
+            }
+        }).catch((e) => {
+            reject(e);
+        });
     });
 });
 
 connection.onRequest<void, void>(LanguageServerRequest.Uninstall, () => {
-    return new Promise<void>((resolve, reject) => {
+    return uninstallDafny();
+});
+
+function uninstallDafny(): Promise<void> {
+    return new Promise<void>(async (resolve, reject) => {
         if (provider) {
+            notificationService.progressText("Stopping dafny");
             provider.stop();
+            await sleep(1000);
+            let tries = 0;
+            while (provider && provider.dafnyServer.isRunning() && tries < MAX_RETRIES) {
+                await sleep(1000);
+                tries++;
+            }
         }
         if (dafnyInstaller) {
-            dafnyInstaller.uninstall();
-            resolve();
+            try {
+                dafnyInstaller.uninstall();
+                resolve();
+            } catch (e) {
+                notificationService.sendError("Error uninstalling: " + e);
+                reject(e);
+            }
         } else {
             reject();
         }
     });
-});
+}
 
 connection.onRequest<void, void>(LanguageServerRequest.Reset, () => {
     if (provider) {

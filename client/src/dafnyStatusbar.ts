@@ -49,16 +49,15 @@ export class Statusbar {
         });
 
         languageServer.onNotification(LanguageServerNotification.Progress, (data: any) => {
-            if (!data) return;
-
-            const progress = (data.progress !== undefined) ? data.progress : 100.0 * data.current / data.total;
-            const label = data.domain + ": " + this.progressBarText(progress) + (data.postfix ? ' ' + data.postfix : '');
+            let label = data.domain;
+            if (data.current) {
+                const progress = (data.progress !== undefined) ? data.progress : 100.0 * data.current / data.total;
+                label = data.domain + ": " + this.progressBarText(progress);
+            }
             this.progressBar.text = label;
-            this.progressBar.color = 'orange';
+            this.progressBar.color = "orange";
             this.progressBar.show();
         });
-
-
     }
 
     public hideProgress() {
@@ -74,7 +73,7 @@ export class Statusbar {
         if (progress < 0) progress = 0;
         if (progress > 100) progress = 100;
         let completed = Math.floor(progress / 10);
-        return "⚫".repeat(completed)+ " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
+        return "⚫".repeat(completed) + " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
     }
 
     public hide(): void {
@@ -132,7 +131,6 @@ export class Statusbar {
             response = StatusString.NotVerified;
         }
         response += " | Proof Obligations: " + result.proofObligations + " | Errors: " + result.errorCount;
-        if (result.counterModel && result.counterModel.States) { response += " | CM: " + result.counterModel.States.length; }
 
         return response;
     }

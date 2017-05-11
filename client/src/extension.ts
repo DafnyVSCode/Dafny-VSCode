@@ -102,8 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
     const uninstallDafnyCommand: vscode.Disposable = vscode.commands.registerCommand(Commands.UninstallDafny, () => {
         languageServer.sendRequest(LanguageServerRequest.Uninstall).then(() => {
             vscode.window.showInformationMessage("Uninstall complete");
-        }, () => {
-            vscode.window.showErrorMessage("Can't uninstall dafny");
+        }, (e) => {
+            vscode.window.showErrorMessage("Can't uninstall dafny:" + e);
         });
 
     });
@@ -148,7 +148,7 @@ export function activate(context: vscode.ExtensionContext) {
         languageServer.sendRequest(LanguageServerRequest.Install).then((basePath) => {
             console.log("BasePath: " + basePath);
             const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-            config.update(Config.DafnyBasePath, basePath).then(() => {
+            config.update(Config.DafnyBasePath, basePath, true).then(() => {
                 vscode.window.showInformationMessage("Installation finished");
                 provider.dafnyStatusbar.hideProgress();
             });

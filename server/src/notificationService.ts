@@ -64,4 +64,8 @@ export class NotificationService {
             this.connection.sendNotification(LanguageServerNotification.Progress, { domain, current, total });
         }
     }
+
+    public progressText(domain) {
+        this.connection.sendNotification(LanguageServerNotification.Progress, { domain });
+    }
 }
