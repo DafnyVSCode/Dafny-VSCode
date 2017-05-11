@@ -189,11 +189,11 @@ export class DafnyServer {
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {
-        if (request.verb === "verify") {
+        if (request.verb === DafnyVerbs.CounterExample) {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {
-            args: ["/mv:-"],
+            args: ["/mv:./model.bvd"],
             filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
             sourceIsFile: false
