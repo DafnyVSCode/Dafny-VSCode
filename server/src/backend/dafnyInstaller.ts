@@ -96,9 +96,9 @@ export class DafnyInstaller {
     public prepareDafny(): Promise<string> {
        
         if (os.platform() !== EnvironmentConfig.Win32) {
-            fs.chmodSync(pathHelper.join(this.basePath, "z3", "bin", "z3"), "755");
-            fs.chmodSync(pathHelper.join(this.basePath, "DafnyServer.exe"), "755");
-            fs.chmodSync(pathHelper.join(this.basePath, "Dafny.exe"), "755");
+            fs.chmodSync(pathHelper.join(this.basePath, "dafny", "z3", "bin", "z3"), "755");
+            fs.chmodSync(pathHelper.join(this.basePath, "dafny", "DafnyServer.exe"), "755");
+            fs.chmodSync(pathHelper.join(this.basePath, "dafny", "Dafny.exe"), "755");
         }
 
         //delete archive
