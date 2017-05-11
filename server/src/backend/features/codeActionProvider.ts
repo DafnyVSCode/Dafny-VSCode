@@ -3,6 +3,7 @@ import { Position, TextEdit, TextEditChange } from "vscode-languageserver-types/
 import { Commands, DafnyKeyWords, DafnyReports } from "./../../strings/stringRessources";
 import { DocumentDecorator } from "./../../vscodeFunctions/documentDecorator";
 import { containsRange } from "./../../vscodeFunctions/positionHelper";
+import { rangesIntersect } from "./../../vscodeFunctions/positionHelper";
 import { translate } from "./../../vscodeFunctions/positionHelper";
 import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 import { DafnyServer } from "./../dafnyServer";
@@ -30,6 +31,9 @@ export class CodeActionProvider {
 
     private getGuardCommands(diagnostic: Diagnostic, params: CodeActionParams): Promise<Command[]> {
         const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
+        if(!doc) {
+            return Promise.resolve([]);
+        }
         const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
         return this.server.symbolService.getAllSymbols(doc).then((symbols: Symbol[]) => {
             const commands: Command[] = [];
@@ -40,17 +44,18 @@ export class CodeActionProvider {
                 }
                 const definingMethod = symbols.find((e: Symbol) => {
                     return (e.symbolType === SymbolType.Method || e.symbolType === SymbolType.Function)
-                        && containsPosition(e.range, diagnostic.range.start);
+                        && rangesIntersect(e.range, diagnostic.range);
                 });
+                const guardedExpression = this.parseGuardedExpression(message, guardKeyWord);
                 let insertPosition: Position = this.dummyPosition;
                 if(definingMethod) {
-                    insertPosition = documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+                    const lastDeclaration = this.findLastDeclaration(guardedExpression, symbols, definingMethod);
+                    insertPosition = documentDecorator.findInsertionPointOfContract(definingMethod.start, diagnostic.range.start);
                 }
                 if(!insertPosition || insertPosition === this.dummyPosition) {
                     insertPosition = documentDecorator.tryFindBeginOfBlock(diagnostic.range.start);
                 }
                 if(insertPosition && insertPosition !== this.dummyPosition) {
-                    const guardedExpression = this.parseGuardedExpression(message, guardKeyWord);
                     const edit = TextEdit.insert(insertPosition, " " + guardKeyWord + " " + guardedExpression);
                     const command = Command.create(`Add ${guardKeyWord} guard`,
                         Commands.EditTextCommand, params.textDocument.uri,
@@ -66,6 +71,9 @@ export class CodeActionProvider {
         const commands: Command[] = [];
         if(diagnostic.message.indexOf(DafnyReports.NullWarning) > -1) {
             const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
+            if(!doc) {
+                return Promise.resolve([]);
+            }
             const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
             const expression = this.parseExpressionWhichMayBeNull(documentDecorator, diagnostic.range.start);
             const designator = this.removeMemberAcces(expression);
@@ -102,12 +110,14 @@ export class CodeActionProvider {
         const commands: Command[] = [];
         if(diagnostic.message === DafnyReports.IndexBounding) {
             const doc = this.server.symbolService.getTextDocument(params.textDocument.uri);
+            if(!doc) {
+                return Promise.resolve([]);
+            }
             const documentDecorator: DocumentDecorator = new DocumentDecorator(doc);
             const arrayExprRange = documentDecorator.readArrayExpression(diagnostic.range.start);
             const arrExpr = documentDecorator.getText(arrayExprRange);
-            const arrId = documentDecorator.matchWordRangeAtPosition(Position.create(arrayExprRange.start.line,
+            const arrIdText = documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line,
                 arrayExprRange.start.character));
-            const arrIdText = documentDecorator.getText(arrId);
             if(arrExpr !== "" && arrIdText !== "") {
                 return this.server.symbolService.getAllSymbols(doc).then((symbols: Symbol[]) => {
                     const definingMethod = symbols.find((e: Symbol) => {
@@ -116,17 +126,25 @@ export class CodeActionProvider {
                         });
                     let insertPosition: Position = this.dummyPosition;
                     if(definingMethod) {
-                        insertPosition = documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+                        const lastDeclaration = this.findLastDeclaration(arrExpr, symbols, definingMethod);
+                        insertPosition = documentDecorator.findInsertionPointOfContract(definingMethod.start, diagnostic.range.start);
                     }
                     if(!insertPosition || insertPosition === this.dummyPosition) {
                         insertPosition = documentDecorator.tryFindBeginOfBlock(diagnostic.range.start);
                     }
                     if(insertPosition && insertPosition !== this.dummyPosition) {
-                         const editLower = TextEdit.insert(insertPosition, " requires " + arrExpr + " >= 0\n");
-                         const editHigher = TextEdit.insert(insertPosition, " requires " + arrExpr + " < " + arrIdText + ".Length");
-                         commands.push(Command.create("Add bound check",
-                            Commands.EditTextCommand, params.textDocument.uri,
-                            this.dummyDocId, [editLower, editHigher]));
+                         if(definingMethod && insertPosition !== documentDecorator.findBeginOfContractsOfMethod(definingMethod.start)) {
+                            const edit = TextEdit.insert(insertPosition, " invariant 0 <= " + arrExpr + " < " + arrIdText + ".Length");
+                            commands.push(Command.create("Add invariant",
+                                Commands.EditTextCommand, params.textDocument.uri,
+                                this.dummyDocId, [edit]));
+                         } else {
+                            const editLower = TextEdit.insert(insertPosition, " requires " + arrExpr + " >= 0\n");
+                            const editHigher = TextEdit.insert(insertPosition, " requires " + arrExpr + " < " + arrIdText + ".Length");
+                            commands.push(Command.create("Add bound check",
+                                Commands.EditTextCommand, params.textDocument.uri,
+                                this.dummyDocId, [editLower, editHigher]));
+                         }
                         }
                     return commands;
                 });
@@ -165,5 +183,36 @@ export class CodeActionProvider {
                 });
             });
         });
+    }
+
+    private extractIdentifiers(expression: string): string[] {
+        const identifiers: string[] = [];
+        const identifiersRegex = /(\w+)/g;
+        let match: RegExpExecArray;
+        while ((match = identifiersRegex.exec(expression)) !== null) {
+            identifiers.push(match[0]);
+        }
+        return identifiers;
+    }
+
+    private findLastDeclaration(expression: string, symbols: Symbol[], definingMethod: Symbol): Position {
+        const identifiers = this.extractIdentifiers(expression);
+        if(!identifiers) {
+            return null;
+        }
+        const declarationsOfIdentifiers = symbols.filter((e: Symbol) => {
+            return (e.symbolType === SymbolType.Definition && rangesIntersect(e.range, definingMethod.range)
+                && identifiers.indexOf(e.name) >= 0);
+        });
+        if(!declarationsOfIdentifiers || declarationsOfIdentifiers.length === 0) {
+            return null;
+        }
+        const lastDeclaration = declarationsOfIdentifiers.reduce((max, x) => {
+            return x.line >= max.line && x.column > max.column ? x : max;
+        });
+        if(lastDeclaration) {
+            return lastDeclaration.start;
+        }
+        return null;
     }
 }

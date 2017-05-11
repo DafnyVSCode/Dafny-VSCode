@@ -1,4 +1,5 @@
 "use strict";
+import { DocumentIterator } from "./documentIterator";
 import {EOL} from "os";
 import * as vscode from "vscode-languageserver";
 import { dafnyKeywords } from "./../languageDefinition/keywords";
@@ -7,7 +8,7 @@ import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 export class DocumentDecorator {
 
-    protected _lines: string[];
+    public _lines: string[];
 
     constructor(public document: vscode.TextDocument) {
 
@@ -223,78 +224,94 @@ export class DocumentDecorator {
 
     public findBeginOfContractsOfMethod(_position: vscode.Position): vscode.Position {
         const position = this.validatePosition(_position);
-        let lineIndex = position.line;
-        let line = this._lines[lineIndex];
+        const iterator = new DocumentIterator(this, position);
         const paramsEndToken = ")";
         const paramsStartToken = "(";
         let openCount = 0;
         let closedCount = 0;
         let start: vscode.Position = null;
-        let foundStartOfParams: boolean = false;
-        let charIndex = line.indexOf(paramsStartToken);
-        let currentChar: string;
-        if( charIndex > -1 ) {
-            openCount = 1;
-            start = vscode.Position.create(lineIndex, charIndex + 1);
-        } else {
-            while(!foundStartOfParams) {
-                lineIndex++;
-                if(lineIndex >= this._lines.length) {
-                    return start;
-                }
-                line = this._lines[lineIndex];
-                charIndex = line.indexOf(paramsStartToken);
-                openCount = 1;
-                foundStartOfParams = true;
-            }
+        iterator.skipToChar(paramsStartToken);
+        if(!iterator.isValidPosition) {
+            return start;
         }
+        start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+        openCount = 1;
         while(openCount !== closedCount) {
-            charIndex++;
-            if(charIndex >= line.length) {
-                lineIndex++;
-                if(lineIndex >= this._lines.length) {
-                    return start;
-                }
-                line = this._lines[lineIndex];
-                charIndex = 0;
+            iterator.skipChar();
+            if(!iterator.isValidPosition) {
+                return start;
             }
-            currentChar =  line.charAt(charIndex);
-            if(currentChar === paramsStartToken) {
+            if(iterator.currentChar === paramsStartToken) {
                 openCount++;
             }
-            if(currentChar === paramsEndToken) {
+            if(iterator.currentChar === paramsEndToken) {
                 closedCount++;
             }
             if(openCount === closedCount) {
-                return vscode.Position.create(lineIndex, ++charIndex);
+                // Skip return type
+                const oldPos = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+                iterator.skipChar();
+                iterator.skipWhiteSpace();
+                if(!iterator.isValidPosition) {
+                    return oldPos;
+                }
+                if(":".indexOf(iterator.currentChar) > -1) {
+                    iterator.skipChar();
+                    iterator.skipWhiteSpace();
+                    iterator.skipWord();
+                    if(iterator.isValidPosition) {
+                        return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+                    }
+                }
+                return oldPos;
             }
         }
         return start;
     }
 
+    public findInsertionPointOfContract(memberStart: vscode.Position, lastDependentDeclaration: vscode.Position = null) {
+        const startOfTopLevelContracts = this.findBeginOfContractsOfMethod(memberStart);
+        if(!lastDependentDeclaration) {
+            return startOfTopLevelContracts;
+        }
+        const iterator = new DocumentIterator(this, startOfTopLevelContracts);
+        while(iterator.isInfrontOf(lastDependentDeclaration)) {
+            iterator.skipChar();
+            iterator.skipToChar("{");
+        }
+        if(iterator.isValidPosition) {
+            return vscode.Position.create(iterator.lineIndex, iterator.charIndex - 1);
+        }
+        return startOfTopLevelContracts;
+
+    }
+
     public tryFindBeginOfBlock(_position: vscode.Position): vscode.Position {
         const position = this.validatePosition(_position);
-        let lineIndex = position.line;
-        let line = this._lines[lineIndex];
         const blockStartToken = ")";
         const start: vscode.Position = null;
-        let charIndex = position.character;
-        let currentChar: string;
-        while(lineIndex >= 0) {
-            charIndex--;
-            if(charIndex < 0) {
-                lineIndex--;
-                if(lineIndex < 0) {
-                    return start;
-                }
-                line = this._lines[lineIndex];
-                charIndex = line.length - 1;
-            }
-            currentChar =  line.charAt(charIndex);
-            if(currentChar === blockStartToken) {
-                return vscode.Position.create(lineIndex, ++charIndex);
-            }
+        const iterator = new DocumentIterator(this, position);
+        iterator.moveBackToChar(blockStartToken);
+        if(iterator.isValidPosition) {
+            return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         }
         return start;
+    }
+
+    public parseArrayIdentifier(_position: vscode.Position): string {
+        const position = this.validatePosition(_position);
+        const iterator = new DocumentIterator(this, position);
+        iterator.skipToChar("[");
+        if(!iterator.isValidPosition) {
+            return "";
+        }
+        const end = vscode.Position.create(iterator.lineIndex, iterator.charIndex);
+        iterator.moveBack();
+        iterator.skipWordBack();
+        if(!iterator.isValidPosition) {
+            return "";
+        }
+        const start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+        return this.getText(vscode.Range.create(start, end));
     }
 }

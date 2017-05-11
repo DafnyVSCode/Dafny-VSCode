@@ -53,3 +53,10 @@ export function containsPosition(range: Range, position: Position): boolean {
     }
     return true;
 }
+
+export function rangesIntersect(range: Range, other: Range): boolean {
+    return containsPosition(range, other.start)
+        || containsPosition(range, other.end)
+        || containsPosition(other, range.start)
+        || containsPosition(other, range.end);
+}
