@@ -17,6 +17,9 @@ export class DafnyBaseCodeLensProvider {
             return symbolTables.find((table: SymbolTable) => table.fileName === document.uri).symbols
                 .filter((info: Symbol) => info.needsCodeLens())
                 .map((info: Symbol) => new ReferencesCodeLens(info));
-        }, bubbleRejectedPromise);
+        }).catch((err: Error) => {
+            console.error(err);
+            return [];
+        });
     }
 }
