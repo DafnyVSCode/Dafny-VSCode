@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { TextDocumentItem } from "vscode-languageserver-types";
 import { Context } from "./context";
-import { CounterModelProvider } from "./CounterModelProvider";
+import { CounterModelProvider } from "./counterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
 import { Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
