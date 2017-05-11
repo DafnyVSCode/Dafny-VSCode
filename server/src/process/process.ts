@@ -23,7 +23,6 @@ export class ProcessWrapper {
         this.serverProc = process;
         this.serverProc.stdout.on("error", errorCallback);
         this.serverProc.stdout.on("data", (data: Buffer) => {
-            console.log(data.toString());
             this.outBuf += data.toString();
             dataCallback();
         });
