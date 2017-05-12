@@ -1,4 +1,4 @@
-# dafny-vscode
+# Dafny-VSCode
 Dafny support for Visual Studio Code.
 
 ## Features
