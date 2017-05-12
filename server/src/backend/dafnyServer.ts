@@ -193,7 +193,7 @@ export class DafnyServer {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {
-            args: ["/mv:./model.bvd"],
+            args: [],
             filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
             sourceIsFile: false
