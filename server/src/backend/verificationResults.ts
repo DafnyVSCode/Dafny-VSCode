@@ -60,7 +60,8 @@ export class VerificationResults {
             diags.push({
                 message: "Please upgrade Dafny. The verification can't be executed.",
                 range: {
-                    start: { character: 0, line: 0 }, end: { character: Number.MAX_VALUE, line: Number.MAX_VALUE }
+                    end: { character: Number.MAX_VALUE, line: Number.MAX_VALUE },
+                    start: { character: 0, line: 0 }
                 },
                 severity: vscode.DiagnosticSeverity.Error, source: "Dafny VSCode"
             });
@@ -133,8 +134,8 @@ export class VerificationResults {
         }
     }
 
-    private checkForRelatedLocation(lines: string[], index: string,
-        diags: vscode.Diagnostic[], relatedLocationCounter: number): vscode.Range {
+    private checkForRelatedLocation(lines: string[], index: string, diags: vscode.Diagnostic[],
+                                    relatedLocationCounter: number): vscode.Range {
         const nextLine: string = lines[(parseInt(index, 10) + 1).toString()];
         const relatedLocations: RegExpExecArray = Verification.RelatedLocationRegex.exec(nextLine);
 

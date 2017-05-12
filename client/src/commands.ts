@@ -25,5 +25,3 @@ export function handlerApplyTextEdits(client: LanguageClient): (uri: string, doc
         }
     };
 }
-
-

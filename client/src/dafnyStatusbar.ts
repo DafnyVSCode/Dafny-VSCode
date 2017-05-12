@@ -2,9 +2,9 @@
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 
+import { Context } from "./context";
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
-import { Context } from "./context";
 
 class Priority {
     public static low: number = 1;
@@ -65,14 +65,14 @@ export class Statusbar {
     }
 
     public formatProgress(progress: number): string {
-        if (!progress) return "0%";
+        if (!progress) { return "0%"; };
         return progress.toFixed(0) + "%";
     }
 
     public progressBarText(progress: number): string {
-        if (progress < 0) progress = 0;
-        if (progress > 100) progress = 100;
-        let completed = Math.floor(progress / 10);
+        if (progress < 0) { progress = 0; };
+        if (progress > 100) { progress = 100; };
+        const completed = Math.floor(progress / 10);
         return "⚫".repeat(completed) + " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
     }
 

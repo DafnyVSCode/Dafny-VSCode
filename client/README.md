@@ -2,13 +2,14 @@
 Dafny support for Visual Studio Code.
 
 ## Features
-* **NEW** IntelliSense for classes
-* **NEW** Compile and Run dfy file
+* **NEW** Display counter example for failing proof (requires Dafny +1.9.15)
+* IntelliSense for classes
+* Compile and Run dfy file
 * Update notification if there is a newer release of Dafny. 
 * CodeLens showing method references
 * DafnyDefinition provider to support refactorings in the future 
-* Automatic verification as one types, 
-* Automatic installation of DafnyServer (windows, osx and ubuntu)
+* Automatic verification as one types 
+* Automatic installation of Dafny
 * Provides .dfy language support to vscode.
 * Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
 * Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
@@ -29,7 +30,6 @@ Dafny support for Visual Studio Code.
 * `Restart DafnyServer` Restart the DafnyServer
 
 ## Requirements - Installation guide
-* Automatic Installation Requirements: `curl` or `wget` on osx and ubuntu. `PowerShell V5` on Windows
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
 * [Binary dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), which contains `DafnyServer.exe` and its dependencies. **This and next releases will use a own release of Dafny to support more features, like Refactorings**
 * The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
@@ -53,6 +53,7 @@ The following are optional:
 
 
 ## Release Notes
+* 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes
 * 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
 * 0.8.0 CodeLens showing method references, Go to Definition, version checking for newer Dafny release. 
 * 0.6.0 DafnyDef allows to get SymbolInformation from DafnyServer, which will allow in the future to implement Refactorings. Go to Definition is already implemented. 

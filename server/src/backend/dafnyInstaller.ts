@@ -25,7 +25,7 @@ export class DafnyInstaller {
         return this.getReleaseInformation().then((json) => {
 
             if (json && json.length > 0 && json[0].name) {
-                const latestVersion = json[0].name; //semver ignores leading v
+                const latestVersion = json[0].name; // semver ignores leading v
                 console.log("Local: " + localVersion);
                 console.log("Remote:" + latestVersion);
                 return semver.gte(localVersion, latestVersion);
@@ -43,11 +43,11 @@ export class DafnyInstaller {
     public getReleaseInformation(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             const options: https.RequestOptions = {
-                host: uri.parse(Installer.ReleaseUrl).authority,
-                path: uri.parse(Installer.ReleaseUrl).path,
                 headers: {
                     "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0"
-                }
+                },
+                host: uri.parse(Installer.ReleaseUrl).authority,
+                path: uri.parse(Installer.ReleaseUrl).path
             };
 
             https.get(options, (res) => {
@@ -94,21 +94,18 @@ export class DafnyInstaller {
     }
 
     public prepareDafny(): Promise<string> {
-       
+
         if (os.platform() !== EnvironmentConfig.Win32) {
             fs.chmodSync(pathHelper.join(this.basePath, "dafny", "z3", "bin", "z3"), "755");
             fs.chmodSync(pathHelper.join(this.basePath, "dafny", "DafnyServer.exe"), "755");
             fs.chmodSync(pathHelper.join(this.basePath, "dafny", "Dafny.exe"), "755");
         }
 
-        //delete archive
         fs.unlink(this.downloadFile, (err) => {
             if (err) {
                 console.error("Error deleting archive: " + err);
             }
         });
-        //trigger a restart of the backend
-        //Settings.initiateBackendRestartIfNeeded(null, null, true);
         console.log("prepared dafny");
 
         return Promise.resolve(pathHelper.join(this.basePath, "dafny"));
@@ -122,7 +119,7 @@ export class DafnyInstaller {
                     return this.prepareDafny();
                 });
             });
-        }).catch(e => {
+        }).catch((e) => {
             console.error(e);
             return Promise.reject(e);
         });
@@ -151,7 +148,6 @@ export class DafnyInstaller {
         return null;
     }
 
-
     private deleteFolderRecursive(path) {
         this.notificationService.progressText("Removing existing files");
         if (fs.existsSync(path)) {
@@ -173,11 +169,11 @@ export class DafnyInstaller {
             try {
                 this.notificationService.startProgress();
                 const options: https.RequestOptions = {
-                    host: uri.parse(url).authority,
-                    path: uri.parse(url).path,
                     headers: {
                         "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0"
-                    }
+                    },
+                    host: uri.parse(url).authority,
+                    path: uri.parse(url).path
                 };
 
                 const file = fs.createWriteStream(filePath);
@@ -212,7 +208,7 @@ export class DafnyInstaller {
     private extract(filePath: string): Promise<boolean> {
         return new Promise<any>((resolve, reject) => {
             try {
-                console.log("Extracting files..."/*, LogLevel.Info*/)
+                console.log("Extracting files...");
                 this.notificationService.startProgress();
 
                 const unzipper = new DecompressZip(filePath);
@@ -240,10 +236,10 @@ export class DafnyInstaller {
                     fs.mkdirSync(this.basePath);
                 }
                 unzipper.extract({
-                    path: this.basePath,
                     filter: (file) => {
                         return file.type !== "SymbolicLink";
-                    }
+                    },
+                    path: this.basePath
                 });
             } catch (e) {
                 console.error("Error extracting dafny: " + e);

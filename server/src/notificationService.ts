@@ -4,7 +4,7 @@ import { IConnection, PublishDiagnosticsParams } from "vscode-languageserver";
 import { LanguageServerNotification } from "./strings/stringRessources";
 
 export class NotificationService {
-
+    private lastProgress: number;
     constructor(private connection: IConnection) { }
 
     public sendError(message: string): void {
@@ -54,8 +54,6 @@ export class NotificationService {
     public startProgress() {
         this.lastProgress = 0;
     }
-
-    private lastProgress: number;
 
     public progress(domain, current, total) {
         const progress = 100.0 * current / total;

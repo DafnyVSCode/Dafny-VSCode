@@ -18,7 +18,7 @@ export class CounterModelProvider {
                 this.context.decorators[editor.document.uri.toString()].dispose();
             }
 
-            let decorators: vscode.DecorationOptions[] = [];
+            const decorators: vscode.DecorationOptions[] = [];
             for (let i = 0; i < res.counterModel.States.length; i++) {
                 const state = res.counterModel.States[i];
                 const decorator = this.createDecorator(state);
@@ -28,16 +28,17 @@ export class CounterModelProvider {
             }
 
             const variableDisplay = vscode.window.createTextEditorDecorationType({
+                dark: {
+                    after: {
+                        backgroundColor: "#cccccc",
+                        color: "#161616",
+                        margin: "0 0 0 30px"
+                    }
+                },
                 light: {
                     after: {
-                        color: "#cccccc",
-                        backgroundColor: "#161616"
-                    }
-                }, dark: {
-                    after: {
-                        margin: "0 0 0 30px",
-                        color: "#161616",
-                        backgroundColor: "#cccccc"
+                        backgroundColor: "#161616",
+                        color: "#cccccc"
                     }
                 }
             });
@@ -53,7 +54,7 @@ export class CounterModelProvider {
 
         let variables = "";
         for (let j = 0; j < state.Variables.length; j++) {
-            if (j > 0) { variables += ", " };
+            if (j > 0) { variables += ", "; };
             variables += state.Variables[j].Name + "=" + state.Variables[j].Value;
         }
 
@@ -61,7 +62,7 @@ export class CounterModelProvider {
             after: {
                 contentText: variables
             }
-        }
+        };
 
         return {
             range: new vscode.Range(new vscode.Position(line, state.Column), new vscode.Position(line, Number.MAX_VALUE)),
