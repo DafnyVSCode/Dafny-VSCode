@@ -5,7 +5,8 @@ import { TextDocumentItem } from "vscode-languageserver-types";
 import { Context } from "./context";
 import { CounterModelProvider } from "./counterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
-import { Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
+import { DotGraphProvider } from "./dotGraphProvider";
+import { Commands, Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
 
 export class DafnyClientProvider {
@@ -17,6 +18,8 @@ export class DafnyClientProvider {
 
     private counterModelProvider: CounterModelProvider;
     private context: Context;
+    private dotGraphProvider: DotGraphProvider;
+    private previewUri = vscode.Uri.parse('dafny-preview:State Visualization');;
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
@@ -25,6 +28,7 @@ export class DafnyClientProvider {
         this.context = new Context();
         this.dafnyStatusbar = new Statusbar(this.languageServer, this.context);
         this.counterModelProvider = new CounterModelProvider(this.context);
+        this.dotGraphProvider = new DotGraphProvider(this.languageServer);
 
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
             (docPathName: string, json: string) => {
@@ -58,6 +62,15 @@ export class DafnyClientProvider {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+
+        vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
+
+        vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
+            vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two).then(() => { }, () => {
+                //Log.error("HTML Preview error: " + reason);
+            });
+        });
+
 
     }
 
