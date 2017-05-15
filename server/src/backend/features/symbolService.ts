@@ -3,7 +3,6 @@ import {TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyVerbs, EnvironmentConfig } from "./../../strings/stringRessources";
 import { hashString } from "./../../strings/stringUtils";
-import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { Reference, Symbol, SymbolTable, SymbolType } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
@@ -68,7 +67,10 @@ export class SymbolService {
                 return this.askDafnyForSymbols(resolve, reject, document);
         }).then((symbols: any) => {
             return Promise.resolve(this.parseSymbols(symbols, document));
-        }, bubbleRejectedPromise);
+        }, (err: Error) => {
+            console.error(err);
+            return Promise.resolve(null)
+        });
     }
     private parseSymbols(response: any, document: TextDocument): SymbolTable {
         const symbolTable = new SymbolTable(document.uri);
