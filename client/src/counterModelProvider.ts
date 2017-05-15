@@ -19,8 +19,7 @@ export class CounterModelProvider {
             }
 
             const decorators: vscode.DecorationOptions[] = [];
-            for (let i = 0; i < res.counterModel.States.length; i++) {
-                const state = res.counterModel.States[i];
+            for (const state of res.counterModel.States) {
                 const decorator = this.createDecorator(state);
                 if (decorator) {
                     decorators.push(decorator);
