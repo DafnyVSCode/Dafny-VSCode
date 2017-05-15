@@ -1,9 +1,9 @@
 "use strict";
-import { DocumentIterator } from "./documentIterator";
 import {EOL} from "os";
 import * as vscode from "vscode-languageserver";
 import { dafnyKeywords } from "./../languageDefinition/keywords";
 import { isPositionInString } from "./../strings/stringUtils";
+import { DocumentIterator } from "./documentIterator";
 import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 export class DocumentDecorator {
@@ -115,7 +115,7 @@ export class DocumentDecorator {
         let closedCount = 0;
         let start: vscode.Position = null;
         let end: vscode.Position = null;
-        let range: vscode.Range = null;
+        const range: vscode.Range = null;
         let charIndex = line.indexOf(exprStartChar);
         if( charIndex > -1 ) {
             openCount = 1;

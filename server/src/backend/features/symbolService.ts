@@ -69,7 +69,7 @@ export class SymbolService {
             return Promise.resolve(this.parseSymbols(symbols, document));
         }, (err: Error) => {
             console.error(err);
-            return Promise.resolve(null)
+            return Promise.resolve(null);
         });
     }
     private parseSymbols(response: any, document: TextDocument): SymbolTable {

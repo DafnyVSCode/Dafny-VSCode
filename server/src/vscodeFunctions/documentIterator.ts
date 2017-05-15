@@ -8,7 +8,7 @@ export class DocumentIterator {
     public lineIndex: number;
     public charIndex: number;
     public currentLine: string;
-    public currentChar: string; 
+    public currentChar: string;
     public isValidPosition: boolean = true;
 
     constructor(documentDecorator: DocumentDecorator, startPosition: Position = null) {

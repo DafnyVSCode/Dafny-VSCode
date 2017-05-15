@@ -189,6 +189,7 @@ export class CodeActionProvider {
         const identifiers: string[] = [];
         const identifiersRegex = /(\w+)/g;
         let match: RegExpExecArray;
+        // tslint:disable-next-line:no-conditional-assignment
         while ((match = identifiersRegex.exec(expression)) !== null) {
             identifiers.push(match[0]);
         }

@@ -140,9 +140,9 @@ export class DafnyInstaller {
     }
 
     private getReleaseUrl(assets: any, platform: string): string {
-        for (let i = 0; i < assets.length; i++) {
-            if (assets[i].name.indexOf(platform) !== -1) {
-                return assets[i].browser_download_url;
+        for (const asset of assets) {
+            if (asset.name.indexOf(platform) !== -1) {
+                return asset.browser_download_url;
             }
         }
         return null;
