@@ -41,6 +41,7 @@ export class Commands {
     public static ShowReferences: string = "dafny.showReferences";
     public static Compile: string = "dafny.compile";
     public static CompileAndRun: string = "dafny.compileAndRun";
+    public static ShowDotGraph: string = "dafny.showDotGraph";
 }
 
 export class InfoMsg {
@@ -89,6 +90,7 @@ export class LanguageServerRequest {
     public static Compile: string = "compile";
     public static Install: string = "install";
     public static Uninstall: string = "uninstall";
+    public static Dotgraph: string = "dotgraph";
 }
 
 export class LanguageServerNotification {

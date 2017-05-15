@@ -96,6 +96,7 @@ export class LanguageServerRequest {
     public static Compile: string = "compile";
     public static Install: string = "install";
     public static Uninstall: string = "uninstall";
+    public static Dotgraph: string = "dotgraph";
 }
 
 export class LanguageServerNotification {

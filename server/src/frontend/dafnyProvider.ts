@@ -1,5 +1,6 @@
 "use strict";
 import { Disposable, TextDocument } from "vscode-languageserver";
+import Uri from "vscode-uri";
 import { Context } from "../backend/context";
 import { DafnyCompiler } from "../backend/dafnyCompiler";
 import { DafnyServer } from "../backend/dafnyServer";
@@ -67,6 +68,16 @@ export class DafnyServerProvider {
     public doVerify(textDocument: TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument, DafnyVerbs.CounterExample);
+        }
+    }
+
+    public dotGraph(textDocument: TextDocument): Promise<void> {
+        if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
+            return new Promise<void>((resolve, reject) => {
+                this.dafnyServer.addDocument(textDocument, "dotgraph", resolve, reject);
+            });
+        } else {
+            return null;
         }
     }
 }
