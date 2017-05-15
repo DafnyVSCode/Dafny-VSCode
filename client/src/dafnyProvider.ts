@@ -67,7 +67,7 @@ export class DafnyClientProvider {
 
         vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
             vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two).then(() => { }, () => {
-                //Log.error("HTML Preview error: " + reason);
+                // Log.error("HTML Preview error: " + reason);
             });
         });
     }
