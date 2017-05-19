@@ -54,12 +54,12 @@ export class DafnyClientProvider {
             }
         }, this);
         this.subscriptions = subs;
-        //vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
+        vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
 
         if (this.docChangeVerify) {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
-        //vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
 
         vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
         vscode.commands.registerCommand(Commands.ShowDotGraph, () => {

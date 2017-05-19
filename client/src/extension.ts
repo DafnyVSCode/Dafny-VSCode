@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     const clientOptions: LanguageClientOptions = {
         documentSelector: ["dafny"],
         synchronize: {
-            configurationSection: "dafny",
+            configurationSection: "dafny"
         }
     };
 

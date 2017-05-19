@@ -44,7 +44,7 @@ connection.onInitialize((params): InitializeResult => {
             },
             definitionProvider: true,
             renameProvider: true,
-            textDocumentSync: documents.syncKind,
+            textDocumentSync: documents.syncKind
         }
     };
 });
@@ -191,7 +191,6 @@ connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string):
     const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
         textDocumentItem.version, textDocumentItem.text);
     if (provider) {
-        verifyAll();
         return provider.dotGraph(textDocument);
     }
     return null;
@@ -272,21 +271,6 @@ connection.onCodeAction((params: CodeActionParams) => {
 connection.onCompletion((handler: TextDocumentPositionParams) => {
     if (provider && provider.completionProvider) {
         return provider.completionProvider.provideCompletion(handler);
-    }
-});
-
-connection.onDidSaveTextDocument((handler) => {
-    const textDocument = documents.get(handler.textDocument.uri);
-    if (provider) {
-        provider.doVerify(textDocument);
-    }
-});
-
-connection.onDidOpenTextDocument((handler) => {
-    if (provider) {
-        const textDocument: TextDocument = TextDocument.create(handler.textDocument.uri, handler.textDocument.languageId,
-        handler.textDocument.version, handler.textDocument.text);
-        provider.doVerify(textDocument);
     }
 });
 
