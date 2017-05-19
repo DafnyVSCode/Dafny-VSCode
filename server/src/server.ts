@@ -262,6 +262,15 @@ connection.onNotification(LanguageServerNotification.Verify, (json: string) => {
     }
 });
 
+connection.onNotification(LanguageServerNotification.CounterExample, (json: string) => {
+    const textDocumentItem: TextDocumentItem = JSON.parse(json);
+    const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
+        textDocumentItem.version, textDocumentItem.text);
+    if (provider) {
+        provider.doCounterExample(textDocument);
+    }
+});
+
 connection.onCodeAction((params: CodeActionParams) => {
     if (provider && provider.codeActionProvider) {
         return provider.codeActionProvider.provideCodeAction(params);

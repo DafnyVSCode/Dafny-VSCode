@@ -27,6 +27,7 @@ export class Config {
     public static AutomaticVerification: string = "automaticVerification";
     public static AutomaticVerificationDelay: string = "automaticVerificationDelayMS";
     public static DafnyBasePath: string = "basePath";
+    public static AutomaticShowCounterExample: string = "automaticShowCounterModel";
 }
 
 export class Application {
@@ -42,6 +43,9 @@ export class Commands {
     public static Compile: string = "dafny.compile";
     public static CompileAndRun: string = "dafny.compileAndRun";
     public static ShowDotGraph: string = "dafny.showDotGraph";
+    public static ShowCounterExample: string = "dafny.showCounterExample";
+    public static HideCounterExample: string = "dafny.hideCounterExample";
+    
 }
 
 export class InfoMsg {
@@ -106,4 +110,5 @@ export class LanguageServerNotification {
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
     public static Progress: string = "progress";
+    public static CounterExample: string = "counterExample";
 }

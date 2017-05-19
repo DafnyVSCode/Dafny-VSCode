@@ -54,7 +54,6 @@ export class DafnyServerProvider {
     public resetServer(): void {
         this.dafnyServer.setInactive();
         this.dafnyServer.reset();
-        // this.doVerify(vscode.window.activeTextEditor.document);
     }
 
     public stop(): void {
@@ -65,9 +64,15 @@ export class DafnyServerProvider {
         this.dafnyServer.init();
     }
 
-    public doVerify(textDocument: TextDocument): void {
+    public doCounterExample(textDocument: TextDocument): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
             this.dafnyServer.addDocument(textDocument, DafnyVerbs.CounterExample);
+        }
+    }
+
+    public doVerify(textDocument: TextDocument): void {
+        if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
+            this.dafnyServer.addDocument(textDocument, DafnyVerbs.Verify);
         }
     }
 

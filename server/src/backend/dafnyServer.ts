@@ -33,7 +33,7 @@ export class DafnyServer {
     private restart: boolean = true;
     private retries: number = 0;
     constructor(private notificationService: NotificationService, private statusbar: Statusbar,
-                private context: Context, private settings: DafnySettings) {
+        private context: Context, private settings: DafnySettings) {
         this.symbolService = new SymbolService(this);
     }
 
@@ -118,7 +118,8 @@ export class DafnyServer {
     private handleProcessData(): void {
         if (this.isRunning() && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
-            if (this.context.activeRequest && this.context.activeRequest.verb === DafnyVerbs.CounterExample) {
+            if (this.context.activeRequest && (this.context.activeRequest.verb === DafnyVerbs.CounterExample
+                || this.context.activeRequest.verb === DafnyVerbs.Verify)) {
                 const result = this.context.collectRequest(log);
                 this.notificationService.sendVerificationResult([this.context.activeRequest.document.uri.toString(),
                 JSON.stringify(result)]);
@@ -191,7 +192,7 @@ export class DafnyServer {
     }
 
     private sendVerificationRequest(request: VerificationRequest): void {
-        if (request.verb === DafnyVerbs.CounterExample) {
+        if (request.verb === DafnyVerbs.CounterExample || request.verb === DafnyVerbs.Verify) {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {

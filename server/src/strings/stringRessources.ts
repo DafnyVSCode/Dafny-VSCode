@@ -112,6 +112,7 @@ export class LanguageServerNotification {
     public static ChangeServerStatus: string = "changeServerStatus";
     public static Ready: string = "ready";
     public static Progress: string = "progress";
+    public static CounterExample: string = "counterExample";
 }
 
 export class DafnyReports {
@@ -133,6 +134,7 @@ export class ToolTipText {
 export class DafnyVerbs {
     public static Symbols: string = "symbols";
     public static CounterExample: string = "counterExample";
+    public static Verify: string = "verify";
 }
 
 export class SymbolString {

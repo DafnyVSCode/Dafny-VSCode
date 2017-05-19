@@ -14,6 +14,7 @@ export class DafnyClientProvider {
     private docChangeTimers: { [docPathName: string]: NodeJS.Timer } = {};
     private docChangeVerify: boolean = false;
     private docChangeDelay: number = 0;
+    private automaticShowCounterExample: boolean = false;
     private subscriptions: vscode.Disposable[];
 
     private counterModelProvider: CounterModelProvider;
@@ -22,9 +23,7 @@ export class DafnyClientProvider {
     private previewUri = vscode.Uri.parse("dafny-preview:State Visualization");
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
-        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-        this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
-        this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
+        this.loadConfig();
         this.context = new Context();
         this.dafnyStatusbar = new Statusbar(this.languageServer, this.context);
         this.counterModelProvider = new CounterModelProvider(this.context);
@@ -33,10 +32,8 @@ export class DafnyClientProvider {
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
             (docPathName: string, json: string) => {
                 this.context.localQueue.remove(docPathName);
-                console.log("notificiation: " + docPathName);
                 const verificationResult: VerificationResult = JSON.parse(json);
                 this.context.verificationResults[docPathName] = verificationResult;
-                console.log(verificationResult);
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
             });
@@ -60,6 +57,7 @@ export class DafnyClientProvider {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+        vscode.workspace.onDidCloseTextDocument(this.hideCounterModel, this);
 
         vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
         vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
@@ -67,6 +65,17 @@ export class DafnyClientProvider {
                 // Log.error("HTML Preview error: " + reason);
             });
         });
+
+        vscode.commands.registerCommand(Commands.ShowCounterExample, () => {
+            this.doCounterModel(vscode.window.activeTextEditor.document);
+        });
+
+        vscode.commands.registerCommand(Commands.HideCounterExample, () => {
+            this.hideCounterModel(vscode.window.activeTextEditor.document);
+        });
+
+        const that = this;
+        vscode.workspace.onDidChangeConfiguration(this.loadConfig, that);
     }
 
     public dispose(): void {
@@ -77,12 +86,40 @@ export class DafnyClientProvider {
             }
         }
     }
+
+    private loadConfig() {
+        const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
+        this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
+        this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
+        this.automaticShowCounterExample = config.get<boolean>(Config.AutomaticShowCounterExample);
+    }
+
+    private doCounterModel(textDocument: vscode.TextDocument): void {
+        this.sendDocument(textDocument, LanguageServerNotification.CounterExample);
+    }
+
     private doVerify(textDocument: vscode.TextDocument): void {
+        this.hideCounterModel(textDocument);
+        if (this.automaticShowCounterExample) {
+            this.sendDocument(textDocument, LanguageServerNotification.CounterExample);
+        } else {
+            this.sendDocument(textDocument, LanguageServerNotification.Verify);
+        }
+
+    }
+
+    private hideCounterModel(textDocument: vscode.TextDocument): void {
+        if (this.context.decorators[textDocument.uri.toString()]) {
+            this.context.decorators[textDocument.uri.toString()].dispose();
+        }
+    }
+
+    private sendDocument(textDocument: vscode.TextDocument, type: string): void {
         if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
             this.context.localQueue.add(textDocument.uri.toString());
             const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
                 textDocument.languageId, textDocument.version, textDocument.getText()));
-            this.languageServer.sendNotification(LanguageServerNotification.Verify, tditem);
+            this.languageServer.sendNotification(type, tditem);
         }
     }
 

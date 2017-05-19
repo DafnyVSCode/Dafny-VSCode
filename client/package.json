@@ -39,6 +39,16 @@
         "command": "dafny.showDotGraph",
         "key": "f6",
         "when": "editorTextFocus && editorLangId == dafny"
+      },
+      {
+        "command": "dafny.showCounterExample",
+        "key": "f7",
+        "when": "editorTextFocus && editorLangId == dafny"
+      },
+      {
+        "command": "dafny.hideCounterExample",
+        "key": "f8",
+        "when": "editorTextFocus && editorLangId == dafny"
       }
     ],
     "snippets": [
@@ -95,15 +105,10 @@
           "default": 700,
           "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
         },
-        "dafny.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "verbose",
-          "description": "Traces the communication between VSCode and the LanguageServer service."
+        "dafny.automaticShowCounterModel": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show countermodel if a program does not hold. Can cause much longer verification time."
         }
       }
     },
