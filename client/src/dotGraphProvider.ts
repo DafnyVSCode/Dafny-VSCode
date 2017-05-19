@@ -4,8 +4,8 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 const viz = require("viz.js");
 import { LanguageClient } from "vscode-languageclient";
-import { LanguageServerRequest } from "./stringRessources";
 import { TextDocumentItem } from "vscode-languageserver-types";
+import { LanguageServerRequest } from "./stringRessources";
 
 export class DotGraphProvider implements vscode.TextDocumentContentProvider {
 
@@ -25,15 +25,15 @@ export class DotGraphProvider implements vscode.TextDocumentContentProvider {
             this.languageServer.sendRequest(LanguageServerRequest.Dotgraph, tditem).then(() => {
                 vscode.workspace.findFiles("**/*" + filename + "*.dot", "**∕node_modules∕**").then((files) => {
                     let graphs = "";
-                    for (let i = 0; i < files.length; i++) {
-                        const filecontent = this.getSvgContent(files[i].fsPath);
-                        const header = files[i].fsPath.substring(files[i].fsPath.indexOf("$$") + 2, files[i].fsPath.length - 4);
+                    for (const file of files) {
+                        const filecontent = this.getSvgContent(file.fsPath);
+                        const header = file.fsPath.substring(file.fsPath.indexOf("$$") + 2, file.fsPath.length - 4);
                         graphs += "<h3>" + header + "</h3>";
                         graphs += this.generateSvg(filecontent);
                     }
-                    const content = this.buildHtml(graphs);
-                    console.log(content);
-                    resolve(content);
+                    const htmlContent = this.buildHtml(graphs);
+                    console.log(htmlContent);
+                    resolve(htmlContent);
                 }, (e) => { vscode.window.showErrorMessage("Can't show graph: " + e); reject(e); });
             }, (e) => {
                 vscode.window.showErrorMessage("Can't show graph: " + e);

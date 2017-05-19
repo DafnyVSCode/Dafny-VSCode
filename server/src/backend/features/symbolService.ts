@@ -3,7 +3,6 @@ import {TextDocument} from "vscode-languageserver";
 import {DafnyServer} from "../dafnyServer";
 import { DafnyVerbs, EnvironmentConfig } from "./../../strings/stringRessources";
 import { hashString } from "./../../strings/stringUtils";
-import { bubbleRejectedPromise } from "./../../util/promiseHelpers";
 import { Reference, Symbol, SymbolTable, SymbolType } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
@@ -68,7 +67,10 @@ export class SymbolService {
                 return this.askDafnyForSymbols(resolve, reject, document);
         }).then((symbols: any) => {
             return Promise.resolve(this.parseSymbols(symbols, document));
-        }, bubbleRejectedPromise);
+        }, (err: Error) => {
+            console.error(err);
+            return Promise.resolve(null);
+        });
     }
     private parseSymbols(response: any, document: TextDocument): SymbolTable {
         const symbolTable = new SymbolTable(document.uri);
@@ -86,8 +88,10 @@ export class SymbolService {
         const parsedSymbol = new Symbol(symbol, document);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
-            if(parsedSymbol.symbolType === SymbolType.Class || parsedSymbol.symbolType === SymbolType.Definition
-                || parsedSymbol.symbolType === SymbolType.Method || parsedSymbol.symbolType === SymbolType.Function) {
+            if(parsedSymbol.isOfType(
+                                    [SymbolType.Class, SymbolType.Definition, SymbolType.Method,
+                                    SymbolType.Function, SymbolType.Predicate])
+            ) {
                 parsedSymbol.setBodyEnd(symbol.EndLine, symbol.EndPosition, symbol.EndColumn);
             }
             if(parsedSymbol.symbolType ===  SymbolType.Method) {

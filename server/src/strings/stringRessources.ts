@@ -142,4 +142,5 @@ export class SymbolString {
     public static Field: string = "Field";
     public static Call: string = "Call";
     public static Definition: string = "Definition";
+    public static Predicate: string = "Predicate";
 }

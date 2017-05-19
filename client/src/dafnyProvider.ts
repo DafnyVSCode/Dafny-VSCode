@@ -19,7 +19,7 @@ export class DafnyClientProvider {
     private counterModelProvider: CounterModelProvider;
     private context: Context;
     private dotGraphProvider: DotGraphProvider;
-    private previewUri = vscode.Uri.parse('dafny-preview:State Visualization');;
+    private previewUri = vscode.Uri.parse("dafny-preview:State Visualization");
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
@@ -64,11 +64,9 @@ export class DafnyClientProvider {
         vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
         vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
             vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two).then(() => { }, () => {
-                //Log.error("HTML Preview error: " + reason);
+                // Log.error("HTML Preview error: " + reason);
             });
         });
-
-
     }
 
     public dispose(): void {

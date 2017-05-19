@@ -8,7 +8,7 @@ export class DocumentIterator {
     public lineIndex: number;
     public charIndex: number;
     public currentLine: string;
-    public currentChar: string; 
+    public currentChar: string;
     public isValidPosition: boolean = true;
 
     constructor(documentDecorator: DocumentDecorator, startPosition: Position = null) {
@@ -74,7 +74,7 @@ export class DocumentIterator {
     public skipToChar(char: string) {
         let foundChar: boolean = false;
         while(this.isValidPosition && !foundChar) {
-            const searchIndex = this.currentLine.indexOf(char);
+            const searchIndex = this.currentLine.indexOf(char, this.charIndex);
             if(searchIndex > 0 && searchIndex > this.charIndex) {
                 this.charIndex = searchIndex;
                 this.currentChar =  this.currentLine.charAt(this.charIndex);

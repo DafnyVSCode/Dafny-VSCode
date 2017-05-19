@@ -2,7 +2,7 @@ import {Position, Range, TextDocument} from "vscode-languageserver";
 import { DafnyKeyWords, SymbolString } from "./../../strings/stringRessources";
 import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 export enum SymbolType {
-    Unknown, Class, Method, Function, Field, Call, Definition
+    Unknown, Class, Method, Function, Field, Call, Definition, Predicate
 }
 export class SymbolTable {
     public symbols: Symbol[];
@@ -58,6 +58,7 @@ export class Symbol {
             case SymbolString.Field: this.symbolType = SymbolType.Field; break;
             case SymbolString.Call: this.symbolType = SymbolType.Call; break;
             case SymbolString.Definition: this.symbolType = SymbolType.Definition; break;
+            case SymbolString.Predicate: this.symbolType = SymbolType.Predicate; break;
             default: this.symbolType = SymbolType.Unknown; break;
         }
     }
@@ -132,12 +133,13 @@ export class Symbol {
         return this.isOfType([SymbolType.Call, SymbolType.Field, SymbolType.Method])
             && this.name.includes(word) && this.hasParentClass(parentClass);
     }
+    public isOfType(types: SymbolType[]): boolean {
+        return types.includes(this.symbolType);
+    }
     private isDefinedInSameClass(symbol: Symbol): boolean {
         return this.hasParentClass(symbol.parentClass) && this.hasModule(symbol.module);
     }
-    private isOfType(types: SymbolType[]): boolean {
-        return types.includes(this.symbolType);
-    }
+
     private hasParentClass(parentClass: string): boolean {
         return this.parentClass === parentClass;
     }

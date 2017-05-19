@@ -1,15 +1,15 @@
 "use strict";
-import { DocumentIterator } from "./documentIterator";
 import {EOL} from "os";
 import * as vscode from "vscode-languageserver";
 import { dafnyKeywords } from "./../languageDefinition/keywords";
 import { isPositionInString } from "./../strings/stringUtils";
+import { DocumentIterator } from "./documentIterator";
 import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 export class DocumentDecorator {
 
     public _lines: string[];
-
+    private boogieCharOffset: number = 1;
     constructor(public document: vscode.TextDocument) {
 
         this._lines = document.getText().split(/\r\n|\r|\n/);
@@ -107,42 +107,33 @@ export class DocumentDecorator {
     }
     public readArrayExpression(_position: vscode.Position): vscode.Range {
         const position = this.validatePosition(_position);
-        let lineIndex = position.line;
-        let line = this._lines[lineIndex];
+        const iterator = new DocumentIterator(this, position);
         const exprStartChar = "[";
         const exprEndChar = "]";
         let openCount = 0;
         let closedCount = 0;
         let start: vscode.Position = null;
-        let end: vscode.Position = null;
-        let range: vscode.Range = null;
-        let charIndex = line.indexOf(exprStartChar);
-        if( charIndex > -1 ) {
+        const range: vscode.Range = null;
+        iterator.skipToChar(exprStartChar);
+        if(iterator.isValidPosition) {
             openCount = 1;
-            start = vscode.Position.create(lineIndex, charIndex + 1);
+            start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         } else {
             return range;
         }
-        let currentChar = line.charAt(charIndex);
         while(openCount !== closedCount) {
-            charIndex++;
-            if(charIndex >= line.length) {
-                lineIndex++;
-                if(lineIndex >= this._lines.length) {
-                    return range;
-                }
-                line = this._lines[lineIndex];
-                charIndex = 0;
+            iterator.skipChar();
+            if(!iterator.isValidPosition) {
+                return range;
             }
-            currentChar =  line.charAt(charIndex);
-            if(currentChar === exprStartChar) {
+            if(iterator.currentChar === exprStartChar) {
                 openCount++;
             }
-            if(currentChar === exprEndChar) {
+            if(iterator.currentChar === exprEndChar) {
                 closedCount++;
             }
             if(openCount === closedCount) {
-                end = vscode.Position.create(lineIndex, charIndex--);
+                const end = vscode.Position.create(iterator.lineIndex, iterator.charIndex);
                 return vscode.Range.create(start, end);
             }
         }
@@ -234,7 +225,7 @@ export class DocumentDecorator {
         if(!iterator.isValidPosition) {
             return start;
         }
-        start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+        start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
         openCount = 1;
         while(openCount !== closedCount) {
             iterator.skipChar();
@@ -249,7 +240,7 @@ export class DocumentDecorator {
             }
             if(openCount === closedCount) {
                 // Skip return type
-                const oldPos = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+                const oldPos = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
                 iterator.skipChar();
                 iterator.skipWhiteSpace();
                 if(!iterator.isValidPosition) {
@@ -260,7 +251,12 @@ export class DocumentDecorator {
                     iterator.skipWhiteSpace();
                     iterator.skipWord();
                     if(iterator.isValidPosition) {
-                        return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
+                        return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
+                    }
+                } else if(iterator.currentLine.substr(iterator.charIndex).startsWith("returns")) {
+                    iterator.skipToChar(")");
+                    if(iterator.isValidPosition) {
+                        return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
                     }
                 }
                 return oldPos;
