@@ -100,7 +100,7 @@ export class Statusbar {
 
         if (!this.serverpid) {
             this.currentDocumentStatucBar.text = StatusString.Pending;
-        } else if (this.activeDocument && editor.document.uri === this.activeDocument) {
+        } else if (this.activeDocument && editor.document.uri.toString() === this.activeDocument.toString()) {
             this.currentDocumentStatucBar.text = StatusString.Verifying;
         } else if (this.queueContains(editor.document.uri.toString())) {
             this.currentDocumentStatucBar.text = StatusString.Queued;

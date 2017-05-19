@@ -132,6 +132,7 @@ export class DafnyServer {
 
             this.serverProc.clearBuffer();
             this.statusbar.changeServerStatus(StatusString.Idle);
+            this.notificationService.sendActiveVerifiyingDocument(null);
             this.active = false;
             this.sendNextRequest();
         }
