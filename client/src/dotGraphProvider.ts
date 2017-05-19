@@ -32,7 +32,6 @@ export class DotGraphProvider implements vscode.TextDocumentContentProvider {
                         graphs += this.generateSvg(filecontent);
                     }
                     const htmlContent = this.buildHtml(graphs);
-                    console.log(htmlContent);
                     resolve(htmlContent);
                 }, (e) => { vscode.window.showErrorMessage("Can't show graph: " + e); reject(e); });
             }, (e) => {

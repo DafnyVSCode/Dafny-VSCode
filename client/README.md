@@ -2,7 +2,8 @@
 Dafny support for Visual Studio Code.
 
 ## Features
-* **NEW** Display counter example for failing proof (requires Dafny +1.9.15)
+* **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use F7. 
+* Display counter example for failing proof (requires Dafny +1.9.15)
 * IntelliSense for classes
 * Compile and Run dfy file
 * Update notification if there is a newer release of Dafny. 
@@ -23,6 +24,9 @@ Dafny support for Visual Studio Code.
 
 * `Ctrl+Shift+B` or `⇧⌘B` Compile dfy file to dll or exe, if there is a Main method
 * `F5` Compile and Run if the source file has a Main method. 
+* `F6` Show Flow graph
+* `F7` Show CounterExample
+* `F8` Hide CounterExample
 
 ## Tasks
 * `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
@@ -51,8 +55,10 @@ The following are optional:
 
 * `dafny.automaticVerificationDelayMS`: Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true.
 
+* `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
 ## Release Notes
+* 0.10.1 Manually show counterexample, flow graph
 * 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes
 * 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
 * 0.8.0 CodeLens showing method references, Go to Definition, version checking for newer Dafny release. 
