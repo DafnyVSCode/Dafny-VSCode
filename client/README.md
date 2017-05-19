@@ -18,7 +18,8 @@ Dafny support for Visual Studio Code.
 * Left hand side status bar item provides information about the current file.
 * Right hand size status bar item relates to the state of the DafnyServer.
 
-![assertions animation](example.gif)
+![assertions animation](simpleassert.gif)
+More examples at the end...
 
 ## Shortcuts
 
@@ -57,7 +58,7 @@ The following are optional:
 
 * `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
-## Release Notes
+# Release Notes
 * 0.10.1 Manually show counterexample, flow graph
 * 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes
 * 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
@@ -76,6 +77,23 @@ The following are optional:
 * 0.0.2: Fixed readme and license, added use animation.
 * 0.0.1: Initial release, some half baked features turned off.
 
+# Examples
+
+## Installation
+On the first start the plugin asks you to install Dafny automatically. 
+![assertions animation](installation.gif)
+
+## Add null check
+Some diagnostics can be directly inserted with a quickfix at the beginning of a line.
+![assertions animation](addnullcheck.gif)
+
+## Compile and Run
+Pressed F5 to compile and run the program
+![assertions animation](compileandrun.gif)
+
+## CounterExample
+Pressed F7 to show counterexamples.
+![assertions animation](counterexample.gif)
 
 
 
