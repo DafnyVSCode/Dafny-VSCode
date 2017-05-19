@@ -59,7 +59,7 @@ function verifyDependencies() {
                 connection.sendNotification(LanguageServerNotification.DafnyMissing, InfoMsg.DafnyUpdateAvailable);
             }
         }).catch(() => {
-            console.log("can't access github");
+            console.error("can't access github");
         });
     }, () => {
         connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyCantBeStarted);
@@ -83,17 +83,13 @@ function init(serverVersion: string) {
 
 connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
     if (provider && provider.renameProvider) {
-        console.log("onRename: " + handler.textDocument.uri);
         return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
     }
 });
 
 connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location> => {
     if (provider && provider.definitionProvider) {
-        console.log("onDefinition: " + handler.textDocument.uri);
         return provider.definitionProvider.provideDefinition(documents.get(handler.textDocument.uri), handler.position);
-    } else {
-        console.log("onDefinition: to early");
     }
 });
 
@@ -114,7 +110,6 @@ function waitForServer(handler: CodeLensParams) {
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
         result.then((lenses: ReferencesCodeLens[]) => {
             lenses.forEach((lens: ReferencesCodeLens) => {
-                console.log("added codelens" + JSON.stringify(getCodeLens(lens)));
                 codeLenses[JSON.stringify(getCodeLens(lens))] = lens;
             });
         });
@@ -133,7 +128,6 @@ function sleep(ms) {
 connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> => {
 
     if (provider && provider.referenceProvider) {
-        console.log("onCodeLens: " + handler.textDocument.uri);
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
         result.then((lenses: ReferencesCodeLens[]) => {
             lenses.forEach((lens: ReferencesCodeLens) => {
@@ -142,7 +136,6 @@ connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> =
         });
         return result;
     } else {
-        console.log("onCodeLens: to early");
         return waitForServer(handler);
     }
 });
@@ -200,7 +193,7 @@ connection.onRequest<string, void>(LanguageServerRequest.Install, () => {
                     verifyDependencies();
                     resolve(basePath);
                 }).catch((e) => {
-                    console.log("errrroooorrr: " + e);
+                    console.error("errrroooorrr: " + e);
                 });
             } else {
                 reject();
@@ -259,14 +252,12 @@ connection.onNotification(LanguageServerNotification.Verify, (json: string) => {
 
 connection.onCodeAction((params: CodeActionParams) => {
     if (provider && provider.codeActionProvider) {
-        console.log("onCodeAction: " + params.textDocument.uri);
         return provider.codeActionProvider.provideCodeAction(params);
     }
 });
 
 connection.onCompletion((handler: TextDocumentPositionParams) => {
     if (provider && provider.completionProvider) {
-        console.log("onComplection: " + handler.position);
         return provider.completionProvider.provideCompletion(handler);
     }
 });

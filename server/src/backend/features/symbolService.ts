@@ -88,8 +88,10 @@ export class SymbolService {
         const parsedSymbol = new Symbol(symbol, document);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
-            if(parsedSymbol.symbolType === SymbolType.Class || parsedSymbol.symbolType === SymbolType.Definition
-                || parsedSymbol.symbolType === SymbolType.Method || parsedSymbol.symbolType === SymbolType.Function) {
+            if(parsedSymbol.isOfType(
+                                    [SymbolType.Class, SymbolType.Definition, SymbolType.Method,
+                                    SymbolType.Function, SymbolType.Predicate])
+            ) {
                 parsedSymbol.setBodyEnd(symbol.EndLine, symbol.EndPosition, symbol.EndColumn);
             }
             if(parsedSymbol.symbolType ===  SymbolType.Method) {
