@@ -33,7 +33,7 @@ export class DafnyServer {
     private restart: boolean = true;
     private retries: number = 0;
     constructor(private notificationService: NotificationService, private statusbar: Statusbar,
-        private context: Context, private settings: DafnySettings) {
+                private context: Context, private settings: DafnySettings) {
         this.symbolService = new SymbolService(this);
     }
 

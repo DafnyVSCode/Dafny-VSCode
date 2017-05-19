@@ -1,5 +1,5 @@
 import {CodeActionParams, Command, Diagnostic} from "vscode-languageserver";
-import server = require("./../../server")
+import server = require("./../../server");
 import { DafnyServer } from "./../dafnyServer";
 import { BaseCommandGenerator } from "./codeActions/baseCommandGenerator";
 import { GuardCommandGenerator } from "./codeActions/guardCommandGenerator";

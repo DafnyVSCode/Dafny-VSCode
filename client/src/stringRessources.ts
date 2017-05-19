@@ -45,7 +45,6 @@ export class Commands {
     public static ShowDotGraph: string = "dafny.showDotGraph";
     public static ShowCounterExample: string = "dafny.showCounterExample";
     public static HideCounterExample: string = "dafny.hideCounterExample";
-    
 }
 
 export class InfoMsg {
