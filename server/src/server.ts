@@ -44,7 +44,7 @@ connection.onInitialize((params): InitializeResult => {
             },
             definitionProvider: true,
             renameProvider: true,
-            textDocumentSync: documents.syncKind
+            textDocumentSync: documents.syncKind,
         }
     };
 });
@@ -72,12 +72,24 @@ function init(serverVersion: string) {
         if (!provider) {
             provider = new DafnyServerProvider(notificationService, serverVersion, workspaceRoot, settings.dafny);
             provider.resetServer();
+            verifyAll();
         } else {
             provider.init();
             provider.resetServer();
+            verifyAll();
         }
     } catch (e) {
         connection.sendNotification(LanguageServerNotification.Error, "Exception occured: " + e);
+    }
+}
+
+function verifyAll() {
+    console.log("verify all" + documents.all().length);
+    if(provider) {
+        documents.all().forEach((d) => {
+            console.log("all verify" + d.uri);
+            provider.doVerify(d);
+        });
     }
 }
 
@@ -186,6 +198,7 @@ connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string):
     const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
         textDocumentItem.version, textDocumentItem.text);
     if (provider) {
+        verifyAll();
         return provider.dotGraph(textDocument);
     }
     return null;
@@ -268,6 +281,21 @@ connection.onCompletion((handler: TextDocumentPositionParams) => {
     if (provider && provider.completionProvider) {
         console.log("onComplection: " + handler.position);
         return provider.completionProvider.provideCompletion(handler);
+    }
+});
+
+connection.onDidSaveTextDocument((handler) => {
+    const textDocument = documents.get(handler.textDocument.uri);
+    if (provider) {
+        provider.doVerify(textDocument);
+    }
+});
+
+connection.onDidOpenTextDocument((handler) => {
+    if (provider) {
+        const textDocument: TextDocument = TextDocument.create(handler.textDocument.uri, handler.textDocument.languageId,
+        handler.textDocument.version, handler.textDocument.text);
+        provider.doVerify(textDocument);
     }
 });
 

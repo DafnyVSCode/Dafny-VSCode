@@ -43,11 +43,9 @@ export class DafnyClientProvider {
     }
 
     public activate(subs: vscode.Disposable[]): void {
-        console.log("length: " + vscode.workspace.textDocuments.length);
-        vscode.workspace.textDocuments.forEach((e) => {
-            console.log("blub: " + e.fileName);
+        /*vscode.workspace.textDocuments.forEach((e) => {
             this.doVerify(e);
-        }, this);
+        }, this);*/
 
         vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
             if (editor) {
@@ -56,15 +54,14 @@ export class DafnyClientProvider {
             }
         }, this);
         this.subscriptions = subs;
-        vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
+        //vscode.workspace.onDidOpenTextDocument(this.doVerify, this);
 
         if (this.docChangeVerify) {
             vscode.workspace.onDidChangeTextDocument(this.docChanged, this);
         }
-        vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
+        //vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
 
         vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
-
         vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
             vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two).then(() => { }, () => {
                 //Log.error("HTML Preview error: " + reason);
