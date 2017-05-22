@@ -2,6 +2,7 @@
 Dafny support for Visual Studio Code.
 
 ## Features
+* **NEW** Context Menu for most commands. 
 * **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use F7. 
 * Display counter example for failing proof (requires Dafny +1.9.15)
 * IntelliSense for classes
@@ -19,6 +20,7 @@ Dafny support for Visual Studio Code.
 * Right hand size status bar item relates to the state of the DafnyServer.
 
 ![assertions animation](simpleassert.gif)
+
 More examples at the end...
 
 ## Shortcuts
@@ -37,8 +39,6 @@ More examples at the end...
 ## Requirements - Installation guide
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
 * [Binary dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), which contains `DafnyServer.exe` and its dependencies. **This and next releases will use a own release of Dafny to support more features, like Refactorings**
-* The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
-
 
 ## Extension Settings
 
@@ -59,6 +59,7 @@ The following are optional:
 * `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
 # Release Notes
+* 0.10.2 Added Context Menu Commands
 * 0.10.1 Manually show counterexample, flow graph
 * 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes
 * 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
@@ -81,18 +82,22 @@ The following are optional:
 
 ## Installation
 On the first start the plugin asks you to install Dafny automatically. 
+
 ![assertions animation](installation.gif)
 
 ## Add null check
 Some diagnostics can be directly inserted with a quickfix at the beginning of a line.
+
 ![assertions animation](addnullcheck.gif)
 
 ## Compile and Run
-Pressed F5 to compile and run the program
+Pressed F5 to compile and run the program.
+
 ![assertions animation](compileandrun.gif)
 
 ## CounterExample
 Pressed F7 to show counterexamples.
+
 ![assertions animation](counterexample.gif)
 
 
