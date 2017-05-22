@@ -2,7 +2,7 @@
     "name": "dafny-vscode",
     "displayName": "Dafny VSCode",
     "description": "Dafny support for Visual Studio Code",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "publisher": "FunctionalCorrectness",
     "homepage": "https://github.com/FunctionalCorrectness/",
     "repository": {
@@ -22,6 +22,40 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
+        "menus": {
+            "editor/context": [
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.restartDafnyServer",
+                    "group": "7_Dafny@4"
+                },
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.compile",
+                    "group": "7_Dafny@5"
+                },
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.compileAndRun",
+                    "group": "7_Dafny@6"
+                },
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.showDotGraph",
+                    "group": "7_Dafny@3"
+                },
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.showCounterExample",
+                    "group": "7_Dafny@1"
+                },
+                {
+                    "when": "editorTextFocus && editorLangId == dafny",
+                    "command": "dafny.hideCounterExample",
+                    "group": "7_Dafny@2"
+                }
+            ]
+        },
         "keybindings": [
             {
                 "command": "dafny.compile",
@@ -48,6 +82,11 @@
             {
                 "command": "dafny.hideCounterExample",
                 "key": "f8",
+                "when": "editorTextFocus && editorLangId == dafny"
+            },
+            {
+                "command": "dafny.restartDafnyServer",
+                "key": "f9",
                 "when": "editorTextFocus && editorLangId == dafny"
             }
         ],
@@ -127,6 +166,26 @@
                 "command": "dafny.uninstallDafny",
                 "icon": "$(issue-reopened)",
                 "title": "Dafny: Uninstall Dafny"
+            },
+            {
+                "command": "dafny.compile",
+                "title": "Dafny: Compile"
+            },
+            {
+                "command": "dafny.compileAndRun",
+                "title": "Dafny: Compile and Run"
+            },
+            {
+                "command": "dafny.showDotGraph",
+                "title": "Dafny: Show Flow Graph"
+            },
+            {
+                "command": "dafny.showCounterExample",
+                "title": "Dafny: Show CounterExample"
+            },
+            {
+                "command": "dafny.hideCounterExample",
+                "title": "Dafny: Hide CounterExample"
             }
         ]
     },
