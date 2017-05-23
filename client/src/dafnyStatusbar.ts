@@ -91,8 +91,8 @@ export class Statusbar {
 
         if (this.serverpid) {
             this.serverStatusBar.text = StatusString.ServerUp;
-            this.serverStatusBar.text += " (pid " + this.serverpid + ")";
-            this.serverStatusBar.text += " | Version " + this.serverversion.trim() + " | " + this.serverStatus + " | ";
+            //this.serverStatusBar.text += " (pid " + this.serverpid + ")";
+            this.serverStatusBar.text += /*" | Version " + this.serverversion.trim() +*/ " | " + this.serverStatus + " | ";
             this.serverStatusBar.text += "Queue: " + this.queueSize + " |";
         } else {
             this.serverStatusBar.text = StatusString.ServerDown;
