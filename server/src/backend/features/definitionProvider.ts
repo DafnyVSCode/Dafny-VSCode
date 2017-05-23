@@ -49,7 +49,7 @@ export class DafnyDefinitionProvider {
             const call = documentDecorator.getFullyQualifiedNameOfCalledMethod(position);
             return this.server.symbolService.getSymbols(documentDecorator.document).then((symbolTables: SymbolTable[]) => {
                 for(const symbolTable of symbolTables) {
-                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.symbolType === SymbolType.Call && s.call === call)) {
+                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.isOfType([SymbolType.Call]) && s.call === call)) {
                         const definitionSymbol = symbolTable.symbols.find((s: Symbol) => s.isFuzzyDefinitionForSymbol(symb));
                         if(definitionSymbol) {
                             return new DafnyDefinitionInformtation(definitionSymbol);

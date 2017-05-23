@@ -34,6 +34,7 @@ export class Symbol {
     public ensures: string[];
     public referencedClass: string;
     public referencedModule: string;
+
     constructor(symbol: any, document: TextDocument) {
         this.column = adjustDafnyColumnPositionInfo(symbol.Column);
         this.line = adjustDafnyLinePositionInfo(symbol.Line);
@@ -73,19 +74,13 @@ export class Symbol {
         return !isNaN(this.column) && !isNaN(this.line) && this.name !== "" && this.name !== undefined;
     }
     public addEnsuresClauses(clauses: any) {
-        if(clauses && clauses.length) {
-            for(const clause of clauses) {
-                this.ensures.push(clause);
-            }
-        }
+        this.ensures = this.addClauses(clauses);
+
     }
     public addRequiresClauses(clauses: any) {
-        if(clauses && clauses.length) {
-            for(const clause of clauses) {
-                this.requires.push(clause);
-            }
-        }
+        this.requires = this.addClauses(clauses);
     }
+
     public prettyEnsures(): string[] {
         return this.ensures.map((e: string) => "Ensures " + e);
     }
@@ -150,6 +145,16 @@ export class Symbol {
         return this.name === name;
     }
 
+    private addClauses(clauses: any, ): string[] {
+        const clauseHolder: string[] = [];
+        if(clauses && clauses.length) {
+            for(const clause of clauses) {
+                clauseHolder.push(clause);
+            }
+        }
+        return clauseHolder;
+    }
+
     private isTypeAt(word: string, type: SymbolType, position: Position = null): boolean {
         const isTypeOfName = this.isOfType([type]) && this.hasName(word);
         if(position !== null) {
@@ -168,6 +173,7 @@ export class Reference {
     public range: Range;
     public document: TextDocument;
     public referencedName: string;
+
     constructor(reference: any, document: TextDocument) {
         this.column = adjustDafnyColumnPositionInfo(reference.Column);
         this.line = adjustDafnyLinePositionInfo(reference.Line);

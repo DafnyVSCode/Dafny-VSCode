@@ -7,7 +7,7 @@ export function methodAt(symbols: Symbol[], range: Range) {
         return null;
     }
     return symbols.find((e: Symbol) => {
-        return (e.symbolType === SymbolType.Method || e.symbolType === SymbolType.Function  || e.symbolType === SymbolType.Predicate)
+        return (e.isOfType([SymbolType.Method, SymbolType.Function, SymbolType.Predicate]))
             && rangesIntersect(e.range, range);
     });
 }

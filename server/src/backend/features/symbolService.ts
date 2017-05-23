@@ -7,6 +7,7 @@ import { Reference, Symbol, SymbolTable, SymbolType } from "./symbols";
 export class SymbolService {
     private symbolTable: {[fileName: string]: SymbolTable} = {};
     private documentTable: {[fileName: string]: TextDocument} = {};
+
     public constructor(public server: DafnyServer) {}
 
     public addSymbols(doc: TextDocument, symbols: SymbolTable, forceAddition: boolean = false): void {
@@ -27,27 +28,13 @@ export class SymbolService {
     public getTextDocument(uri: string): TextDocument {
         return this.documentTable[uri];
     }
+
     public getSymbols(doc: TextDocument, forceOld: boolean = false): Promise<SymbolTable[]> {
         const hash = hashString(doc.getText());
-        const symbolTables: SymbolTable[] = [];
-        for(const key in this.symbolTable) {
-            if(key !== doc.uri) {
-                symbolTables.push(this.symbolTable[key]);
-            }
-        }
+        const symbolTables = this.getAllCachedExcept(doc.uri);
         const symbols = this.symbolTable[doc.uri];
         if(!symbols || (!forceOld && hash !== symbols.hash)) {
-            return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
-                if(symb.symbols.length >  0) {
-                    symb.hash = hashString(doc.getText());
-                    this.addSymbols(doc, symb, true);
-                    symbolTables.push(symb);
-                }else {
-                    symbolTables.push(symbols);
-                }
-
-                return Promise.resolve(symbolTables);
-            });
+            return this.loadSymbols(doc, symbolTables, symbols);
         } else {
             symbolTables.push(symbols);
             return Promise.resolve(symbolTables);
@@ -72,6 +59,28 @@ export class SymbolService {
             return Promise.resolve(null);
         });
     }
+
+    private getAllCachedExcept(uri: string): SymbolTable[] {
+        const symbolTables: SymbolTable[] = [];
+        for(const key in this.symbolTable) {
+            if(key !== uri) {
+                symbolTables.push(this.symbolTable[key]);
+            }
+        }
+        return symbolTables;
+    }
+    private loadSymbols(doc: TextDocument, symbolTables: SymbolTable[], symbols: SymbolTable): Promise<SymbolTable[]> {
+        return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
+            if(symb.symbols.length >  0) {
+                symb.hash = hashString(doc.getText());
+                this.addSymbols(doc, symb, true);
+                symbolTables.push(symb);
+            } else {
+                symbolTables.push(symbols);
+            }
+            return Promise.resolve(symbolTables);
+        });
+    }
     private parseSymbols(response: any, document: TextDocument): SymbolTable {
         const symbolTable = new SymbolTable(document.uri);
         if(response && response.length && response.length > 0) {
@@ -85,7 +94,7 @@ export class SymbolService {
         return symbolTable;
     }
     private parseSymbol(symbol: any, document: TextDocument): Symbol {
-        const parsedSymbol = new Symbol(symbol, document);
+        let parsedSymbol = new Symbol(symbol, document);
         if(parsedSymbol.isValid()) {
             parsedSymbol.setSymbolType(symbol.SymbolType);
             if(parsedSymbol.isOfType(
@@ -102,18 +111,22 @@ export class SymbolService {
                 parsedSymbol.referencedClass = symbol.ReferencedClass;
                 parsedSymbol.referencedModule = symbol.ReferencedModule;
             }
-            if(symbol.References && symbol.References.length && symbol.References.length > 0) {
-                for(const reference of symbol.References) {
-                    const parsedReference = new Reference(reference, document);
-                    if(parsedReference.isValid()) {
-                        parsedSymbol.References.push(parsedReference);
-                    }
+            parsedSymbol = this.parseReferences(symbol, parsedSymbol, document);
+        }
+        return parsedSymbol;
+    }
+
+    private parseReferences(symbol: any, parsedSymbol: Symbol, document: TextDocument): Symbol {
+        if(symbol.References && symbol.References.length && symbol.References.length > 0) {
+            for(const reference of symbol.References) {
+                const parsedReference = new Reference(reference, document);
+                if(parsedReference.isValid()) {
+                    parsedSymbol.References.push(parsedReference);
                 }
             }
         }
         return parsedSymbol;
     }
-
     private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
         this.server.addDocument(document, DafnyVerbs.Symbols, (response: string) =>  {
             this.handleProcessData(response, ((data) => {resolve(data); }));

@@ -2,6 +2,7 @@ import { EOL } from "os";
 import { Command, Diagnostic } from "vscode-languageserver";
 import { Position, TextDocument, TextEdit } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
+import { DocumentDecorator } from "./../../../vscodeFunctions/documentDecorator";
 import { DafnyServer } from "./../../dafnyServer";
 import { methodAt } from "./../semanticAnalysis";
 import { SymbolType } from "./../symbols";
@@ -12,22 +13,10 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
 
     protected calculateCommands(): Promise<Command[]> {
         if (this.diagnostic.message === DafnyReports.IndexBounding) {
-            const arrayExprRange = this.documentDecorator.readArrayExpression(this.diagnostic.range.start);
-            const arrExpression = this.documentDecorator.getText(arrayExprRange);
-            const arrIdentifier = this.documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line,
-                arrayExprRange.start.character));
-            if (arrExpression !== "" && arrIdentifier !== "") {
+            const arr = new ArrayInformation(this.documentDecorator, this.diagnostic.range.start);
+            if (arr.isValid()) {
                 return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
-                    const definingMethod = methodAt(symbols, this.diagnostic.range);
-                    const insertPosition: Position = this.findIndexInsertionPoint(definingMethod);
-                    if (insertPosition && insertPosition !== this.dummyPosition) {
-                        const methodStart = this.documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
-                        if (definingMethod && insertPosition !== methodStart) {
-                            this.addInvariantCommand(insertPosition, arrExpression, arrIdentifier);
-                        } else {
-                            this.addBoundCheckCommand(insertPosition, arrExpression, arrIdentifier);
-                        }
-                    }
+                    this.addNecessaryConstraints(symbols, arr);
                     return Promise.resolve(this.commands);
                 }).catch((err: Error) => { console.error(err); return Promise.resolve([]); });
             }
@@ -35,16 +24,29 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         return Promise.resolve(this.commands);
     }
 
-    private findIndexInsertionPoint(definingMethod: Symbol): Position {
-        let insertPosition: Position = this.dummyPosition;
-        if (definingMethod) {
-            insertPosition = this.documentDecorator.findInsertionPointOfContract(definingMethod.start);
-        }
-        if (!insertPosition || insertPosition === this.dummyPosition) {
-            insertPosition = this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
-        }
-        return insertPosition;
+    protected findBestEffortInsertPosition(): Position {
+        return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
+
+    protected findExactInsertPosition(methodStart: Symbol): Position {
+        if (!methodStart) {
+            return null;
+        }
+        return this.documentDecorator.findInsertionPointOfContract(methodStart.start);
+     }
+
+     private addNecessaryConstraints(symbols: Symbol[], array: ArrayInformation): void {
+        const definingMethod = methodAt(symbols, this.diagnostic.range);
+        const insertPosition: Position = this.findInsertionPosition(definingMethod);
+        if (insertPosition && insertPosition !== this.dummyPosition) {
+            const methodStart = this.documentDecorator.findBeginOfContractsOfMethod(definingMethod.start);
+            if (definingMethod && insertPosition !== methodStart) {
+                this.addInvariantCommand(insertPosition, array.indexExpression, array.identifier);
+            } else {
+                this.addBoundCheckCommand(insertPosition, array.indexExpression, array.identifier);
+            }
+        }
+     }
 
     private addInvariantCommand(insertPosition: Position, arrExpression: string, arrIdentifier: string): void {
         const invariantMessage = "invariant 0 <= " + arrExpression + " < " + arrIdentifier + ".Length";
@@ -62,5 +64,20 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         this.commands.push(Command.create(`Add bound checks: ${lowerBoundMessage} and ${upperBoundMessage}`,
             Commands.EditTextCommand, this.uri,
             this.dummyDocId, [editLower, editHigher]));
+    }
+}
+
+class ArrayInformation {
+    public identifier: string;
+    public indexExpression: string;
+
+    constructor(documentDecorator: DocumentDecorator, startPosition: Position) {
+        const arrayExprRange = documentDecorator.readArrayExpression(startPosition);
+        this.indexExpression = documentDecorator.getText(arrayExprRange);
+        this.identifier = documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line,
+            arrayExprRange.start.character));
+    }
+    public isValid(): boolean {
+        return this.identifier !== "" && this.indexExpression !== "";
     }
 }
