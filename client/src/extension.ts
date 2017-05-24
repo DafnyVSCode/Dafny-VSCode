@@ -8,7 +8,7 @@ import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
 import { CompilerResult } from "./serverHelper/compilerResult";
 import { Config, EnvironmentConfig } from "./stringRessources";
-import { Answer, Commands, ErrorMsg, InfoMsg, LanguageServerNotification, LanguageServerRequest } from "./stringRessources";
+import { Answer, Commands, ErrorMsg, InfoMsg, LanguageServerNotification, LanguageServerRequest, WarningMsg } from "./stringRessources";
 
 let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
@@ -29,6 +29,8 @@ export function activate(context: vscode.ExtensionContext) {
             configurationSection: "dafny"
         }
     };
+
+    checkOpenInWorkspace();
 
     languageServer = new LanguageClient("dafny-vscode", "Dafny Language Server", serverOptions, clientOptions);
     languageServer.onReady().then(() => {
@@ -162,5 +164,11 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage("Installing error: " + e);
             provider.dafnyStatusbar.hideProgress();
         });
+    }
+
+    function checkOpenInWorkspace() {
+        if(vscode.workspace.rootPath === undefined) {
+            vscode.window.showWarningMessage(WarningMsg.NoWorkspace);
+        }
     }
 }
