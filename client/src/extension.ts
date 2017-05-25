@@ -4,6 +4,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from "vscode-languageclient";
 import { handlerApplyTextEdits } from "./commands";
+import { Context } from "./context";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
 import { CompilerResult } from "./serverHelper/compilerResult";
@@ -54,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         languageServer.onNotification(LanguageServerNotification.Ready, () => {
+            if (Context.unitTest) { Context.unitTest.backendStarted(); };
             provider.activate(context.subscriptions);
         });
     });
@@ -167,7 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     function checkOpenInWorkspace() {
-        if(vscode.workspace.rootPath === undefined) {
+        if (vscode.workspace.rootPath === undefined) {
             vscode.window.showWarningMessage(WarningMsg.NoWorkspace);
         }
     }
