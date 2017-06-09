@@ -107,7 +107,7 @@ function getWordAtPosSlow(column: number, wordDefinition: RegExp, text: string, 
 
 export function matchWordAtText(column: number, text: string, textOffset: number): WordAtPosition {
     const pos = column - 1 - textOffset;
-    const endStrings: string[] = [" ", "(", ")", "}", "{"];
+    const endStrings: string[] = [" ", "(", ")", "}", "{", ":"];
     const possibleStarts = endStrings.map((e: string) => text.lastIndexOf(e, pos - 1) + 1).filter((e: number) => e !== -1);
     const start = Math.max.apply(null, possibleStarts);
     const possibleEnds = endStrings.map((e: string) => text.indexOf(e, pos)).filter((e: number) => e !== -1);

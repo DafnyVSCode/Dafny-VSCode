@@ -1,4 +1,4 @@
-import { Position, TextDocument, WorkspaceEdit } from "vscode-languageserver";
+import { Position, Range, TextDocument, WorkspaceEdit } from "vscode-languageserver";
 import { TextEdit } from "vscode-languageserver-types";
 import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
 import { DafnyServer } from "./../dafnyServer";
@@ -92,6 +92,7 @@ class WorkSpaceRenameHolder {
     }
 
     private buildSymbolEdit(symbol: Symbol): TextEdit {
-        return TextEdit.replace(symbol.range, this.newName);
+        return TextEdit.replace(Range.create(symbol.start,
+            Position.create(symbol.start.line, symbol.start.character + symbol.name.length)), this.newName);
     }
 }
