@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.10.9
+BugFix: Rename method
+
 ## 0.10.8
 Warning if no workspace is used
 Changelog 
