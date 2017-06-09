@@ -7,6 +7,7 @@ export class Severity {
 }
 export class WarningMsg {
     public static MonoPathWrong: string = "dafny.monoPath set incorrectly; found mono in system PATH and will use it";
+    public static NoWorkspace: string = "Please use a workspace (File - Open Folder). Otherwise some features aren't working properly";
 }
 
 export class ErrorMsg {

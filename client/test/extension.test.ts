@@ -4,99 +4,144 @@
 //
 
 // the module 'assert' provides assertion methods from node
-/*import * as assert from "assert";
+import * as assert from "assert";
+import * as path from "path";
 import * as vscode from "vscode";
-import {Context} from "../src/backend/context";
-import {DafnyServer} from "../src/backend/dafnyServer";
-import {DafnyDefinitionProvider} from "../src/backend/features/definitionProvider";
-import {Statusbar} from "../src/frontend/dafnyStatusbar";
+import { Context } from "../src/context";
+import { VerificationResult } from "../src/verificationResult";
 
 const extensionID = "FunctionalCorrectness.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
-const tempFolder = samplesFolder;
 
-function getProvider(startFilePath: string, position: vscode.Position, expectedResult: any) {
-    let editor: vscode.TextEditor;
-    const workingFilePath = tempFolder + startFilePath;
 
-    const context: Context = new Context();
-    const statusbar: Statusbar = new Statusbar(context);
-    const dafnyServer = new DafnyServer(statusbar, context);
-    const dafnyDefinitionProvider = new DafnyDefinitionProvider(dafnyServer);
-    dafnyServer.reset();
-    let actual: any = null;
+export class UnitTestCallback {
+    backendStarted = () => { };
+    verificationComplete = (verificationResult: VerificationResult) => {
+        log("Status:" + verificationResult.verificationStatus.toString());
+    };
+    activated = () => { };
+}
 
-    const testPromise = vscode.workspace.openTextDocument(workingFilePath).then((workingDocument) => {
-        return vscode.window.showTextDocument(workingDocument);
-    }).then((_editor) => {
-        editor = _editor;
-        return dafnyDefinitionProvider.provideDefinition(_editor.document, position);
-    }).then((locationFound) => {
-        actual = locationFound;
-    }).then(() => {
-        return vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+Context.unitTest = new UnitTestCallback();
+
+function log(msg: string) {
+    console.log("[UnitTest] " + msg);
+}
+
+/*function wait(timeout): Promise<boolean> {
+    return new Promise((resolve) => {
+        setTimeout(function () {
+            resolve(true);
+        }, timeout);
     });
+}*/
 
-    return testPromise.then(() => {
-        assert.deepEqual(actual.range, expectedResult);
+function waitForBackendStarted(): Promise<boolean> {
+    return new Promise((resolve) => {
+        Context.unitTest.backendStarted = () => {
+            log("Backend started");
+            resolve(true);
+        }
     });
 }
 
-function verifyFile(startFilePath: string, expectedResult: any) {
-    let editor: vscode.TextEditor;
-    const workingFilePath = tempFolder + startFilePath;
-
-    const context: Context = new Context();
-    const statusbar: Statusbar = new Statusbar(context);
-    const dafnyServer = new DafnyServer(statusbar, context);
-    let actual: any = null;
-
-    const testPromise = vscode.workspace.openTextDocument(workingFilePath).then((workingDocument) => {
-        return vscode.window.showTextDocument(workingDocument);
-    }).then((_editor) => {
-        editor = _editor;
-        dafnyServer.reset();
-        dafnyServer.addDocument(_editor.document, "verify");
-        return new Promise((f) => setTimeout(f, 10000));
-    }).then(() => {
-        const result = context.verificationResults.latestResults[editor.document.fileName];
-        actual = result;
-    }).then(() => {
-        return;
-    }).then(() => {
-        return vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-    });
-
-    return testPromise.then(() => {
-        assert.deepEqual(actual, expectedResult);
+function waitForVerification(fileName: string, expectedResult: any): Promise<void> {
+    return new Promise((resolve) => {
+        Context.unitTest.verificationComplete = (verificationResult: VerificationResult) => {
+            log("Verification finished: " + fileName);
+            log(JSON.stringify(verificationResult));
+            resolve(verificationResult);
+        }
+    }).then((verificationResult) => {
+        assert.deepEqual(verificationResult, expectedResult);
     });
 }
+
+function waitForCounterExample(fileName: string, isCounterModelEmpty: boolean): Promise<void> {
+    return new Promise((resolve) => {
+        Context.unitTest.verificationComplete = (verificationResult: VerificationResult) => {
+            log("CounterExample finished: " + fileName);
+            log(JSON.stringify(verificationResult.counterModel));
+            resolve(verificationResult.counterModel);
+        }
+    }).then((counterModel: any) => {
+        if (isCounterModelEmpty) {
+            assert.equal(counterModel.States.length, 0, "Model is not empty")
+        } else {
+            assert.notEqual(counterModel.States.length, 0, "Model is empty");
+        }
+    });
+}
+
+function openFile(fileName: string): Promise<vscode.TextDocument> {
+    return new Promise((resolve) => {
+        let filePath = path.join(samplesFolder, fileName);
+        log("open " + filePath);
+        vscode.workspace.openTextDocument(filePath).then(document => {
+            vscode.window.showTextDocument(document).then(() => {
+                resolve(document);
+            });
+        });
+    });
+}
+
+function executeCommand(command: string, args?: any) {
+    log(command + (args ? " " + args : ""));
+    return vscode.commands.executeCommand(command, args);
+}
+
+/*function closeFile(): Thenable<{}> {
+    let filePath = path.join(samplesFolder, vscode.window.activeTextEditor.document.fileName);
+    log("close " + filePath);
+    return vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+}*/
+
 
 suite("DafnyServer Tests", () => {
     // tslint:disable-next-line:only-arrow-functions
-    test("Verify simple.dfy", function() {
-        this.timeout(30000);
-        return verifyFile("simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
+    test("Verify simple.dfy", function () {
+        log("Language Detection, and Backend Startup test.");
+        this.timeout(40000);
+
+        return openFile("simple.dfy").then((document: any) => {
+            if (document.languageId !== "dafny") {
+                throw new Error("The language of dafny file was not detected correctly: should: dafny, is: " + document.languageId);
+            }
+            return waitForBackendStarted();
+        });
     });
+
     // tslint:disable-next-line:only-arrow-functions
-    test("Verify simple_invalid_assert.dfy", function() {
-        this.timeout(30000);
-        return verifyFile("simple_invalid_assert.dfy", { crashed: false, errorCount: 1, proofObligations: 1 });
+    test("Verify simple_invalid_assert.dfy", function () {
+        log("Test simple verification");
+        this.timeout(15000);
+        return waitForVerification(samplesFolder + "simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
+    });
+
+    // tslint:disable-next-line:only-arrow-functions
+    test("Verify countermodel", function () {
+        this.timeout(40000);
+
+        return openFile("abs_failing.dfy").then(() => {
+            return waitForVerification(samplesFolder + "abs_failing.dfy",
+                { crashed: false, errorCount: 1, proofObligations: 1 }).then(() => {
+                    executeCommand("dafny.showCounterExample");
+                    return waitForCounterExample("abs_failing.dfy", false);
+                });
+        });
+    });
+
+    // tslint:disable-next-line:only-arrow-functions
+    test("Verify countermodel", function () {
+        this.timeout(40000);
+
+        return openFile("simple2.dfy").then(() => {
+            return waitForVerification(samplesFolder + "simple2.dfy",
+                { crashed: false, errorCount: 0, proofObligations: 2 }).then(() => {
+                    executeCommand("dafny.showCounterExample");
+                    return waitForCounterExample("simple2.dfy", true);
+                });
+        });
     });
 });
 
-suite("DafnyDef Tests", () => {
-    // tslint:disable-next-line:only-arrow-functions
-    test("Verify go to definition", function() {
-        this.timeout(30000);
-        return getProvider("gotodefinition.dfy", new vscode.Position(6, 13),
-            {_end: new vscode.Position(1, 11), _start: new vscode.Position(1, 11)});
-    });
-    // tslint:disable-next-line:only-arrow-functions
-    test("Verify go to definition, not available", function() {
-        this.timeout(30000);
-        return getProvider("gotodefinition.dfy", new vscode.Position(14, 14),
-            {_end: new vscode.Position(5, 11), _start: new vscode.Position(5, 11)});
-    });
-});
-*/
