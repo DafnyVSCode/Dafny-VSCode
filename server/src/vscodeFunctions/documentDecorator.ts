@@ -276,7 +276,7 @@ export class DocumentDecorator {
             iterator.skipToChar("{");
         }
         if(iterator.isValidPosition) {
-            return vscode.Position.create(iterator.lineIndex, iterator.charIndex - 1);
+            return vscode.Position.create(iterator.lineIndex, iterator.charIndex - 2);
         }
         return startOfTopLevelContracts;
 
