@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.10.10
+BugFix: Decrease guard
+
 ## 0.10.9
 BugFix: Rename method
 
