@@ -120,5 +120,8 @@ You can run the tests with "npm test" while in the client folder. Feel free to a
 
 If you need to change the DafnyServer itself, which should not often be the case, check with [Microsoft Dafny](https://github.com/Microsoft/dafny) in order to integrate your changes.
 
+# Contributing
+
+We welcome all contributions! Please create a pull request and we will take care of releasing a new version when appropriate.
 
 [![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
