@@ -95,7 +95,7 @@ Pressed F5 to compile and run the program
 Pressed F7 to show counterexamples.
 ![assertions animation](counterexample.gif)
 
-#Development
+# Development
 It is pretty simple to contribute to this plugin. 
 All it takes is having Visual Studio Code and npm installed.
 Simply clone this repository and switch into the new folder. Execute the following commands:
