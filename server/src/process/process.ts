@@ -66,19 +66,9 @@ export class ProcessWrapper {
     }
     private writeRequestToServer(request: string, verb: string, serverEndTag: string,
                                  commandFailedMessage: string, requestFailedMessage: string): void {
-        let good: boolean = this.serverProc.stdin.write(verb + "\n", () => {
-            if (!good) {
-                throw new CommandFailedException(commandFailedMessage);
-            }
-            good = this.serverProc.stdin.write(request + "\n", () => {
-                if (!good) {
-                    throw new RequestFailedException(requestFailedMessage);
-                }
-                good = this.serverProc.stdin.write(serverEndTag + "\n", () => {
-                    if (!good) {
-                        throw new CommandEndFailedException(commandFailedMessage);
-                    }
-                });
+        this.serverProc.stdin.write(verb + "\n", () => {
+            this.serverProc.stdin.write(request + "\n", () => {
+                this.serverProc.stdin.write(serverEndTag + "\n", () => {});
             });
         });
     }
