@@ -23,7 +23,7 @@ export class DotGraphProvider implements vscode.TextDocumentContentProvider {
             const filename = vscode.window.activeTextEditor.document.uri.fsPath.split("/").pop().split("\\").pop();
             console.log("**/*" + filename + "*.dot");
             this.languageServer.sendRequest(LanguageServerRequest.Dotgraph, tditem).then(() => {
-                vscode.workspace.findFiles("**/*" + filename + "*.dot", "**∕node_modules∕**").then((files) => {
+                vscode.workspace.findFiles("**/*" + filename + "*.dot", "**/node_modules/**").then((files) => {
                     let graphs = "";
                     for (const file of files) {
                         const filecontent = this.getSvgContent(file.fsPath);
