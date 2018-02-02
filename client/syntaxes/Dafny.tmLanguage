@@ -196,49 +196,49 @@
 					<key>match</key>
 					<string>\b(try|catch|finally|throw)\b</string>
 					<key>name</key>
-					<string>keyword.control.catch-exception.java</string>
+					<string>keyword.control.catch-exception.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>\?|:</string>
+					<string>\|:</string>
 					<key>name</key>
-					<string>keyword.control.java</string>
+					<string>keyword.control.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(==|!=|&lt;=|&gt;=|&lt;&gt;|&lt;|&gt;)</string>
 					<key>name</key>
-					<string>keyword.operator.comparison.java</string>
+					<string>keyword.operator.comparison.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(:=)</string>
 					<key>name</key>
-					<string>keyword.operator.assignment.java</string>
+					<string>keyword.operator.assignment.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(\-\-|\+\+)</string>
 					<key>name</key>
-					<string>keyword.operator.increment-decrement.java</string>
+					<string>keyword.operator.increment-decrement.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(\-|\+|\*|\/|%)</string>
 					<key>name</key>
-					<string>keyword.operator.arithmetic.java</string>
+					<string>keyword.operator.arithmetic.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(!|&amp;&amp;|\|\|)</string>
 					<key>name</key>
-					<string>keyword.operator.logical.java</string>
+					<string>keyword.operator.logical.dafny</string>
 				</dict>
 				<dict>
 					<key>match</key>
 					<string>(?&lt;=\S)\.(?=\S)</string>
 					<key>name</key>
-					<string>keyword.operator.dereference.java</string>
+					<string>keyword.operator.dereference.dafny</string>
 				</dict>
 			</array>
 		</dict>
