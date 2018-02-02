@@ -13,10 +13,8 @@ export class DotGraphProvider implements vscode.TextDocumentContentProvider {
 
     }
 
-    public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
+    public provideTextDocumentContent(_: vscode.Uri): Thenable<string> {
         return new Promise((resolve, reject) => {
-            let content = "<h1>" + uri.fsPath + "</h1>";
-            content += "2";
             const textDocument = vscode.window.activeTextEditor.document;
             const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
                 textDocument.languageId, textDocument.version, textDocument.getText()));

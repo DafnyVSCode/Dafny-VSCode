@@ -4,6 +4,11 @@
   "description": "Dafny support for Visual Studio Code",
   "version": "0.8.5",
   "publisher": "FunctionalCorrectness",
+  "homepage": "https://github.com/FunctionalCorrectness/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FunctionalCorrectness/VS-Code-Language-Server-for-Dafny.git"
+  },
   "license": "MIT",
   "engines": {
     "node": "*"
@@ -17,7 +22,7 @@
     "semver": "^5.3.0",
     "typescript-collections": "^1.2.3",
     "utf8": "*",
-    "vscode-languageserver": "^3.1.0",
+    "vscode-languageserver": "^3.4.0",
     "vscode-uri": "^1.0.0"
   },
   "devDependencies": {

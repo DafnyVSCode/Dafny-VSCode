@@ -9,13 +9,14 @@
         "type": "git",
         "url": "https://github.com/FunctionalCorrectness/VS-Code-Language-Server-for-Dafny.git"
     },
+    "license": "MIT",
     "galleryBanner": {
         "color": "#639ECA",
         "theme": "dark"
     },
     "icon": "logo.png",
     "engines": {
-        "vscode": "^1.6.0"
+        "vscode": "^1.15.0"
     },
     "categories": [
         "Languages"
@@ -205,10 +206,10 @@
         "@types/node": "^6.0.40",
         "mocha": "^2.3.3",
         "typescript": "^2.0.3",
-        "vscode": "^1.0.0"
+        "vscode": "^1.1.5"
     },
     "dependencies": {
         "viz.js": "^1.7.1",
-        "vscode-languageclient": "^3.1.0"
+        "vscode-languageclient": "^3.4.0"
     }
 }
