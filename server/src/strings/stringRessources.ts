@@ -60,7 +60,7 @@ export class Answer {
 }
 
 export class Installer {
-    public static Repository = "FunctionalCorrectness/dafny-microsoft";
+    public static Repository = "Microsoft/dafny";
     public static ReleaseUrl = "https://api.github.com/repos/" + Installer.Repository + "/releases";
 }
 

@@ -23,12 +23,18 @@ export class DafnyInstaller {
 
     public latestVersionInstalled(localVersion: string): Promise<boolean> {
         return this.getReleaseInformation().then((json) => {
-
+            const localVersionSemVer = localVersion.match(/(\d+\.\d+\.\d+)/);
             if (json && json.length > 0 && json[0].name) {
                 const latestVersion = json[0].name; // semver ignores leading v
-                console.log("Local: " + localVersion);
-                console.log("Remote:" + latestVersion);
-                return semver.gte(localVersion, latestVersion);
+                const latestVersionSemVer = latestVersion.match(/(\d+\.\d+\.\d+)/);
+                if (localVersionSemVer != null && latestVersionSemVer != null) {
+                    console.log("Local: " + localVersionSemVer[0]);
+                    console.log("Remote:" + latestVersionSemVer[0]);
+                    return semver.gte(localVersionSemVer[0], latestVersionSemVer[0]);
+                } else {
+                    console.log("can't parse version numbers");
+                    return Promise.reject(false);
+                }
             } else {
                 console.log("cant get release information");
                 return Promise.reject(false);
