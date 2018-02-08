@@ -15,8 +15,8 @@ import { NotificationService } from "../notificationService";
 
 export class DafnyInstaller {
 
-    private basePath = this.resolvePath("~/.dafny");
-    private downloadFile = this.resolvePath("~/dafny.zip");
+    private basePath = this.resolvePath(pathHelper.join(__dirname, "../../"));
+    private downloadFile = this.resolvePath(pathHelper.join(this.basePath, "dafny.zip"));
 
     constructor(private notificationService: NotificationService, private dafnySettings: DafnySettings) {
     }
