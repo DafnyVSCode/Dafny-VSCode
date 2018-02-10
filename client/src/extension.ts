@@ -17,7 +17,7 @@ const runner: DafnyRunner = new DafnyRunner();
 
 export function activate(context: vscode.ExtensionContext) {
     const serverModule = context.asAbsolutePath(path.join("server", "server.js"));
-    const debugOptions = { execArgv: ["--nolazy", "--debug=6009"] };
+    const debugOptions = { execArgv: ["--nolazy", "--inspect=6009"] };
 
     const serverOptions: ServerOptions = {
         debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions },

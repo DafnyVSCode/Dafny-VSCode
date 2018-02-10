@@ -15,8 +15,8 @@ import { NotificationService } from "../notificationService";
 
 export class DafnyInstaller {
 
-    private basePath = this.resolvePath(pathHelper.join(__dirname, "../../"));
-    private downloadFile = this.resolvePath(pathHelper.join(this.basePath, "dafny.zip"));
+    private basePath = this.resolvePath(pathHelper.join(__dirname, "../..", "dafny"));
+    private downloadFile = this.resolvePath(pathHelper.join(this.basePath, "..", "dafny.zip"));
 
     constructor(private notificationService: NotificationService, private dafnySettings: DafnySettings) {
     }
@@ -24,8 +24,8 @@ export class DafnyInstaller {
     public latestVersionInstalled(localVersion: string): Promise<boolean> {
         return this.getReleaseInformation().then((json) => {
             const localVersionSemVer = localVersion.match(/(\d+\.\d+\.\d+)/);
-            if (json && json.length > 0 && json[0].name) {
-                const latestVersion = json[0].name; // semver ignores leading v
+            if (json && json.name) {
+                const latestVersion = json.name; // semver ignores leading v
                 const latestVersionSemVer = latestVersion.match(/(\d+\.\d+\.\d+)/);
                 if (localVersionSemVer != null && latestVersionSemVer != null) {
                     console.log("Local: " + localVersionSemVer[0]);
@@ -75,9 +75,9 @@ export class DafnyInstaller {
     }
 
     public downloadRelease(json: any): Promise<boolean> {
-        if (json && json.length > 0 && json[0].assets) {
+        if (json && json.assets) {
 
-            const assets = json[0].assets;
+            const assets = json.assets;
             let url = "";
 
             if (os.platform() === EnvironmentConfig.Win32) {
@@ -132,9 +132,10 @@ export class DafnyInstaller {
     }
 
     public uninstall(): void {
-        if (this.dafnySettings.basePath && this.dafnySettings.basePath.length > 10) {
-            console.log("remove " + this.dafnySettings.basePath);
-            this.deleteFolderRecursive(this.dafnySettings.basePath);
+        let path = this.basePath;
+        if (path && path.length > 10) {
+            console.log("remove " + path);
+            this.deleteFolderRecursive(path);
         }
     }
 
@@ -170,7 +171,6 @@ export class DafnyInstaller {
     };
 
     private download(url, filePath): Promise<boolean> {
-        console.log("downloading: " + url);
         return new Promise<any>((resolve, reject) => {
             try {
                 this.notificationService.startProgress();
@@ -197,11 +197,11 @@ export class DafnyInstaller {
                         file.close();
                         return resolve(true);
                     });
-                    request.on("error", (err) => {
-                        fs.unlink(filePath);
-                        console.error("Error downloading dafny: " + err.message);
-                        return reject(false);
-                    });
+                });
+                request.on("error", (err) => {
+                    fs.unlink(filePath);
+                    console.error("Error downloading dafny: " + err.message);
+                    return reject(false);
                 });
             } catch (e) {
                 console.error("Error downloading dafny: " + e);
