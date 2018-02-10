@@ -75,7 +75,7 @@ export class SymbolService {
                 symb.hash = hashString(doc.getText());
                 this.addSymbols(doc, symb, true);
                 symbolTables.push(symb);
-            } else {
+            } else if (symbols) {
                 symbolTables.push(symbols);
             }
             return Promise.resolve(symbolTables);
