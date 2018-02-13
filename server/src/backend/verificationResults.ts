@@ -142,7 +142,7 @@ export class VerificationResults {
         if (relatedLocations) {
             const lineNum: number = parseInt(relatedLocations[1], 10) - 1; // 1 based
             const colNum: number = Math.max(0, parseInt(relatedLocations[2], 10) - 1); // 1 based, but 0 can appear in some cases
-            let msgStr: string = relatedLocations[5];
+            let msgStr: string = relatedLocations[3];
 
             const start: vscode.Position = vscode.Position.create(lineNum, colNum);
             const end: vscode.Position = vscode.Position.create(lineNum, Number.MAX_VALUE);
