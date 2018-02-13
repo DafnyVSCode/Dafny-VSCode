@@ -83,10 +83,10 @@ export class VerificationResults {
                 const end: vscode.Position = vscode.Position.create(lineNum, Number.MAX_VALUE);
                 const range: vscode.Range = vscode.Range.create(start, end);
 
-                const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Error) ?
-                    vscode.DiagnosticSeverity.Error : (typeStr === Severity.Warning) ?
+                const severity: vscode.DiagnosticSeverity = (typeStr === Severity.Info) ?
+                    vscode.DiagnosticSeverity.Information : (typeStr === Severity.Warning) ?
                         vscode.DiagnosticSeverity.Warning :
-                        vscode.DiagnosticSeverity.Information;
+                        vscode.DiagnosticSeverity.Error;
 
                 if (severity === vscode.DiagnosticSeverity.Error) {
                     errorCount++;
@@ -97,6 +97,10 @@ export class VerificationResults {
                     msgStr += " Related location " + relatedLocationCounter + ": Line: " +
                         (relatedRange.start.line + 1) + ", Col: " + (relatedRange.start.character + 1);
                     relatedLocationCounter++;
+                }
+
+                if (typeStr == Severity.TimedOut) {
+                    msgStr += " (timed out)";
                 }
 
                 lastDiagnostic = vscode.Diagnostic.create(range, msgStr, severity);

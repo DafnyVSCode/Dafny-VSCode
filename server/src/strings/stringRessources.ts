@@ -2,8 +2,8 @@
 
 export class Severity {
     public static Warning: string = "Warning";
-    public static Error: string = "Error";
-
+    public static Info: string = "Info";
+    public static TimedOut: string = "Timed out on";
 }
 export class WarningMsg {
     public static MonoPathWrong: string = "dafny.monoPath set incorrectly; found mono in system PATH and will use it";
