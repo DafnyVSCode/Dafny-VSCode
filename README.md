@@ -2,21 +2,23 @@
 Dafny support for Visual Studio Code.
 
 ## Features
-* **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use F7. 
-* Display counter example for failing proof (requires Dafny +1.9.15)
+
+
+* Provides .dfy language support to vscode.
+* Automatic installation of Dafny
+* Update notification if there is a newer release of Dafny. 
+* Automatic verification as one types
+  * Errors, warnings and hints are shown through the vscode interface.
+  * When there are no errors, you get a thumbsup on the status bar
+* Display counter examples for failing proofs
+* CodeLens showing method references
 * IntelliSense for classes
 * Compile and Run dfy file
-* Update notification if there is a newer release of Dafny. 
-* CodeLens showing method references
-* DafnyDefinition provider to support refactorings in the future 
-* Automatic verification as one types 
-* Automatic installation of Dafny
-* Provides .dfy language support to vscode.
-* Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
-* Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
 * Syntax highlighting thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
 * Left hand side status bar item provides information about the current file.
 * Right hand size status bar item relates to the state of the DafnyServer.
+* DafnyDefinition provider to support refactorings in the future 
+
 
 ![assertions animation](simpleassert.gif)
 More examples at the end...
@@ -34,10 +36,10 @@ More examples at the end...
 * `Uninstall DafnyServer` Uninstalls the DafnyServer
 * `Restart DafnyServer` Restart the DafnyServer
 
-## Requirements - Installation guide
-* A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
-* [Binary dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), which contains `DafnyServer.exe` and its dependencies. **This and next releases will use a own release of Dafny to support more features, like Refactorings**
-* The path to the `DafnyServer.exe` set in the user configuration as `dafny.dafnyServerPath` (see the `File` menu on Windows and GNU+Linux, `Code` menu on OSX).
+## Installation guide
+* The plugin needs a C# runtime to run the Dafny server. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
+* Install the Dafny VSCode extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FunctionalCorrectness.dafny-vscode#overview). When you first open a Dafny file, the extension will prompt you to automatically install Dafny.
+* In case you would like the plugin to use a different [Dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
 
 
 ## Extension Settings
@@ -59,8 +61,9 @@ The following are optional:
 * `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
 # Release Notes
-* 0.10.1 Manually show counterexample, flow graph
-* 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes
+* 0.11.1 Use Dafny releases from Microsoft/dafny. Miscellaneous bug fixes.
+* 0.10.1 Manually show counterexample, flow graph.
+* 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes.
 * 0.9.0 Switched to Language Server. IntelliSense for classes, compile and execute Dafny program in VSCode. QuickFix for decrease, increase and object may be null. 
 * 0.8.0 CodeLens showing method references, Go to Definition, version checking for newer Dafny release. 
 * 0.6.0 DafnyDef allows to get SymbolInformation from DafnyServer, which will allow in the future to implement Refactorings. Go to Definition is already implemented. 
@@ -112,8 +115,7 @@ This opens the language server part and the client part of the plugin in two dif
 In the server editor, press CTRL + Shift + b to compile. The task that is started also watches file changes and recompiles automatically after saving.
 
 To try out the changes, go to the client editor and press F5. A new instance of Visual Studio Code will be started that has the Dafny plugin running and ready for testing.
-Sometimes, Visual Studio Code does not recognize changes and does not apply them to the running test instance. If this is the case, simply close and restart the test instance, the changes
-should then be applied. 
+Sometimes, Visual Studio Code does not recognize changes and does not apply them to the running test instance. If this is the case, simply close and restart the test instance, the changes should then be applied. 
 
 If you wish to contribute, simply make your changes and submit a pull request. Make sure that your changes don't break the existing tests in the client/test folder. 
 You can run the tests with "npm test" while in the client folder. Feel free to add any tests.
