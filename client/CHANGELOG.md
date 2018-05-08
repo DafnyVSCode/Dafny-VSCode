@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.11.1 
+Use Dafny releases from Microsoft/dafny. Miscellaneous bug fixes.
+
 ## 0.10.10
 BugFix: Decrease guard
 
