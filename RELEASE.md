@@ -15,6 +15,6 @@ This file outlines the tasks that need to be done in order to release a new vers
 * Run the following commands in the root of the repository:
   * `vsce login FunctionalCorrectness`
   * `vsce publish minor`
-  * Hint 1: For this to work, you need the proper rights.
+  * Hint 1: For this to work, you need the proper permissions (manage permissions [here](https://marketplace.visualstudio.com/manage/publishers/FunctionalCorrectness?auth_redirect=True)).
   * Hint 2: All the information about publishing extensions can be found [here](https://code.visualstudio.com/docs/extensions/publish-extension).
 * Download and try the plugin after publishing was successful.
