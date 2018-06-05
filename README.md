@@ -84,6 +84,8 @@ The following are optional:
 
 We welcome all contributions! Please create a pull request and we will take care of releasing a new version when appropriate.
 
+## How-To
+
 It is pretty simple to contribute to this plugin. All it takes is having Visual Studio Code and npm installed. Simply clone this repository and switch into the new folder. Execute the following commands:
 
 * `cd server`
