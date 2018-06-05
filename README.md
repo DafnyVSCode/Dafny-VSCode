@@ -80,24 +80,6 @@ The following are optional:
 * 0.0.2: Fixed readme and license, added use animation.
 * 0.0.1: Initial release, some half baked features turned off.
 
-# Examples
-
-## Installation
-On the first start the plugin asks you to install Dafny automatically. 
-![assertions animation](installation.gif)
-
-## Add null check
-Some diagnostics can be directly inserted with a quickfix at the beginning of a line.
-![assertions animation](addnullcheck.gif)
-
-## Compile and Run
-Pressed F5 to compile and run the program
-![assertions animation](compileandrun.gif)
-
-## CounterExample
-Pressed F7 to show counterexamples.
-![assertions animation](counterexample.gif)
-
 # Development
 It is pretty simple to contribute to this plugin. 
 All it takes is having Visual Studio Code and npm installed.
