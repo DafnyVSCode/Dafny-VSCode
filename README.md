@@ -3,7 +3,6 @@ Dafny support for Visual Studio Code.
 
 ## Features
 
-
 * Provides .dfy language support to vscode.
 * Automatic installation of Dafny
 * Update notification if there is a newer release of Dafny. 
@@ -19,7 +18,6 @@ Dafny support for Visual Studio Code.
 * Right hand size status bar item relates to the state of the DafnyServer.
 * DafnyDefinition provider to support refactorings in the future 
 
-
 ![assertions animation](simpleassert.gif)
 More examples at the end...
 
@@ -32,15 +30,16 @@ More examples at the end...
 * `F8` Hide CounterExample
 
 ## Tasks
+
 * `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
 * `Uninstall DafnyServer` Uninstalls the DafnyServer
 * `Restart DafnyServer` Restart the DafnyServer
 
 ## Installation guide
+
 * The plugin needs a C# runtime to run the Dafny server. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
 * Install the Dafny VSCode extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FunctionalCorrectness.dafny-vscode#overview). When you first open a Dafny file, the extension will prompt you to automatically install Dafny.
 * In case you would like the plugin to use a different [Dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
-
 
 ## Extension Settings
 
@@ -61,6 +60,7 @@ The following are optional:
 * `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
 # Release Notes
+
 * 0.11.1 Use Dafny releases from Microsoft/dafny. Miscellaneous bug fixes.
 * 0.10.1 Manually show counterexample, flow graph.
 * 0.10.0 Display counter example for failing proof. Switched to typescript implementation to download dependencies. Lots of bugfixes.
@@ -81,17 +81,17 @@ The following are optional:
 * 0.0.1: Initial release, some half baked features turned off.
 
 # Development
+
 It is pretty simple to contribute to this plugin. 
 All it takes is having Visual Studio Code and npm installed.
 Simply clone this repository and switch into the new folder. Execute the following commands:
 
-* cd server
-* npm install
-* code .
-* cd ../client
-* npm install
-* code .
-
+* `cd server`
+* `npm install`
+* `code .`
+* `cd ../client`
+* `npm install`
+* `code .`
 
 This opens the language server part and the client part of the plugin in two different Visual Studio Code editors and install all the dependencies.
 In the server editor, press CTRL + Shift + b to compile. The task that is started also watches file changes and recompiles automatically after saving.
