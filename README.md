@@ -2,7 +2,7 @@
 
 Dafny support for Visual Studio Code.
 
-## Contributing
+## Contribute
 
 We welcome all contributions! Please create a pull request and we will take care of releasing a new version when appropriate.
 
