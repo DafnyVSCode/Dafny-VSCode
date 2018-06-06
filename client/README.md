@@ -4,23 +4,23 @@ Dafny support for Visual Studio Code.
 
 ## Features
 
-* **NEW** Warning if the Dafny Plugin is used without a workspace. Can cause features to not work correctly. 
-* **NEW** Context Menu for most commands. 
-* **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use `F7`. 
-* Display counter example for failing proof (requires Dafny +1.9.15)
-* IntelliSense for classes
-* Compile and Run dfy file
-* Update notification if there is a newer release of Dafny. 
-* CodeLens showing method references
-* DafnyDefinition provider to support refactorings in the future 
-* Automatic verification as one types 
-* Automatic installation of Dafny
-* Provides .dfy language support to vscode.
-* Spawns a DafnyServer in the background and sends veification requests upon opening and saving Dafny files.
-* Errors, warnings and hints are shown through the vscode interface. When there are no errors, you get a thumbup on the status bar.
-* Syntax highlighting thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
+* Provides `.dfy` language support to VS Code.
+* Automatic installation of _Dafny_.
+* Compile and run `.dfy` files.
+* Automatic verification as one types.
+* Errors, warnings and hints are shown through the VS Code interface. When there are no errors, you get a :thumbsup: on the status bar.
+* Spawns a _DafnyServer_ in the background and sends verification requests upon opening and saving _Dafny_ files.
+* Context menu for most commands.
 * Left hand side status bar item provides information about the current file.
-* Right hand size status bar item relates to the state of the DafnyServer.
+* Right hand size status bar item relates to the state of the _DafnyServer_.
+* _IntelliSense_ for classes.
+* _CodeLens_ showing method references.
+* Shows warning if the _Dafny_ plugin is used without a workspace. Can cause features to not work correctly.
+* Display counter example for failing proof (requires _Dafny_ 1.9.15+).
+* _CounterExamples_ are not shown directly. You can set `dafny.automaticShowCounterModel` to true or use `F7`.
+* Syntax highlighting thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
+* _DafnyDefinition_ provider to support refactorings in the future.
+* Update notification if there is a newer release of _Dafny_.
 
 ![assertions animation](simpleassert.gif)
 
