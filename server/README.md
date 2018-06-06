@@ -1,3 +1,3 @@
-#README
+# Dafny Language Server
 
-This is a language server sample implementation in node
+This is a _Dafny_ language server implementation in node.
