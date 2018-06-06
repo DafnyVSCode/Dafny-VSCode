@@ -1,6 +1,10 @@
 # Dafny VSCode
 
-Dafny support for Visual Studio Code.
+This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
+
+# Architecture
+
+The infrastructure consists of a _Dafny_ language server, which can be found in the [server](server/) directory, and a VS Code extension, which in turn can be found in the [client](client/) directory. These components communicate with each other using the [_Language Server Protocol (LSP)_](https://microsoft.github.io/language-server-protocol/).
 
 ## Contribute
 
