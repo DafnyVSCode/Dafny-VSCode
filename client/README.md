@@ -52,19 +52,19 @@ Choose `Tasks -> Run Task...` to run one of the following:
 
 The following are necessary:
 
-* `dafny.basePath`: absolute path to the **Dafny Directory**. 
+| Setting          | Description                              |
+| :--------------- |:---------------------------------------- |
+| `dafny.basePath` | Absolute path to the **Dafny Directory** |
 
 The following are optional:
 
-* `dafny.monoPath`: Absolute path to `mono` binary. Only required if `mono` isn't found in PATH (you'll get an error if that's the case).
-
-* `dafny.useMono`: Only applicable to Windows; requires .net 4.0 or higher when false. Attempts to launch dafny process directly when set to false 
-
-* `dafny.automaticVerification`: Verify as soon as the document is changed (default). When false, only verify on save.
-
-* `dafny.automaticVerificationDelayMS`: Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true.
-
-* `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
+| Setting          | Description                              |
+| :--------------- |:---------------------------------------- |
+| `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in PATH (you'll get an error if that's the case). |
+| `dafny.useMono` | Only applicable to Windows! Requires .net 4.0 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
+| `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
+| `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
+| `dafny.automaticShowCounterModel` | Show CounterModel automatically if a proof fails. Can cause performance issues. |
 
 ## Examples
 
