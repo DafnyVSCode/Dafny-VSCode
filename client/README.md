@@ -28,11 +28,13 @@ More examples at the end...
 
 ## Shortcuts
 
-* `Ctrl+Shift+B` or `⇧+⌘+B` Compile dfy file to dll or exe, if there is a Main method
-* `F5` Compile and Run if the source file has a Main method. 
-* `F6` Show Flow graph
-* `F7` Show CounterExample
-* `F8` Hide CounterExample
+| Shortcut                  | Description                                                          |
+| :------------------------ |:-------------------------------------------------------------------- | 
+| `Ctrl+Shift+B` or `⇧+⌘+B` | Compile `.dfy` file to `.dll` or `.exe`, if there is a `Main` method |
+| `F5`                      | Compile and run, if the source file has a `Main` method              |
+| `F6`                      | Show flow graph                                                      |
+| `F7`                      | Show CounterExample                                                  |
+| `F8`                      | Hide CounterExample                                                  |
 
 ## Tasks
 
