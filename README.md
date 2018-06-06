@@ -25,4 +25,8 @@ If you wish to contribute, simply make your changes and submit a pull request. M
 
 If you need to change the DafnyServer itself, which should not often be the case, check with [Microsoft Dafny](https://github.com/Microsoft/dafny) in order to integrate your changes.
 
+## Release
+
+To release a new version of Dafny-VSCode, follow the description in [RELEASE.md](RELEASE.md).
+
 [![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
