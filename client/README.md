@@ -1,14 +1,14 @@
-# Dafny-VSCode
+# Dafny VSCode Extension
 
-Dafny support for Visual Studio Code.
+This extension adds the support of _Dafny_ to Visual Studio Code.
 
 ## Features
 
-* Provides `.dfy` language support to VS Code.
+* Provides `.dfy` language support to VSCode.
 * Automatic installation of _Dafny_.
 * Compile and run `.dfy` files.
 * Automatic verification as one types.
-* Errors, warnings and hints are shown through the VS Code interface. When there are no errors, you get a :thumbsup: on the status bar.
+* Errors, warnings and hints are shown through the VSCode interface. When there are no errors, you get a :thumbsup: on the status bar.
 * Spawns a _DafnyServer_ in the background and sends verification requests upon opening and saving _Dafny_ files.
 * Context menu for most commands.
 * Left hand side status bar item provides information about the current file.
@@ -56,15 +56,15 @@ Choose `Tasks -> Run Task...` to run one of the following:
 
 The following are necessary:
 
-| Setting          | Description                              |
-| :--------------- |:---------------------------------------- |
-| `dafny.basePath` | Absolute path to the **Dafny Directory** |
+| Setting          | Description                             |
+| :--------------- |:--------------------------------------- |
+| `dafny.basePath` | Absolute path to the _Dafny_ directory. |
 
 The following are optional:
 
 | Setting          | Description                              |
 | :--------------- |:---------------------------------------- |
-| `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in PATH (you'll get an error if that's the case). |
+| `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in _PATH_ (you'll get an error if that's the case). |
 | `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.0 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
 | `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
 | `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
