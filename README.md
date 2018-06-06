@@ -1,4 +1,5 @@
 # Dafny-VSCode
+
 Dafny support for Visual Studio Code.
 
 ## Contributing
