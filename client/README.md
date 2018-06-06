@@ -35,9 +35,9 @@ More examples at the end...
 * `F8` Hide CounterExample
 
 ## Tasks
-* `Install DafnyServer` Download and install the dafnyserver and sets the dafny.dafnyServerPath accordingly
+* `Install DafnyServer` Downloads and installs the DafnyServer and sets the dafny.dafnyServerPath accordingly
 * `Uninstall DafnyServer` Uninstalls the DafnyServer
-* `Restart DafnyServer` Restart the DafnyServer
+* `Restart DafnyServer` Restarts the DafnyServer
 
 ## Requirements - Installation guide
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
