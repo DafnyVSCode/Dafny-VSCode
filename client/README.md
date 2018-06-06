@@ -33,18 +33,18 @@ More examples at the end...
 | `Ctrl+Shift+B` or `⇧+⌘+B` | Compile `.dfy` file to `.dll` or `.exe`, if there is a `Main` method |
 | `F5`                      | Compile and run, if the source file has a `Main` method              |
 | `F6`                      | Show flow graph                                                      |
-| `F7`                      | Show CounterExample                                                  |
-| `F8`                      | Hide CounterExample                                                  |
+| `F7`                      | Show _CounterExample_                                                |
+| `F8`                      | Hide _CounterExample_                                                |
 
 ## Tasks
 
 Choose `Tasks -> Run Task...` to run one of the following:
 
-| Task                    | Description                                                                           |
-| :---------------------- |:------------------------------------------------------------------------------------- | 
-| `Install DafnyServer`   | Downloads and installs the DafnyServer and sets the dafny.dafnyServerPath accordingly |
-| `Uninstall DafnyServer` | Uninstalls the DafnyServer                                                            |
-| `Restart DafnyServer`   | Restarts the DafnyServer                                                              |
+| Task                    | Description                                                                               |
+| :---------------------- |:----------------------------------------------------------------------------------------- | 
+| `Install DafnyServer`   | Downloads and installs the _DafnyServer_ and sets the `dafny.dafnyServerPath accordingly` |
+| `Uninstall DafnyServer` | Uninstalls the _DafnyServer_                                                              |
+| `Restart DafnyServer`   | Restarts the _DafnyServer_                                                                |
 
 ## Requirements - Installation guide
 * A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
@@ -63,15 +63,15 @@ The following are optional:
 | Setting          | Description                              |
 | :--------------- |:---------------------------------------- |
 | `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in PATH (you'll get an error if that's the case). |
-| `dafny.useMono` | Only applicable to Windows! Requires .net 4.0 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
+| `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.0 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
 | `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
 | `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
-| `dafny.automaticShowCounterModel` | Show CounterModel automatically if a proof fails. Can cause performance issues. |
+| `dafny.automaticShowCounterModel` | Show _CounterModel_ automatically if a proof fails. Can cause performance issues. |
 
 ## Examples
 
 ### Installation
-On the first start the plugin asks you to install Dafny automatically. 
+On the first start the plugin asks you to install _Dafny_ automatically. 
 
 ![assertions animation](installation.gif)
 
@@ -86,7 +86,7 @@ Pressed `F5` to compile and run the program.
 ![assertions animation](compileandrun.gif)
 
 ### CounterExample
-Pressed `F7` to show counterexamples.
+Pressed `F7` to show counter examples.
 
 ![assertions animation](counterexample.gif)
 
