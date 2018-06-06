@@ -1,4 +1,4 @@
-# Dafny-VSCode
+# Dafny VSCode
 
 Dafny support for Visual Studio Code.
 
@@ -27,6 +27,6 @@ If you need to change the _DafnyServer_ itself, which should not often be the ca
 
 ## Release
 
-To release a new version of Dafny-VSCode, follow the description in [RELEASE.md](RELEASE.md).
+To release a new version of Dafny VSCode, follow the description in [RELEASE.md](RELEASE.md).
 
 [![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
