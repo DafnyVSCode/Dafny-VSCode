@@ -46,9 +46,11 @@ Choose `Tasks -> Run Task...` to run one of the following:
 | `Uninstall DafnyServer` | Uninstalls the _DafnyServer_                                                              |
 | `Restart DafnyServer`   | Restarts the _DafnyServer_                                                                |
 
-## Requirements - Installation guide
-* A C# runtime to run DafnyServer. Mono should be supported on all platforms that vscode runs on. On windows, you can also use .net.
-* [Binary dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), which contains `DafnyServer.exe` and its dependencies. **This and next releases will use a own release of Dafny to support more features, like Refactorings**
+## Requirements
+
+* The plugin needs a _C#_ runtime to run the _DafnyServer_. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
+* In case you would like the plugin to use a different [Dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
+* Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_.
 
 ## Extension Settings
 
