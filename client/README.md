@@ -1,10 +1,12 @@
 # Dafny-VSCode
+
 Dafny support for Visual Studio Code.
 
 ## Features
+
 * **NEW** Warning if the Dafny Plugin is used without a workspace. Can cause features to not work correctly. 
 * **NEW** Context Menu for most commands. 
-* **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use F7. 
+* **NEW** CounterExamples are not shown directly anymore, because of performance issues. You still can dafny.automaticShowCounterModel to true or use `F7`. 
 * Display counter example for failing proof (requires Dafny +1.9.15)
 * IntelliSense for classes
 * Compile and Run dfy file
@@ -26,7 +28,7 @@ More examples at the end...
 
 ## Shortcuts
 
-* `Ctrl+Shift+B` or `⇧⌘B` Compile dfy file to dll or exe, if there is a Main method
+* `Ctrl+Shift+B` or `⇧+⌘+B` Compile dfy file to dll or exe, if there is a Main method
 * `F5` Compile and Run if the source file has a Main method. 
 * `F6` Show Flow graph
 * `F7` Show CounterExample
@@ -59,28 +61,26 @@ The following are optional:
 
 * `dafny.automaticShowCounterModel`: Show CounterModel automatically if a proof fails. Can cause performance issues.
 
-# Examples
+## Examples
 
-## Installation
+### Installation
 On the first start the plugin asks you to install Dafny automatically. 
 
 ![assertions animation](installation.gif)
 
-## Add null check
+### Add null check
 Some diagnostics can be directly inserted with a quickfix at the beginning of a line.
 
 ![assertions animation](addnullcheck.gif)
 
-## Compile and Run
-Pressed F5 to compile and run the program.
+### Compile and Run
+Pressed `F5` to compile and run the program.
 
 ![assertions animation](compileandrun.gif)
 
-## CounterExample
-Pressed F7 to show counterexamples.
+### CounterExample
+Pressed `F7` to show counterexamples.
 
 ![assertions animation](counterexample.gif)
-
-
 
 [![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
