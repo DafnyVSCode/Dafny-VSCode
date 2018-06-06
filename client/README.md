@@ -87,7 +87,7 @@ Pressed `F5` to compile and run the program.
 
 ![assertions animation](compileandrun.gif)
 
-### CounterExample
+### Show Counter Example
 Pressed `F7` to show counter examples.
 
 ![assertions animation](counterexample.gif)
