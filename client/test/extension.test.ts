@@ -66,7 +66,7 @@ function waitForCounterExample(fileName: string, isCounterModelEmpty: boolean): 
         }
     }).then((counterModel: any) => {
         if (isCounterModelEmpty) {
-            assert.equal(counterModel.States.length, 0, "Model is not empty")
+			assert.equal(counterModel, undefined, "Model is not empty")
         } else {
             assert.notEqual(counterModel.States.length, 0, "Model is empty");
         }
@@ -132,7 +132,7 @@ suite("DafnyServer Tests", () => {
     });
 
     // tslint:disable-next-line:only-arrow-functions
-    test("Verify countermodel", function () {
+    test("Verify countermodel empty", function () {
         this.timeout(40000);
 
         return openFile("simple2.dfy").then(() => {
