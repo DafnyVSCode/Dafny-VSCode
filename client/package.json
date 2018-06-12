@@ -206,7 +206,7 @@
         "@types/node": "^6.0.40",
         "mocha": "^2.3.3",
         "typescript": "^2.0.3",
-        "vscode": "^1.1.5"
+        "vscode": "^1.1.18"
     },
     "dependencies": {
         "viz.js": "^1.7.1",
