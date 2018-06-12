@@ -4,10 +4,10 @@
     "description": "Dafny support for Visual Studio Code",
     "version": "0.11.1",
     "publisher": "FunctionalCorrectness",
-    "homepage": "https://github.com/FunctionalCorrectness/",
+    "homepage": "https://github.com/DafnyVSCode/",
     "repository": {
         "type": "git",
-        "url": "https://github.com/FunctionalCorrectness/VS-Code-Language-Server-for-Dafny.git"
+        "url": "https://github.com/DafnyVSCode/Dafny-VSCode.git"
     },
     "license": "MIT",
     "galleryBanner": {

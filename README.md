@@ -30,5 +30,3 @@ If you wish to contribute, simply make your changes and submit a pull request. M
 ## Release
 
 To release a new version of Dafny VSCode, follow the description in [RELEASE.md](RELEASE.md).
-
-[![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)

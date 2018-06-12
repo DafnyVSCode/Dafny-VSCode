@@ -49,7 +49,7 @@ Choose `Tasks -> Run Task...` to run one of the following:
 ## Requirements
 
 * The plugin needs a _C#_ runtime to run the _DafnyServer_. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
-* In case you would like the plugin to use a different [Dafny distribution](https://github.com/FunctionalCorrectness/dafny-microsoft/releases), set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
+* In case you would like the plugin to use a different _Dafny_ distribution, set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
 * Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_.
 
 ## Extension Settings
@@ -91,5 +91,3 @@ Pressed `F5` to compile and run the program.
 Pressed `F7` to show counter examples.
 
 ![assertions animation](counterexample.gif)
-
-[![Analytics](https://ga-beacon.appspot.com/UA-98083145-1/FunctionalCorrectness/dafny-vscode?pixel)](https://github.com/FunctionalCorrectness/dafny-vscode)
