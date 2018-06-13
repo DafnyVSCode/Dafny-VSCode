@@ -12,6 +12,7 @@ before_install:
   - wget https://github.com/Microsoft/dafny/releases/download/v2.1.1/dafny-2.1.1.10209-x64-ubuntu-14.04.zip
   - sudo apt-get install unzip
   - unzip dafny-2.1.1.10209-x64-ubuntu-14.04.zip
+  - ls
   - export PATH=/usr/local/dafny:$PATH
   # Needed to run an instance of vscode on travis
   - export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
