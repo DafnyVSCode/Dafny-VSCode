@@ -23,4 +23,5 @@ install:
   - npm run compile
   - cd ../client
   - npm install
+  - npm run vscode:prepublish
   - npm run test
