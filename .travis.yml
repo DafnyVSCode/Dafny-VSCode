@@ -13,8 +13,8 @@ before_install:
 install:
   - cd server
   - npm install
-  - npm compile
+  - npm run compile
   - cd ../client
   - npm install
-  - npm compile
-  - npm test
+  - npm run compile
+  - npm run test
