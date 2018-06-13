@@ -1,7 +1,8 @@
 # Release Notes
 
 ## 0.12.0
-The Dafny base path can now alternatively be set via the environment variable DAFNY_PATH.
+* The Dafny base path can now alternatively be set via the environment variable DAFNY_PATH.
+* Dependencies were upgraded to prevent several vulnerabilities.
 
 ## 0.11.1 
 Use Dafny releases from Microsoft/dafny. Miscellaneous bug fixes.
