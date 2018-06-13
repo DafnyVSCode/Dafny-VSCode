@@ -4,12 +4,19 @@ node_js:
   - "10.4.1"
 before_install:
   - sudo apt-get update
+  # Update to lastest npm version
   - npm install npm@latest -g
+  # Install mono
   - sudo apt-get install mono-complete
+  # Download and unzip Dafny Server binary. Add extracted folder to path
   - wget https://github.com/Microsoft/dafny/releases/download/v2.1.1/dafny-2.1.1.10209-x64-ubuntu-14.04.zip
   - sudo apt-get install unzip
   - unzip dafny-2.1.1.10209-x64-ubuntu-14.04.zip
   - export PATH=/usr/local/dafny:$PATH
+  # Needed to run an instance of vscode on travis
+  - export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3
 install:
   - cd server
   - npm install
