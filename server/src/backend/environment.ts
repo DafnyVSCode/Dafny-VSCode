@@ -32,11 +32,11 @@ export class Environment {
     }
 
     public getStartDafnyCommand(): Command {
-        return this.getCommand(this.dafnySettings.basePath + "/" + Application.DafnyServer);
+        return this.getCommand(this.getBasePath() + "/" + Application.DafnyServer);
     }
 
     public getDafnyExe(): Command {
-        return this.getCommand(this.dafnySettings.basePath + "/" + Application.Dafny);
+        return this.getCommand(this.getBasePath() + "/" + Application.Dafny);
     }
 
     public getStandardSpawnOptions(): cp.SpawnOptions {
@@ -67,6 +67,23 @@ export class Environment {
         }
         return monoPath;
     }
+
+    /**
+     * Determines the Dafny base path either from the configuration set in the Dafny settings,
+     * or, if not available from there, from the environment variable DAFNY_PATH.
+     * @return {String} A string containing the determined Dafny base path.
+     */
+    private getBasePath(): String {
+        if(this.dafnySettings.basePath === "") {
+            if(process.env.DAFNY_PATH === undefined || process.env.DAFNY_PATH === "") {
+                return "";
+            } else {
+                return process.env.DAFNY_PATH;
+            }
+        }
+        return this.dafnySettings.basePath;
+    }
+
     private getCommand(commandName: string): Command {
         let baseCommand: string;
         let args: string[];
