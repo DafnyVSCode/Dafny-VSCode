@@ -1,0 +1,19 @@
+sudo: required
+language: node_js
+node_js:
+  - "10.1.0"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install mono-complete
+  - wget https://github.com/Microsoft/dafny/releases/download/v2.1.1/dafny-2.1.1.10209-x64-ubuntu-14.04.zip
+  - sudo apt-get install unzip
+  - unzip dafny-2.1.1.10209-x64-ubuntu-14.04.zip
+  - export PATH=/usr/local/dafny:$PATH
+install:
+  - cd server
+  - npm install
+  - npm compile
+  - cd ../client
+  - npm install
+  - npm compile
+  - npm test
