@@ -1,23 +1,26 @@
-echo/
-echo ************************************************
-echo * STARTUP DAFNY VSCODE DEVELOPMENT ENVIRONMENT *
-echo ************************************************
-echo/
-echo Installing server ...
-echo/
+@echo off
+rem
+rem ************************************************
+rem * STARTUP DAFNY VSCODE DEVELOPMENT ENVIRONMENT *
+rem ************************************************
+rem
+rem Installing server ...
+rem
 
 cd server
 npm install
 code .
 
-echo/
-echo Installing client ...
-echo/
+rem
+rem Installing client ...
+rem
 
 cd ..\client
 npm install
 code .
 
-echo/
-echo DONE!
-echo/
+cd ..
+
+rem
+rem DONE!
+rem
