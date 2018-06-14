@@ -24,6 +24,8 @@ cd ../client
 npm install
 code .
 
+cd ..
+
 cat << EOF
 
 DONE!
