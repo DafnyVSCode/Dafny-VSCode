@@ -24,7 +24,9 @@ It is pretty simple to contribute to this plugin. All it takes is having Visual 
 * `npm install`
 * `code .`
 
-This opens the language server part and the client part of the plugin in two different Visual Studio Code editors and installs all the dependencies. In the server editor, press `CTRL+Shift+b` or `⇧+⌘+B` to compile. The task that is started also watches file changes and recompiles automatically after saving.
+Note: It is necessary that the `code` command is available in your `PATH`. On the Mac, this is usually not given. If it is missing, have a look at this [tutorial](https://code.visualstudio.com/docs/setup/mac).
+
+If all the commands succeeded, the language server part and the client part of the plugin are opened in two different Visual Studio Code editors and installs all the dependencies. In the server editor, press `CTRL+Shift+b` or `⇧+⌘+B` to compile. The task that is started also watches file changes and recompiles automatically after saving.
 
 To try out the changes, go to the client editor and press `F5`. A new instance of Visual Studio Code will be started that has the Dafny plugin running and ready for testing. Sometimes, Visual Studio Code does not recognize changes and does not apply them to the running test instance. If this is the case, simply close and restart the test instance, the changes should then be applied.
 
