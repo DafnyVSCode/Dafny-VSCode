@@ -32,6 +32,8 @@ To try out the changes, go to the client editor and press `F5`. A new instance o
 
 If you wish to contribute, simply make your changes and submit a pull request. Make sure that your changes don't break the existing tests in the client/test folder. You can run the tests with `npm test` while in the client folder. For this to work, you have to set environment variable `DAFNY_PATH` on your system to your _Dafny_ release (without a "/" at the end of the path). Feel free to add any tests.
 
+Final note: Having the extension installed via the Visual Studio Marketplace (along with a _Dafny_ installation via the extension), can lead to conflicts with your locally built extension. It is therefore recommended to uninstall all previous installations of the extension from Visual Studio Code.
+
 ## Release
 
 To release a new version of Dafny VSCode, follow the description in [RELEASE.md](RELEASE.md).
