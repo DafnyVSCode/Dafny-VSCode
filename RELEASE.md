@@ -34,6 +34,10 @@ Run the following commands in the root of the repository:
 * Hint 1: For this to work, you need the proper permissions (manage permissions [here](https://marketplace.visualstudio.com/manage/publishers/FunctionalCorrectness?auth_redirect=True)).
 * Hint 2: All the information about publishing extensions can be found [here](https://code.visualstudio.com/docs/extensions/publish-extension).
 
+## Create Tag
+
+Don't forget to create and publish a git TAG on the released commit (on the master branch) with the version number according to the release on the Visual Studio Marketplace.
+
 ## Final Check
 
 Download and try the plugin after publishing was successful.
