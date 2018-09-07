@@ -91,3 +91,7 @@ Pressed `F5` to compile and run the program.
 Pressed `F7` to show counter examples.
 
 ![assertions animation](counterexample.gif)
+
+## Contribute
+
+This is an open-source project that lives from coding contributions. We welcome your help! For a description of how you can contribute, as well as a list of issues you can work on, please visit the [Dafny-VSCode GitHub site](https://github.com/DafnyVSCode/Dafny-VSCode).
