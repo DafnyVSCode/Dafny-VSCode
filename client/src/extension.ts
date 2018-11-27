@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
     const disposable = languageServer.start();
     context.subscriptions.push(disposable);
 
-    vscode.commands.registerCommand(Commands.ShowReferences, (uri: vscode.Uri, position, locations) => {
+    vscode.commands.registerCommand(Commands.ShowReferences, (uri, position, locations) => {
         function parsePosition(p: any): vscode.Position {
             return new vscode.Position(p.line, p.character);
         }
@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext) {
             return vscode.Uri.file(u);
         }
 
-        const parsedUri = vscode.Uri.file(uri.fsPath);
+        const parsedUri = vscode.Uri.file(uri);
         const parsedPosition = parsePosition(position);
         const parsedLocations = [];
         for (const location of locations) {
