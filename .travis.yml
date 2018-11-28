@@ -1,6 +1,8 @@
 dist: trusty
 sudo: required
 language: node_js
+services:
+  - docker
 addons:
   sonarcloud:
     organization: "dafnyvscode"
@@ -8,31 +10,9 @@ addons:
       secure: "CqxeC5xLixqUU+n4B4R9mqZqcLt44Q5aqB0VWiGMW5HjC+kOITDLJpdN/WsAiS+W14twjnWbNHpTh3ffAwimNLPX5EFOa4byX0ehQvtJ+KXRF9JIV2FXIuv4ZxH2I8wiPHthzl+nSAXeyP6L6/aAYyu4f1syhEJEqKSb/9RgtQbb8NIcKwFflb1M/UWCjoUJaAuTToaJWNoPZYWVEuvnhARoyUP+S6OmHj1QwYU8k7JcWbFyv+Mr/ERtTNZkqdiAHJayCulGfb8JBANUjC19a9gPoOyeyg2OjDOI594Jj2e/PtT6W3iKbqyUpJKncXqW7yIWaPHOR6oFnjEuroJTnXDCt3KcD+kvnhq3CQCLtQF9+fXU7Vupjp21PBTSiCDgLQSzkzLuFdPybigtrWZPCLoPFSvUnjXX1YJJYGGxaj/Mh1yqlagc/Va5o09ViJf2GKXWREFO9zihdOxkikd8IR9uJztFqG9qFgUisV7Uezv1T64wdfZhomFHC3jRkPI4oOi33i04xXO9ibaaIvktNKBfubu6TZsK+/n3xTpT2iyarD5AQy9JN9ZV+ixCSCtrosMxZ3a1lF2l5apI6fYw53/Z+mMg01xDcxDH5/2ULrmlTTRhVPGvJPJT19hrM+kk2zYnvRXobbUzxmCWF6C9sM3JoYIsLNmdcVHE9wYml+g="
 node_js:
   - "10.4.1"
-before_install:
-  - sudo apt-get update
-  # Update to lastest npm version
-  - npm install npm@latest -g
-  # Install mono
-  - sudo apt-get install mono-complete
-  # Download and unzip Dafny Server binary. Add extracted folder to path
-  - wget https://github.com/Microsoft/dafny/releases/download/v2.1.1/dafny-2.1.1.10209-x64-ubuntu-14.04.zip
-  - sudo apt-get install unzip
-  - unzip dafny-2.1.1.10209-x64-ubuntu-14.04.zip
-  - export DAFNY_PATH=$TRAVIS_BUILD_DIR/dafny
-  # Needed to run an instance of vscode on travis
-  - export CXX="g++-4.9" CC="gcc-4.9" DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3
-  # Install tslint
-  - npm i tslint
 install:
-  - cd server
-  - npm install
-  - npm run compile
-  - cd ../client
-  - npm install
-  - npm run vscode:prepublish
+  - npm install -g tslint
+
 script:
-  - npm run test
-  - cd ..
+  - ./test-docker.bash
   - sonar-scanner

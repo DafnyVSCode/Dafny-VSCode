@@ -24,12 +24,15 @@ It is pretty simple to contribute to this plugin. All it takes is having Visual 
 
 These scripts do nothing else than execute the following commands:
 
-* `cd server`
-* `npm install`
-* `code .`
-* `cd ../client`
-* `npm install`
-* `code .`
+```bash
+cd server
+npm install
+code . &
+
+cd ../client
+npm install
+code . &
+```
 
 Note: It is necessary that the `code` command is available in your `PATH`. On the Mac, this is usually not given. If it is missing, have a look at this [tutorial](https://code.visualstudio.com/docs/setup/mac).
 
@@ -37,7 +40,10 @@ If all the commands succeeded, the language server part and the client part of t
 
 To try out the changes, go to the client editor and press `F5`. A new instance of Visual Studio Code will be started that has the Dafny plugin running and ready for testing. Sometimes, Visual Studio Code does not recognize changes and does not apply them to the running test instance. If this is the case, simply close and restart the test instance, the changes should then be applied.
 
-If you wish to contribute, simply make your changes and submit a pull request. Make sure that your changes don't break the existing tests in the client/test folder. You can run the tests with `npm test` while in the client folder. For this to work, you have to set environment variable `DAFNY_PATH` on your system to your _Dafny_ release (without a "/" at the end of the path). Feel free to add any tests.
+If you wish to contribute, simply make your changes and submit a pull request. Make sure that your changes don't break the existing tests in the client/test folder.
+You can run the tests with `npm test` while in the client folder. For this to work, you have to set environment variable `DAFNY_PATH` on your system to your _Dafny_ release (without a "/" at the end of the path).
+Alternatively, you can execute tests with docker (Linux & macOS only) using `./test-docker.bash`.
+Feel free to add any tests.
 
 Final note: Having the extension installed via the Visual Studio Marketplace (along with a _Dafny_ installation via the extension), can lead to conflicts with your locally built extension. It is therefore recommended to uninstall all previous installations of the extension from Visual Studio Code.
 
