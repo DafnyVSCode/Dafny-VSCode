@@ -1,16 +1,17 @@
 FROM node:10-stretch
 
 # Note that there is already a node user with UID/GID 1000
-#ARG UID=1000
-#ARG GID=1000
+ARG UID=1000
+ARG GID=1000
 ARG USER=node
 
 ARG DAFNY_RELEASE=v2.2.0
 ARG DAFNY_RELEASEFILE=dafny-2.2.0.10923-x64-debian-8.5.zip
 
-# We currently assume, that your desktop has the same UID/GID as node in the node:10-stretch image.
-#RUN addgroup --gid ${GID} ${USER} && \
-#    useradd -d /home/${USER} -m -u ${UID} -g ${USER} ${USER}
+RUN if [ "${USER}" != "node" ]; then \
+      addgroup --gid ${GID} ${USER}; \
+      useradd -d /home/${USER} -m -u ${UID} -g ${USER} ${USER};\
+    fi
 
 RUN apt-get update && \
     apt-get install -y mono-complete unzip xvfb x11-utils \
