@@ -5,6 +5,8 @@ This repository contains the infrastructure necessary to support _Dafny_ for Vis
 * master: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
 * develop: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
 
+[![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
+
 ## Architecture
 
 The infrastructure consists of a _Dafny_ language server, which can be found in the [server](server/) directory, and a VS Code extension, which in turn can be found in the [client](client/) directory. These components communicate with each other using the [_Language Server Protocol (LSP)_](https://microsoft.github.io/language-server-protocol/).
