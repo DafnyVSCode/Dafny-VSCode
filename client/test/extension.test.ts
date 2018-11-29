@@ -57,6 +57,9 @@ function waitForVerification(fileName: string, expectedResult: any): Promise<voi
     });
 }
 
+/*
+ *   Disable countermodel temporarly, until https://github.com/DafnyVSCode/Dafny-VSCode/issues/23 is solved.
+
 function waitForCounterExample(fileName: string, isCounterModelEmpty: boolean): Promise<void> {
     return new Promise((resolve) => {
         Context.unitTest.verificationComplete = (verificationResult: VerificationResult) => {
@@ -72,7 +75,7 @@ function waitForCounterExample(fileName: string, isCounterModelEmpty: boolean): 
         }
     });
 }
-
+*/
 function openFile(fileName: string): Promise<vscode.TextDocument> {
     return new Promise((resolve) => {
         let filePath = path.join(samplesFolder, fileName);
@@ -85,10 +88,13 @@ function openFile(fileName: string): Promise<vscode.TextDocument> {
     });
 }
 
+/*
+ *   Disable countermodel temporarly, until https://github.com/DafnyVSCode/Dafny-VSCode/issues/23 is solved.
 function executeCommand(command: string, args?: any) {
     log(command + (args ? " " + args : ""));
     return vscode.commands.executeCommand(command, args);
 }
+*/
 
 /*function closeFile(): Thenable<{}> {
     let filePath = path.join(samplesFolder, vscode.window.activeTextEditor.document.fileName);
@@ -118,6 +124,9 @@ suite("DafnyServer Tests", () => {
         return waitForVerification(samplesFolder + "simple.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
     });
 
+/*
+ *   Disable countermodel temporarly, until https://github.com/DafnyVSCode/Dafny-VSCode/issues/23 is solved.
+
     // tslint:disable-next-line:only-arrow-functions
     test("Verify countermodel", function () {
         this.timeout(40000);
@@ -143,5 +152,6 @@ suite("DafnyServer Tests", () => {
                 });
         });
     });
+    */
 });
 
