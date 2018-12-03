@@ -1,5 +1,10 @@
 # Release Notes
 
+## 0.13.0
+
+* Fixed the CodeLens references counter (Thanks @GoryMoon!)
+* Dependencies were upgraded to prevent several vulnerabilities.
+
 ## 0.12.0
 * The Dafny base path can now alternatively be set via the environment variable DAFNY_PATH.
 * Dependencies were upgraded to prevent several vulnerabilities.

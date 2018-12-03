@@ -2,7 +2,7 @@
     "name": "dafny-vscode",
     "displayName": "Dafny VSCode",
     "description": "Dafny support for Visual Studio Code",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "publisher": "FunctionalCorrectness",
     "homepage": "https://github.com/DafnyVSCode/",
     "repository": {
