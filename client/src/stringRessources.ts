@@ -35,7 +35,7 @@ export class Application {
     public static DafnyServer: string = "DafnyServer.exe";
 }
 
-export class Commands {
+export class CommandStrings {
     public static RestartServer: string = "dafny.restartDafnyServer";
     public static InstallDafny: string = "dafny.installDafny";
     public static UninstallDafny: string = "dafny.uninstallDafny";
