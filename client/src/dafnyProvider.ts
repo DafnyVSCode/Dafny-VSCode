@@ -6,7 +6,7 @@ import { Context } from "./context";
 import { CounterModelProvider } from "./counterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
 import { DotGraphProvider } from "./dotGraphProvider";
-import { Commands, Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
+import { CommandStrings, Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
 
 export class DafnyClientProvider {
@@ -61,15 +61,15 @@ export class DafnyClientProvider {
         vscode.workspace.onDidCloseTextDocument(this.hideCounterModel, this);
 
         vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
-        vscode.commands.registerCommand(Commands.ShowDotGraph, () => {
+        vscode.commands.registerCommand(CommandStrings.ShowDotGraph, () => {
             vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two);
         });
 
-        vscode.commands.registerCommand(Commands.ShowCounterExample, () => {
+        vscode.commands.registerCommand(CommandStrings.ShowCounterExample, () => {
             this.doCounterModel(vscode.window.activeTextEditor.document);
         });
 
-        vscode.commands.registerCommand(Commands.HideCounterExample, () => {
+        vscode.commands.registerCommand(CommandStrings.HideCounterExample, () => {
             this.hideCounterModel(vscode.window.activeTextEditor.document);
         });
 

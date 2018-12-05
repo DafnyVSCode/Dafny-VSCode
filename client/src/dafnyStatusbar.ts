@@ -90,10 +90,9 @@ export class Statusbar {
         }
 
         if (this.serverpid) {
-            this.serverStatusBar.text = StatusString.ServerUp;
-            //this.serverStatusBar.text += " (pid " + this.serverpid + ")";
-            this.serverStatusBar.text += /*" | Version " + this.serverversion.trim() +*/ " | " + this.serverStatus + " | ";
-            this.serverStatusBar.text += "Queue: " + this.queueSize + " |";
+            this.serverStatusBar.text = `${StatusString.ServerUp} | ${this.serverStatus} | Queue: ${this.queueSize}`;
+            this.serverStatusBar.tooltip = `Dafny Version ${this.serverversion.trim()} | Dafny PID ${this.serverpid}`
+
         } else {
             this.serverStatusBar.text = StatusString.ServerDown;
         }

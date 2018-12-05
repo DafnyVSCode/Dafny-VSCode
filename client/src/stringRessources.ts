@@ -12,6 +12,10 @@ export class WarningMsg {
 
 export class ErrorMsg {
     public static NoMono: string = "Could not find mono, neither in system PATH nor at dafny.monoPath";
+    public static NoSupportedMono: string = "Could not find compatible Mono. Dafny requires Mono >= 4.0 or Microsoft .NET >= 4.5. Please restart Code after the installation.";
+    public static GetMono: string = "Get Mono";
+    public static GetMonoUri: string = "https://www.mono-project.com/download/stable/";
+    public static ConfigureMonoPath: string = "Change dafny.monoPath";
     public static DafnyServerRestart: string = "DafnyServer process quit unexpectedly; attempting restart";
     public static DafnyServerRestartFailed: string = "DafnyServer restart failed";
     public static DafnyServerWrongPath: string = "Failed to start DafnyServer, check paths in config";
@@ -35,7 +39,7 @@ export class Application {
     public static DafnyServer: string = "DafnyServer.exe";
 }
 
-export class Commands {
+export class CommandStrings {
     public static RestartServer: string = "dafny.restartDafnyServer";
     public static InstallDafny: string = "dafny.installDafny";
     public static UninstallDafny: string = "dafny.uninstallDafny";
