@@ -23,20 +23,24 @@ Build the server and the client as described in [README.md](README.md).
 
 ## Trigger Release
 
-Run the following commands in the root of the repository:
+Run the following commands on the `develop`-branch in the `client` folder:
 
-* `vsce login FunctionalCorrectness`
+* `npx vsce login FunctionalCorrectness`
 * Depending on your changes:
-  * `vsce publish patch` (if you only committed bug fixes)
-  * `vsce publish minor` (if you introduced new features)
-  * `vsce publish major` (if backward compatibility is no longer given)
+  * `npx vsce publish patch` (if you only committed bug fixes)
+  * `npx vsce publish minor` (if you introduced new features)
+  * `npx vsce publish major` (if backward compatibility is no longer given)
+
 * Note: This will automatically adjust your _package.json_ file.
 * Hint 1: For this to work, you need the proper permissions (manage permissions [here](https://marketplace.visualstudio.com/manage/publishers/FunctionalCorrectness?auth_redirect=True)).
 * Hint 2: All the information about publishing extensions can be found [here](https://code.visualstudio.com/docs/extensions/publish-extension).
 
-## Create Tag
+## Merge into Master and create Tag
 
-Don't forget to create and publish a git TAG on the released commit (on the master branch) with the version number according to the release on the Visual Studio Marketplace.
+* `git add README.md CHANGELOG.md package.json package-lock.json && git commit -m "Update changelog and bump version"`
+* `git checkout master && git merge develop`
+* Create Tag for the current version: `git tag vX.X.X`
+* `git push --all`
 
 ## Final Check
 
