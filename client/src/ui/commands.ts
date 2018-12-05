@@ -9,7 +9,7 @@ import { DafnyRunner } from "../dafnyRunner";
  * VSCode UI Commands
  */
 export default class Commands {
-    
+
     extensionContext: vscode.ExtensionContext;
     languageServer: LanguageClient;
     provider: DafnyClientProvider;
@@ -112,7 +112,7 @@ export default class Commands {
     compile(uri: vscode.Uri, run: boolean = false) {
         vscode.window.activeTextEditor.document.save();
         vscode.window.showInformationMessage(InfoMsg.CompilationStarted);
-        
+
         this.languageServer.sendRequest(LanguageServerRequest.Compile, uri)
         .then((result: CompilerResult) => {
             vscode.window.showInformationMessage(InfoMsg.CompilationFinished);
