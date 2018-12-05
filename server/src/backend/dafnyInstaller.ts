@@ -15,14 +15,15 @@ import { NotificationService } from "../notificationService";
 
 export class DafnyInstaller {
 
-    private basePath = this.resolvePath(pathHelper.join(__dirname, "../..", "dafny"));
-    private downloadFile = this.resolvePath(pathHelper.join(this.basePath, "..", "dafny.zip"));
+    private readonly basePath = this.resolvePath(pathHelper.join(__dirname, "..", "..", "dafny"));
+    private readonly downloadFile = this.resolvePath(pathHelper.join(this.basePath, "..", "dafny.zip"));
 
     constructor(private notificationService: NotificationService, private dafnySettings: DafnySettings) {
     }
 
-    public latestVersionInstalled(localVersion: string): Promise<boolean> {
-        return this.getReleaseInformation().then((json) => {
+    public async latestVersionInstalled(localVersion: string): Promise<boolean> {
+        try {
+            const json = await this.getReleaseInformation();
             const localVersionSemVer = localVersion.match(/(\d+\.\d+\.\d+)/);
             if (json && json.name) {
                 const latestVersion = json.name; // semver ignores leading v
@@ -36,14 +37,12 @@ export class DafnyInstaller {
                     return Promise.reject(false);
                 }
             } else {
-                console.log("cant get release information");
-                return Promise.reject(false);
+                throw new Error("Could not read dafny version from JSON")
             }
-
-        }, (e) => {
-            console.log("cant get release information1: " + e);
+        } catch (e) {
+            console.log("Can't get release information: " + e);
             return Promise.reject(false);
-        });
+        }
     }
 
     public getReleaseInformation(): Promise<any> {
@@ -64,8 +63,13 @@ export class DafnyInstaller {
                 });
 
                 res.on("end", () => {
-                    const json = JSON.parse(body);
-                    return resolve(json);
+                    try {
+                        const json = JSON.parse(body);
+                        resolve(json);
+                    } catch(e) {
+                        console.log("Could not parse Dafny release information JSON")
+                        reject();
+                    }
                 });
             }).on("error", (e) => {
                 console.error(e);
@@ -94,8 +98,9 @@ export class DafnyInstaller {
 
             return this.download(url, this.downloadFile);
         } else {
-            console.log("cant get release information2");
-            return Promise.reject("cant get release information2");
+            const msg = "Could not get Dafny Release assets from JSON response."
+            console.log(msg);
+            return Promise.reject(msg);
         }
     }
 
@@ -117,18 +122,18 @@ export class DafnyInstaller {
         return Promise.resolve(pathHelper.join(this.basePath, "dafny"));
     }
 
-    public install(): Promise<string> {
+    public async install(): Promise<string> {
         this.notificationService.progressText("Fetching GitHub release data");
-        return this.getReleaseInformation().then((json) => {
-            return this.downloadRelease(json).then(() => {
-                return this.extract(this.downloadFile).then(() => {
-                    return this.prepareDafny();
-                });
-            });
-        }).catch((e) => {
+        try {
+            const json = await this.getReleaseInformation();
+            await this.downloadRelease(json);
+            await this.extract(this.downloadFile);
+            return this.prepareDafny();
+        }
+        catch (e) {
             console.error(e);
             return Promise.reject(e);
-        });
+        }
     }
 
     public uninstall(): void {
@@ -168,7 +173,7 @@ export class DafnyInstaller {
             });
             fs.rmdirSync(path);
         }
-    };
+    }
 
     private download(url, filePath): Promise<boolean> {
         return new Promise<any>((resolve, reject) => {
@@ -200,8 +205,7 @@ export class DafnyInstaller {
                 });
                 request.on("error", (err) => {
                     fs.unlink(filePath);
-                    console.error("Error downloading dafny: " + err.message);
-                    return reject(false);
+                    throw err;
                 });
             } catch (e) {
                 console.error("Error downloading dafny: " + e);
@@ -242,9 +246,7 @@ export class DafnyInstaller {
                     fs.mkdirSync(this.basePath);
                 }
                 unzipper.extract({
-                    filter: (file) => {
-                        return file.type !== "SymbolicLink";
-                    },
+                    filter: (file) => file.type !== "SymbolicLink",
                     path: this.basePath
                 });
             } catch (e) {

@@ -62,7 +62,6 @@ function verifyDependencies() {
             console.error("can't access github");
         });
     }, () => {
-        connection.sendNotification(LanguageServerNotification.Error, ErrorMsg.DafnyCantBeStarted);
         connection.sendNotification(LanguageServerNotification.DafnyMissing, InfoMsg.AskInstallDafny);
     });
 }
