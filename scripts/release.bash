@@ -76,7 +76,7 @@ git commit -m "Update changelog and bump version to ${RELEASE_VERSION}"
 git checkout master
 git merge develop
 git tag v${RELEASE_VERSION}
-git push master v${RELEASE_VERSION}
+git push origin master v${RELEASE_VERSION}
 git checkout develop
 
 echo "DONE! Please download and test the extension in code."
