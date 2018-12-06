@@ -7,8 +7,8 @@ confirm() {
 }
 
 edit() {
-    confirm "$2 \nPress [ENTER] to open $1."
-    $EDTIOR "$1"
+    confirm "$2\n\nPress [ENTER] to open $1."
+    "${EDITOR:-vi}" "$1"
 }
 
 
@@ -34,32 +34,34 @@ echo -e "Please make sure you are logged into the FunctionalCorrectness account 
 # Release preferences
 ###############################################################################
 read -p "Please insert the version number you would like to release and press [ENTER] (format: major.minor.patch): " RELEASE_VERSION
-confirm "The new extension versioon will be '${RELEASE_VERSION}'. Press [ENTER] to confirm."
+confirm "The new extension version will be '${RELEASE_VERSION}'. Press [ENTER] to confirm."
 
 
 ###############################################################################
 # Main Script
 ###############################################################################
-cd "$ROOT"
+cd "$ROOT" >/dev/null
 pushd server >/dev/null
     echo "Building server..."
+    npm version ${RELEASE_VERSION}
     npm install
-    npm run build
+    npm run compile
 popd
 
 
 pushd client >/dev/null
-
+    echo "Update metafiles..."
     edit README.md "Please check that README.md is still complete.\nNote: this README is shown in the Visual Studio Marketplace. Please check the spelling and formatting."
     edit CHANGELOG.md "Please add all new features etc. to the CHANGELOG. Note: this CHANGELOG is shown in the Visual Studio Marketplace. Please check the spelling and formatting."
 
     echo "Building client..."
+    npm version ${RELEASE_VERSION}
     npm install
     npm run vscode:prepublish
 
 
     echo "Running tests with docker..."
-    ./test-docker.bash
+    ../scripts/test-docker.bash
 
     confirm "Please test the plugin manually according to the API Documentation ( https://github.com/DafnyVSCode/apiDocumentation )\nPress [ENTER] to continue after testing."
 
@@ -69,7 +71,7 @@ pushd client >/dev/null
 popd
 
 echo "Update repository with release information (commit, tag and push to master)..."
-git add client/README.md client/CHANGELOG.md client/package.json client/package-lock.json
+git add client/README.md client/CHANGELOG.md {client,server}/package.json {client,server}/package-lock.json
 git commit -m "Update changelog and bump version to ${RELEASE_VERSION}"
 git checkout master
 git merge develop
