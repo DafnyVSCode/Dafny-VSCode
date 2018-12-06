@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.14.0
+* Fix installation of Dafny on some constellations on Windows (#7).
+* Check for a recent mono version on launch.
+
 ## 0.13.0
 
 * Fixed the CodeLens references counter (Thanks @GoryMoon!)
