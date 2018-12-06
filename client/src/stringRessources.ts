@@ -12,7 +12,9 @@ export class WarningMsg {
 
 export class ErrorMsg {
     public static NoMono: string = "Could not find mono, neither in system PATH nor at dafny.monoPath";
-    public static NoSupportedMono: string = "Could not find compatible Mono. Dafny requires Mono >= 4.0 or Microsoft .NET >= 4.5. Please restart Code after the installation.";
+    public static NoSupportedMono: string = "Could not find compatible Mono. Dafny requires Mono >= 4.0. ";
+    public static RestartCodeAfterMonoInstall: string = "Please restart Code after the Mono installation.";
+    public static RestartMacAfterMonoInstall: string = "Please restart your Mac after the Mono installation.";
     public static GetMono: string = "Get Mono";
     public static GetMonoUri: string = "https://www.mono-project.com/download/stable/";
     public static ConfigureMonoPath: string = "Change dafny.monoPath";

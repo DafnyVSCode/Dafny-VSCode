@@ -1,10 +1,11 @@
 "use strict";
 
 import * as vscode from "vscode";
+import { platform } from "os";
 import { LanguageClient } from "vscode-languageclient";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
-import { WarningMsg, LanguageServerNotification, ErrorMsg } from "./stringRessources";
+import { WarningMsg, LanguageServerNotification, ErrorMsg, EnvironmentConfig } from "./stringRessources";
 import DafnyLanguageClient from './server/dafnyLanguageClient';
 import Notifications from "./ui/notifications";
 import Commands from "./ui/commands";
@@ -28,6 +29,14 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         .then(selection => {
             if(selection === ErrorMsg.GetMono) {
                 vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(ErrorMsg.GetMonoUri));
+                let restartMessage;
+                if(platform() === EnvironmentConfig.OSX) {
+                    // Mono adds a new folder to PATH; so give the easiest advice... ;)
+                    restartMessage = ErrorMsg.RestartMacAfterMonoInstall;
+                } else {
+                    restartMessage = ErrorMsg.RestartCodeAfterMonoInstall;
+                }
+                vscode.window.showWarningMessage(restartMessage);
             }
 
             if(selection === ErrorMsg.ConfigureMonoPath) {
