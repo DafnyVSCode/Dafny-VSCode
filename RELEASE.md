@@ -2,6 +2,8 @@
 
 This file outlines the tasks that need to be done in order to release a new version of the plugin on the VS Code Marketplace.
 
+Note that this process can also be run interactively with `scripts/release.bash`.
+
 ## Preparations
 
 ### Update Documentation

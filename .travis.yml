@@ -14,5 +14,5 @@ install:
   - npm install -g tslint
 
 script:
-  - ./test-docker.bash
+  - scripts/test-docker.bash
   - sonar-scanner

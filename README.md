@@ -4,8 +4,7 @@ This repository contains the infrastructure necessary to support _Dafny_ for Vis
 
 * master: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
 * develop: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
-
-[![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
+* [![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg | width=90)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
 
 ## Architecture
 
@@ -19,20 +18,10 @@ We welcome all contributions! Please create a pull request and we will take care
 
 It is pretty simple to contribute to this plugin. All it takes is having Visual Studio Code and npm installed. Simply clone this repository and switch into the new folder. On the command line, execute one of the following scripts:
 
-* Linux & macOS: `./startup`
-* Windows: `startup.bat`
+* Linux & macOS: `scripts/startup.bash`
+* Windows: `scripts\startup.bat`
 
-These scripts do nothing else than execute the following commands:
-
-```bash
-cd server
-npm install
-code . &
-
-cd ../client
-npm install
-code . &
-```
+These scripts install node dependencies and start code for both the server and client.
 
 Note: It is necessary that the `code` command is available in your `PATH`. On the Mac, this is usually not given. If it is missing, have a look at this [tutorial](https://code.visualstudio.com/docs/setup/mac).
 
@@ -42,7 +31,7 @@ To try out the changes, go to the client editor and press `F5`. A new instance o
 
 If you wish to contribute, simply make your changes and submit a pull request. Make sure that your changes don't break the existing tests in the client/test folder.
 You can run the tests with `npm test` while in the client folder. For this to work, you have to set environment variable `DAFNY_PATH` on your system to your _Dafny_ release (without a "/" at the end of the path).
-Alternatively, you can execute tests with docker (Linux & macOS only) using `./test-docker.bash`.
+Alternatively, you can execute tests with docker (Linux & macOS only) using `scripts/test-docker.bash`.
 Feel free to add any tests.
 
 Final note: Having the extension installed via the Visual Studio Marketplace (along with a _Dafny_ installation via the extension), can lead to conflicts with your locally built extension. It is therefore recommended to uninstall all previous installations of the extension from Visual Studio Code.

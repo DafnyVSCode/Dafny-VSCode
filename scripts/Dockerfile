@@ -31,4 +31,4 @@ RUN mkdir /home/${USER}/source
 VOLUME [ "/home/${USER}/source" ]
 
 WORKDIR /home/${USER}/source
-ENTRYPOINT ./test-docker.bash --inside
+ENTRYPOINT scripts/test-docker.bash --inside

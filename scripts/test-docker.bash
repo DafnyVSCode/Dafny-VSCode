@@ -6,6 +6,8 @@ if [ "$1" != "--inside" ]; then
     echo -e "\n---------------------------------------------------------"\
             "Build and Run Docker Testing Containers..."\
             "---------------------------------------------------------\n"
+    ROOT="`git rev-parse --show-toplevel`/"
+    cd "$ROOT"
 
     # Add user build args if the local uid does not match `node` default user,
     #  so that files created inside the container have the same owner as the
@@ -19,8 +21,9 @@ if [ "$1" != "--inside" ]; then
         build_args="--build-arg UID=${uid} --build-arg GID=${gid} --build-arg USER=${user}"
     fi
 
-    docker build ${build_args} -t instituteforsoftware/dafny-vscode-test .
-    docker run --rm --mount type=bind,source="`pwd`",target="/home/${user}/source" instituteforsoftware/dafny-vscode-test
+    docker build -f scripts/Dockerfile ${build_args} -t instituteforsoftware/dafny-vscode-test .
+    docker run --rm --mount type=bind,source="$ROOT",target="/home/${user}/source" \
+        instituteforsoftware/dafny-vscode-test
     exit $?
 fi
 

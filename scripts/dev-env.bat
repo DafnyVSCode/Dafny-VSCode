@@ -9,7 +9,7 @@ echo(
 echo Installing server ...
 echo(
 
-cd server
+cd %~dp0\..\server
 call npm install
 call code .
 
