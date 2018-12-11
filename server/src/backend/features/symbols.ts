@@ -2,7 +2,7 @@ import {Position, Range, TextDocument} from "vscode-languageserver";
 import { DafnyKeyWords, SymbolString } from "./../../strings/stringRessources";
 import { containsPosition } from "./../../vscodeFunctions/positionHelper";
 export enum SymbolType {
-    Unknown, Class, Method, Function, Field, Call, Definition, Predicate
+    Unknown, Class, Method, Function, Field, Call, Definition, Predicate,
 }
 export class SymbolTable {
     public symbols: Symbol[];
@@ -52,7 +52,7 @@ export class Symbol {
         this.ensures = [];
     }
     public setSymbolType(type: string): void {
-        switch(type) {
+        switch (type) {
             case SymbolString.Class: this.symbolType = SymbolType.Class; break;
             case SymbolString.Method: this.symbolType = SymbolType.Method; break;
             case SymbolString.Function: this.symbolType = SymbolType.Function; break;
@@ -145,10 +145,10 @@ export class Symbol {
         return this.name === name;
     }
 
-    private addClauses(clauses: any, ): string[] {
+    private addClauses(clauses: any): string[] {
         const clauseHolder: string[] = [];
-        if(clauses && clauses.length) {
-            for(const clause of clauses) {
+        if (clauses && clauses.length) {
+            for (const clause of clauses) {
                 clauseHolder.push(clause);
             }
         }
@@ -157,7 +157,7 @@ export class Symbol {
 
     private isTypeAt(word: string, type: SymbolType, position: Position = null): boolean {
         const isTypeOfName = this.isOfType([type]) && this.hasName(word);
-        if(position !== null) {
+        if (position !== null) {
             return isTypeOfName && containsPosition(this.range, position);
         }
         return isTypeOfName;

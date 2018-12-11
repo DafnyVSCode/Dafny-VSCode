@@ -55,7 +55,7 @@ export class NotificationService {
         this.lastProgress = 0;
     }
 
-    public progress(domain, current, total) {
+    public progress(domain: string, current: number, total: number) {
         const progress = 100.0 * current / total;
         if (Math.floor(progress) > this.lastProgress) {
             this.lastProgress = progress;
@@ -63,7 +63,7 @@ export class NotificationService {
         }
     }
 
-    public progressText(domain) {
+    public progressText(domain: string) {
         this.connection.sendNotification(LanguageServerNotification.Progress, { domain });
     }
 }

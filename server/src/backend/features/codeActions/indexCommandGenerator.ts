@@ -1,11 +1,9 @@
 import { EOL } from "os";
-import { Command, Diagnostic } from "vscode-languageserver";
-import { Position, TextDocument, TextEdit } from "vscode-languageserver-types/lib/main";
+import { Command } from "vscode-languageserver";
+import { Position, TextEdit } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
 import { DocumentDecorator } from "./../../../vscodeFunctions/documentDecorator";
-import { DafnyServer } from "./../../dafnyServer";
 import { methodAt } from "./../semanticAnalysis";
-import { SymbolType } from "./../symbols";
 import { Symbol } from "./../symbols";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 

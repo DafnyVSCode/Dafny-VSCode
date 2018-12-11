@@ -9,14 +9,11 @@ import { Environment } from "./environment";
 
 export class DependencyVerifier {
 
-    private upgradeNecessary = "UPDATE_NECESSARY";
-    private latestInstalled = "Latest version installed";
     private version = "VERSION:";
 
     private serverProc: ProcessWrapper;
     private callbackSuccess: (serverVersion: string) => any;
     private callbackError: (error: any) => any;
-    private upgradeCallback: () => any;
     private serverVersion: string;
 
     public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,

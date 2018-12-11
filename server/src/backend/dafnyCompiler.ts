@@ -1,6 +1,5 @@
 "use strict";
 import * as cp from "child_process";
-import * as vscode from "vscode-languageserver";
 import Uri from "vscode-uri";
 import { NotificationService } from "../notificationService";
 import { Context } from "./context";
@@ -26,7 +25,7 @@ export class DafnyCompiler {
             args.push(uri.fsPath);
             console.log(dafnyCommand.command + " " + args);
             const process = cp.spawn(dafnyCommand.command, args, environment.getStandardSpawnOptions());
-            process.on("exit", (code, signal) => {
+            process.on("exit", () => {
                 resolve({ error: false, executable });
             });
             process.stdout.on("error", (data: Buffer) => {
@@ -44,7 +43,7 @@ export class DafnyCompiler {
 
             });
         });
-    };
+    }
 }
 
 export class CompilerResult {

@@ -12,7 +12,7 @@ export enum VerificationStatus {
     Verified = 0,
     NotVerified = 1,
     Failed = 2,
-};
+}
 
 export class VerificationResult {
     public verificationStatus: VerificationStatus;
@@ -20,11 +20,10 @@ export class VerificationResult {
     public errorCount: number;
     public crashed: boolean = false;
     public counterModel: any;
-};
+}
 
 export class VerificationResults {
     public latestResults: { [docPathName: string]: VerificationResult } = {};
-    private diagCol: vscode.PublishDiagnosticsParams;
 
     constructor(private notificationService: NotificationService) { }
 
@@ -61,9 +60,9 @@ export class VerificationResults {
                 message: "Please upgrade Dafny. The verification can't be executed.",
                 range: {
                     end: { character: Number.MAX_VALUE, line: Number.MAX_VALUE },
-                    start: { character: 0, line: 0 }
+                    start: { character: 0, line: 0 },
                 },
-                severity: vscode.DiagnosticSeverity.Error, source: "Dafny VSCode"
+                severity: vscode.DiagnosticSeverity.Error, source: "Dafny VSCode",
             });
         }
 
@@ -99,7 +98,7 @@ export class VerificationResults {
                     relatedLocationCounter++;
                 }
 
-                if (typeStr == Severity.TimedOut) {
+                if (typeStr === Severity.TimedOut) {
                     msgStr += " (timed out)";
                 }
 
@@ -140,7 +139,7 @@ export class VerificationResults {
 
     private checkForRelatedLocation(lines: string[], index: string, diags: vscode.Diagnostic[],
                                     relatedLocationCounter: number): vscode.Range {
-        const nextLine: string = lines[(parseInt(index, 10) + 1).toString()];
+        const nextLine: string = lines[parseInt(index, 10) + 1];
         const relatedLocations: RegExpExecArray = Verification.RelatedLocationRegex.exec(nextLine);
 
         if (relatedLocations) {

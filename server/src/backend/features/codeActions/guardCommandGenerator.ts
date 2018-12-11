@@ -1,6 +1,6 @@
 import {EOL} from "os";
 import {Command} from "vscode-languageserver";
-import { Position, TextDocument, TextEdit} from "vscode-languageserver-types/lib/main";
+import { Position, TextEdit} from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyKeyWords, DafnyReports } from "./../../../strings/stringRessources";
 import { methodAt } from "./../semanticAnalysis";
 import { Symbol } from "./../symbols";
@@ -10,7 +10,7 @@ export class GuardCommandGenerator extends BaseCommandGenerator {
 
     protected calculateCommands(): Promise<Command[]> {
         return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
-            for(const guardKeyWord of DafnyKeyWords.GuardKeyWords) {
+            for (const guardKeyWord of DafnyKeyWords.GuardKeyWords) {
                 this.addGuards(guardKeyWord, symbols);
             }
             return this.commands;
@@ -25,20 +25,20 @@ export class GuardCommandGenerator extends BaseCommandGenerator {
     }
 
     protected findExactInsertPosition(definingMethod: Symbol): Position {
-        if(definingMethod === null) {
+        if (definingMethod === null) {
             return null;
         }
         return this.documentDecorator.findInsertionPointOfContract(definingMethod.start, this.diagnostic.range.start);
     }
     private addGuards(guardKeyWord: string, symbols: Symbol[]): void {
         const message = this.diagnostic.message;
-        if(message.indexOf(guardKeyWord) < 0 || message.startsWith(DafnyReports.UnresolvedDecreaseWarning)) {
+        if (message.indexOf(guardKeyWord) < 0 || message.startsWith(DafnyReports.UnresolvedDecreaseWarning)) {
             return;
         }
         const definingMethod = methodAt(symbols, this.diagnostic.range);
         const guardedExpression = this.parseGuardedExpression(guardKeyWord);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
-        if(insertPosition && insertPosition !== this.dummyPosition) {
+        if (insertPosition && insertPosition !== this.dummyPosition) {
             this.addGuardCommand(insertPosition, guardKeyWord, guardedExpression, this.uri);
         }
     }

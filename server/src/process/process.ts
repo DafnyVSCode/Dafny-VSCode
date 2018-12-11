@@ -1,10 +1,7 @@
 "use strict";
 
 import * as cp from "child_process";
-import {
-    CommandEndFailedException, CommandFailedException,
-    DafnyServerExeption, RequestFailedException
-} from "../errorHandling/errors";
+import { CommandFailedException, DafnyServerExeption } from "../errorHandling/errors";
 
 export class ProcessWrapper {
     public pid: number;
@@ -43,8 +40,7 @@ export class ProcessWrapper {
         this.outBuf = "";
     }
     public sendRequestToDafnyServer(request: string, verb: string): void {
-        this.writeRequestToServer(request, verb, "[[DAFNY-CLIENT: EOM]]",
-            "Verification command failed of request: ${request}", "Verification request failed of task: ${request}");
+        this.writeRequestToServer(request, verb, "[[DAFNY-CLIENT: EOM]]");
     }
 
     public sendQuit(): void {
@@ -64,8 +60,7 @@ export class ProcessWrapper {
     public positionCommandEnd(): number {
         return this.outBuf.search(this.commandEndRegex);
     }
-    private writeRequestToServer(request: string, verb: string, serverEndTag: string,
-                                 commandFailedMessage: string, requestFailedMessage: string): void {
+    private writeRequestToServer(request: string, verb: string, serverEndTag: string): void {
         this.serverProc.stdin.write(verb + "\n", () => {
             this.serverProc.stdin.write(request + "\n", () => {
                 this.serverProc.stdin.write(serverEndTag + "\n", () => {});

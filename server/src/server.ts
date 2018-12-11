@@ -4,24 +4,23 @@ import {
     CodeActionParams, CodeLens, CodeLensParams,
     createConnection, IConnection, InitializeResult, IPCMessageReader,
     IPCMessageWriter, Location, RenameParams, TextDocument,
-    TextDocumentItem, TextDocumentPositionParams, TextDocuments, TextDocumentSyncKind, WorkspaceEdit
+    TextDocumentItem, TextDocumentPositionParams, TextDocuments, WorkspaceEdit,
 } from "vscode-languageserver";
 import Uri from "vscode-uri";
 import { CompilerResult } from "./backend/dafnyCompiler";
 import { DafnyInstaller } from "./backend/dafnyInstaller";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
-import { CodeActionProvider } from "./backend/features/codeActionProvider";
 import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
 import { NotificationService } from "./notificationService";
-import { Answer, ErrorMsg, InfoMsg } from "./strings/stringRessources";
-import { Commands, LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
+import { InfoMsg } from "./strings/stringRessources";
+import { LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
 
 const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 const documents: TextDocuments = new TextDocuments();
 const codeLenses: { [codeLens: string]: ReferencesCodeLens; } = {};
-let settings: Settings = null;
+let settings: ISettings = null;
 let started: boolean = false;
 let notificationService: NotificationService = null;
 let dafnyInstaller: DafnyInstaller = null;
@@ -40,18 +39,18 @@ connection.onInitialize((params): InitializeResult => {
             codeLensProvider: { resolveProvider: true },
             completionProvider: {
                 resolveProvider: true,
-                triggerCharacters: ["."]
+                triggerCharacters: ["."],
             },
             definitionProvider: true,
             renameProvider: true,
-            textDocumentSync: documents.syncKind
-        }
+            textDocumentSync: documents.syncKind,
+        },
     };
 });
 
 function verifyDependencies() {
     const dependencyVerifier: DependencyVerifier = new DependencyVerifier();
-    dafnyInstaller = new DafnyInstaller(notificationService, settings.dafny);
+    dafnyInstaller = new DafnyInstaller(notificationService);
     dependencyVerifier.verifyDafnyServer(workspaceRoot, notificationService, settings.dafny, (serverVersion: string) => {
         init(serverVersion);
         dafnyInstaller.latestVersionInstalled(serverVersion).then((latest) => {
@@ -84,7 +83,7 @@ function init(serverVersion: string) {
 
 function verifyAll() {
     console.log("verify all" + documents.all().length);
-    if(provider) {
+    if (provider) {
         documents.all().forEach((d) => {
             console.log("all verify" + d.uri);
             provider.doVerify(d);
@@ -132,7 +131,7 @@ function getCodeLens(referenceCodeLens: ReferencesCodeLens): CodeLens {
     return { command: referenceCodeLens.command, data: referenceCodeLens.data, range: referenceCodeLens.range };
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise((resolve: any) => setTimeout(resolve, ms));
 }
 
@@ -163,12 +162,12 @@ connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
     }
 });
 
-interface Settings {
+interface ISettings {
     dafny: DafnySettings;
 }
 
 connection.onDidChangeConfiguration((change) => {
-    settings = change.settings as Settings;
+    settings = change.settings as ISettings;
     if (!started) {
         started = true;
         verifyDependencies();

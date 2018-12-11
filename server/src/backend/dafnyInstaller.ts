@@ -5,9 +5,7 @@ const redirect = require("follow-redirects").https;
 import * as fs from "fs";
 import * as os from "os";
 import uri from "vscode-uri";
-import { DafnyUnsupportedPlatform } from "../errorHandling/errors";
-import { Config, EnvironmentConfig, InfoMsg, Installer } from "../strings/stringRessources";
-import { DafnySettings } from "./dafnySettings";
+import { EnvironmentConfig, Installer } from "../strings/stringRessources";
 const DecompressZip = require("decompress-zip");
 const semver = require("semver");
 import * as pathHelper from "path";
@@ -18,7 +16,7 @@ export class DafnyInstaller {
     private readonly basePath = this.resolvePath(pathHelper.join(__dirname, "..", "..", "dafny"));
     private readonly downloadFile = this.resolvePath(pathHelper.join(this.basePath, "..", "dafny.zip"));
 
-    constructor(private notificationService: NotificationService, private dafnySettings: DafnySettings) {
+    constructor(private notificationService: NotificationService) {
     }
 
     public async latestVersionInstalled(localVersion: string): Promise<boolean> {
@@ -37,7 +35,7 @@ export class DafnyInstaller {
                     return Promise.reject(false);
                 }
             } else {
-                throw new Error("Could not read dafny version from JSON")
+                throw new Error("Could not read dafny version from JSON");
             }
         } catch (e) {
             console.log("Can't get release information: " + e);
@@ -49,10 +47,10 @@ export class DafnyInstaller {
         return new Promise<any>((resolve, reject) => {
             const options: https.RequestOptions = {
                 headers: {
-                    "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0"
+                    "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0",
                 },
                 host: uri.parse(Installer.ReleaseUrl).authority,
-                path: uri.parse(Installer.ReleaseUrl).path
+                path: uri.parse(Installer.ReleaseUrl).path,
             };
 
             https.get(options, (res) => {
@@ -66,8 +64,8 @@ export class DafnyInstaller {
                     try {
                         const json = JSON.parse(body);
                         resolve(json);
-                    } catch(e) {
-                        console.log("Could not parse Dafny release information JSON")
+                    } catch (e) {
+                        console.log("Could not parse Dafny release information JSON");
                         reject();
                     }
                 });
@@ -98,7 +96,7 @@ export class DafnyInstaller {
 
             return this.download(url, this.downloadFile);
         } else {
-            const msg = "Could not get Dafny Release assets from JSON response."
+            const msg = "Could not get Dafny Release assets from JSON response.";
             console.log(msg);
             return Promise.reject(msg);
         }
@@ -129,15 +127,14 @@ export class DafnyInstaller {
             await this.downloadRelease(json);
             await this.extract(this.downloadFile);
             return this.prepareDafny();
-        }
-        catch (e) {
+        } catch (e) {
             console.error(e);
             return Promise.reject(e);
         }
     }
 
     public uninstall(): void {
-        let path = this.basePath;
+        const path = this.basePath;
         if (path && path.length > 10) {
             console.log("remove " + path);
             this.deleteFolderRecursive(path);
@@ -160,10 +157,10 @@ export class DafnyInstaller {
         return null;
     }
 
-    private deleteFolderRecursive(path) {
+    private deleteFolderRecursive(path: string) {
         this.notificationService.progressText("Removing existing files");
         if (fs.existsSync(path)) {
-            fs.readdirSync(path).forEach((file, index) => {
+            fs.readdirSync(path).forEach((file) => {
                 const curPath = path + "/" + file;
                 if (fs.lstatSync(curPath).isDirectory()) {
                     this.deleteFolderRecursive(curPath);
@@ -175,25 +172,25 @@ export class DafnyInstaller {
         }
     }
 
-    private download(url, filePath): Promise<boolean> {
+    private download(url: string, filePath: string): Promise<boolean> {
         return new Promise<any>((resolve, reject) => {
             try {
                 this.notificationService.startProgress();
                 const options: https.RequestOptions = {
                     headers: {
-                        "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0"
+                        "User-Agent": "Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0",
                     },
                     host: uri.parse(url).authority,
-                    path: uri.parse(url).path
+                    path: uri.parse(url).path,
                 };
 
                 const file = fs.createWriteStream(filePath);
-                const request = redirect.get(options, (response) => {
+                const request = redirect.get(options, (response: any) => {
                     response.pipe(file);
 
                     const len = parseInt(response.headers["content-length"], 10);
                     let cur = 0;
-                    response.on("data", (chunk) => {
+                    response.on("data", (chunk: string) => {
                         cur += chunk.length;
                         this.notificationService.progress("Downloading Dafny ", cur, len);
                     });
@@ -203,7 +200,7 @@ export class DafnyInstaller {
                         return resolve(true);
                     });
                 });
-                request.on("error", (err) => {
+                request.on("error", (err: Error) => {
                     fs.unlink(filePath);
                     throw err;
                 });
@@ -213,7 +210,7 @@ export class DafnyInstaller {
             }
         });
 
-    };
+    }
 
     private extract(filePath: string): Promise<boolean> {
         return new Promise<any>((resolve, reject) => {
@@ -223,11 +220,11 @@ export class DafnyInstaller {
 
                 const unzipper = new DecompressZip(filePath);
 
-                unzipper.on("progress", (fileIndex, fileCount) => {
+                unzipper.on("progress", (fileIndex: number, fileCount: number) => {
                     this.notificationService.progress("Extracting Dafny ", fileIndex + 1, fileCount);
                 });
 
-                unzipper.on("error", (e) => {
+                unzipper.on("error", (e: any) => {
                     if (e.code && e.code === "ENOENT") {
                         console.error("Error updating Dafny, missing create file permission in the dafny directory: " + e);
                     } else if (e.code && e.code === "EACCES") {
@@ -238,7 +235,7 @@ export class DafnyInstaller {
                     return reject(e);
                 });
 
-                unzipper.on("extract", (log) => {
+                unzipper.on("extract", () => {
                     return resolve();
                 });
 
@@ -246,8 +243,8 @@ export class DafnyInstaller {
                     fs.mkdirSync(this.basePath);
                 }
                 unzipper.extract({
-                    filter: (file) => file.type !== "SymbolicLink",
-                    path: this.basePath
+                    filter: (file: any) => file.type !== "SymbolicLink",
+                    path: this.basePath,
                 });
             } catch (e) {
                 console.error("Error extracting dafny: " + e);
