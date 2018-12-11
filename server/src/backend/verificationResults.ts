@@ -7,19 +7,12 @@ import { NotificationService } from "../notificationService";
 import { Verification } from "../strings/regexRessources";
 import { EnvironmentConfig, Severity } from "../strings/stringRessources";
 import { VerificationRequest } from "./verificationRequest";
+import { VerificationResult } from "./VerificationResult";
 
 export enum VerificationStatus {
     Verified = 0,
     NotVerified = 1,
     Failed = 2,
-}
-
-export class VerificationResult {
-    public verificationStatus: VerificationStatus;
-    public proofObligations: number;
-    public errorCount: number;
-    public crashed: boolean = false;
-    public counterModel: any;
 }
 
 export class VerificationResults {
@@ -66,8 +59,7 @@ export class VerificationResults {
             });
         }
 
-        // tslint:disable-next-line:forin
-        for (const index in lines) {
+        for (const index of lines.keys()) {
             const sourceLine: string = lines[index];
             const errors: RegExpExecArray = Verification.LogParseRegex.exec(sourceLine);
             const proofObligationLine: RegExpExecArray = Verification.NumberOfProofObligations.exec(sourceLine);
@@ -137,9 +129,9 @@ export class VerificationResults {
         }
     }
 
-    private checkForRelatedLocation(lines: string[], index: string, diags: vscode.Diagnostic[],
-                                    relatedLocationCounter: number): vscode.Range {
-        const nextLine: string = lines[parseInt(index, 10) + 1];
+    private checkForRelatedLocation(lines: string[], index: number, diags: vscode.Diagnostic[],
+                                    relatedLocationCounter: number): vscode.Range | undefined {
+        const nextLine: string = lines[index + 1];
         const relatedLocations: RegExpExecArray = Verification.RelatedLocationRegex.exec(nextLine);
 
         if (relatedLocations) {
@@ -155,5 +147,6 @@ export class VerificationResults {
 
             return range;
         }
+        return undefined;
     }
 }

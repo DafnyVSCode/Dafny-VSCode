@@ -1,7 +1,7 @@
 "use strict";
 import {EOL} from "os";
-import { CompletionItem, CompletionItemKind, Position, TextDocument } from "vscode-languageserver-types/lib/main";
 import { TextDocumentPositionParams } from "vscode-languageserver-protocol";
+import { CompletionItem, CompletionItemKind, Position, TextDocument } from "vscode-languageserver-types/lib/main";
 import { DocumentDecorator } from "./../../vscodeFunctions/documentDecorator";
 import { DafnyServer } from "./../dafnyServer";
 import {DafnySymbol, SymbolType } from "./symbols";
@@ -43,8 +43,8 @@ export class DafnyCompletionProvider {
                 if (e.isDefiningClassForFieldType(field)) {
                     return true;
                 }
-                return false;
             }
+            return false;
         });
     }
     private parseWordForCompletion(document: TextDocument, position: Position): string {

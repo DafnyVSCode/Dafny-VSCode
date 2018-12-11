@@ -13,69 +13,69 @@ export class DocumentIterator {
 
     constructor(documentDecorator: DocumentDecorator, startPosition: Position = null) {
         this.documentDecorator = documentDecorator;
-        if(startPosition) {
+        if (startPosition) {
             this.lineIndex = startPosition.line;
             this.charIndex = startPosition.character;
-            this.currentLine = this.documentDecorator._lines[this.lineIndex];
+            this.currentLine = this.documentDecorator.documentLines[this.lineIndex];
             this.currentChar = this.currentLine.charAt(this.charIndex);
         }
     }
 
     public skipChar() {
-        if(!this.isValidPosition) {
+        if (!this.isValidPosition) {
             return;
         }
         this.charIndex++;
-        if(this.charIndex >= this.currentLine.length) {
+        if (this.charIndex >= this.currentLine.length) {
             this.lineIndex++;
-            if(this.lineIndex >= this.documentDecorator._lines.length) {
+            if (this.lineIndex >= this.documentDecorator.documentLines.length) {
                 this.isValidPosition = false;
                 return;
             }
-            this.currentLine = this.documentDecorator._lines[this.lineIndex];
+            this.currentLine = this.documentDecorator.documentLines[this.lineIndex];
             this.charIndex = 0;
         }
         this.currentChar =  this.currentLine.charAt(this.charIndex);
     }
 
     public moveBack() {
-        if(!this.isValidPosition) {
+        if (!this.isValidPosition) {
             return;
         }
         this.charIndex--;
-        if(this.charIndex < 0) {
+        if (this.charIndex < 0) {
             this.lineIndex--;
-            if(this.lineIndex < 0) {
+            if (this.lineIndex < 0) {
                 this.isValidPosition = false;
                 return;
             }
-            this.currentLine = this.documentDecorator._lines[this.lineIndex];
+            this.currentLine = this.documentDecorator.documentLines[this.lineIndex];
             this.charIndex = this.currentLine.length - 1;
         }
         this.currentChar = this.currentLine.charAt(this.charIndex);
     }
 
     public skipWhiteSpace() {
-        while(this.isValidPosition && " \t\n\r\v".indexOf(this.currentChar) > -1) {
+        while (this.isValidPosition && " \t\n\r\v".indexOf(this.currentChar) > -1) {
             this.skipChar();
         }
     }
     public skipWord() {
-         while(this.isValidPosition && !/[^a-zA-Z0-9]/.test(this.currentChar)) {
+         while (this.isValidPosition && !/[^a-zA-Z0-9]/.test(this.currentChar)) {
             this.skipChar();
         }
     }
 
     public skipWordBack() {
-         while(this.isValidPosition && !/[^a-zA-Z0-9]/.test(this.currentChar)) {
+         while (this.isValidPosition && !/[^a-zA-Z0-9]/.test(this.currentChar)) {
             this.moveBack();
         }
     }
     public skipToChar(char: string) {
         let foundChar: boolean = false;
-        while(this.isValidPosition && !foundChar) {
+        while (this.isValidPosition && !foundChar) {
             const searchIndex = this.currentLine.indexOf(char, this.charIndex);
-            if(searchIndex > 0 && searchIndex > this.charIndex) {
+            if (searchIndex > 0 && searchIndex > this.charIndex) {
                 this.charIndex = searchIndex;
                 this.currentChar =  this.currentLine.charAt(this.charIndex);
                 foundChar = true;
@@ -87,9 +87,9 @@ export class DocumentIterator {
 
     public moveBackToChar(char: string) {
         let foundChar: boolean = false;
-        while(this.isValidPosition && !foundChar) {
+        while (this.isValidPosition && !foundChar) {
             const searchIndex = this.currentLine.indexOf(char);
-            if(searchIndex > 0 && searchIndex < this.charIndex) {
+            if (searchIndex > 0 && searchIndex < this.charIndex) {
                 this.charIndex = searchIndex;
                 this.currentChar =  this.currentLine.charAt(this.charIndex);
                 foundChar = true;

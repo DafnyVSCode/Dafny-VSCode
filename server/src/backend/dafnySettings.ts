@@ -1,6 +1,6 @@
 "use strict";
 
-export interface DafnySettings {
+export interface IDafnySettings {
     basePath: string;
     useMono: boolean;
     monoPath: string;

@@ -8,18 +8,18 @@ import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
 export class DocumentDecorator {
 
-    public _lines: string[];
+    public documentLines: string[];
     private boogieCharOffset: number = 1;
     constructor(public document: vscode.TextDocument) {
 
-        this._lines = document.getText().split(/\r\n|\r|\n/);
+        this.documentLines = document.getText().split(/\r\n|\r|\n/);
     }
 
-    public getText(_range: vscode.Range): string {
-        const range = this.validateRange(_range);
+    public getText(textRange: vscode.Range): string {
+        const range = this.validateRange(textRange);
 
         if (range.start.line === range.end.line) {
-            return this._lines[range.start.line].substring(range.start.character,
+            return this.documentLines[range.start.line].substring(range.start.character,
                 range.end.character).trim();
         }
 
@@ -28,11 +28,11 @@ export class DocumentDecorator {
         const endLineIndex = range.end.line;
         const resultLines: string[] = [];
 
-        resultLines.push(this._lines[startLineIndex].substring(range.start.character).trim());
+        resultLines.push(this.documentLines[startLineIndex].substring(range.start.character).trim());
         for (let i = startLineIndex + 1; i < endLineIndex; i++) {
-            resultLines.push(this._lines[i].trim());
+            resultLines.push(this.documentLines[i].trim());
         }
-        resultLines.push(this._lines[endLineIndex].substring(0, range.end.character).trim());
+        resultLines.push(this.documentLines[endLineIndex].substring(0, range.end.character).trim());
 
         return resultLines.join(lineEnding).trim();
     }
@@ -42,11 +42,11 @@ export class DocumentDecorator {
         let line: number;
         line = position.line;
 
-        if (line < 0 || line >= this._lines.length) {
+        if (line < 0 || line >= this.documentLines.length) {
             throw new Error("Illegal value for `line` " + line);
         }
 
-        return this._lines[line];
+        return this.documentLines[line];
     }
 
     public validateRange(range: vscode.Range): vscode.Range {
@@ -69,12 +69,12 @@ export class DocumentDecorator {
             line = 0;
             character = 0;
             hasChanged = true;
-        } else if (line >= this._lines.length) {
-            line = this._lines.length - 1;
-            character = this._lines[line].length;
+        } else if (line >= this.documentLines.length) {
+            line = this.documentLines.length - 1;
+            character = this.documentLines[line].length;
             hasChanged = true;
         } else {
-            const maxCharacter = this._lines[line].length;
+            const maxCharacter = this.documentLines[line].length;
             if (character < 0) {
                 character = 0;
                 hasChanged = true;
@@ -90,23 +90,23 @@ export class DocumentDecorator {
         return vscode.Position.create(line, character);
     }
 
-    public findInsertPositionRange(_position: vscode.Position, insertBefore: string): vscode.Range {
-        let currentLine = _position.line;
-        let currentPosition = _position.character;
-        while(currentLine > 0 && this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore) < 0) {
+    public findInsertPositionRange(insertPosition: vscode.Position, insertBefore: string): vscode.Range {
+        let currentLine = insertPosition.line;
+        let currentPosition = insertPosition.character;
+        while (currentLine > 0 && this.documentLines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore) < 0) {
             currentLine -= 1;
-            currentPosition = this._lines[currentLine].length;
+            currentPosition = this.documentLines[currentLine].length;
         }
-        let positionOfInsertion =  this._lines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore);
-        if(positionOfInsertion < 0) {
+        let positionOfInsertion =  this.documentLines[currentLine].substr(0, currentPosition).lastIndexOf(insertBefore);
+        if (positionOfInsertion < 0) {
             positionOfInsertion = 0;
         }
         return vscode.Range.create(vscode.Position.create(currentLine, positionOfInsertion),
             vscode.Position.create(currentLine, positionOfInsertion +  insertBefore.length));
 
     }
-    public readArrayExpression(_position: vscode.Position): vscode.Range {
-        const position = this.validatePosition(_position);
+    public readArrayExpression(arrayPosition: vscode.Position): vscode.Range {
+        const position = this.validatePosition(arrayPosition);
         const iterator = new DocumentIterator(this, position);
         const exprStartChar = "[";
         const exprEndChar = "]";
@@ -115,42 +115,42 @@ export class DocumentDecorator {
         let start: vscode.Position = null;
         const range: vscode.Range = null;
         iterator.skipToChar(exprStartChar);
-        if(iterator.isValidPosition) {
+        if (iterator.isValidPosition) {
             openCount = 1;
             start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         } else {
             return range;
         }
-        while(openCount !== closedCount) {
+        while (openCount !== closedCount) {
             iterator.skipChar();
-            if(!iterator.isValidPosition) {
+            if (!iterator.isValidPosition) {
                 return range;
             }
-            if(iterator.currentChar === exprStartChar) {
+            if (iterator.currentChar === exprStartChar) {
                 openCount++;
             }
-            if(iterator.currentChar === exprEndChar) {
+            if (iterator.currentChar === exprEndChar) {
                 closedCount++;
             }
-            if(openCount === closedCount) {
+            if (openCount === closedCount) {
                 const end = vscode.Position.create(iterator.lineIndex, iterator.charIndex);
                 return vscode.Range.create(start, end);
             }
         }
         return range;
     }
-    public matchWordRangeAtPosition(_position: vscode.Position, adjust: boolean = true): vscode.Range {
-        const position = this.validatePosition(_position);
+    public matchWordRangeAtPosition(rangePosition: vscode.Position, adjust: boolean = true): vscode.Range {
+        const position = this.validatePosition(rangePosition);
         const wordAtText = matchWordAtText(
             position.character + 1,
-            this._lines[position.line],
-            0
+            this.documentLines[position.line],
+            0,
         );
 
         if (wordAtText) {
             let start = wordAtText.startColumn;
             let end = wordAtText.endColumn;
-            if(adjust) {
+            if (adjust) {
                 start -= 1;
                 end -= 1;
             }
@@ -158,13 +158,13 @@ export class DocumentDecorator {
         }
         return undefined;
     }
-    public getWordRangeAtPosition(_position: vscode.Position, regexp?: RegExp): vscode.Range {
-        const position = this.validatePosition(_position);
+    public getWordRangeAtPosition(wordRangePosition: vscode.Position, regexp?: RegExp): vscode.Range {
+        const position = this.validatePosition(wordRangePosition);
         const wordAtText = getWordAtText(
             position.character + 1,
             ensureValidWordDefinition(regexp),
-            this._lines[position.line],
-            0
+            this.documentLines[position.line],
+            0,
         );
 
         if (wordAtText) {
@@ -213,8 +213,8 @@ export class DocumentDecorator {
         return wordRange ? this.getText(wordRange) : "";
     }
 
-    public findBeginOfContractsOfMethod(_position: vscode.Position): vscode.Position {
-        const position = this.validatePosition(_position);
+    public findBeginOfContractsOfMethod(beginPosition: vscode.Position): vscode.Position {
+        const position = this.validatePosition(beginPosition);
         const iterator = new DocumentIterator(this, position);
         const paramsEndToken = ")";
         const paramsStartToken = "(";
@@ -222,40 +222,40 @@ export class DocumentDecorator {
         let closedCount = 0;
         let start: vscode.Position = null;
         iterator.skipToChar(paramsStartToken);
-        if(!iterator.isValidPosition) {
+        if (!iterator.isValidPosition) {
             return start;
         }
         start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
         openCount = 1;
-        while(openCount !== closedCount) {
+        while (openCount !== closedCount) {
             iterator.skipChar();
-            if(!iterator.isValidPosition) {
+            if (!iterator.isValidPosition) {
                 return start;
             }
-            if(iterator.currentChar === paramsStartToken) {
+            if (iterator.currentChar === paramsStartToken) {
                 openCount++;
             }
-            if(iterator.currentChar === paramsEndToken) {
+            if (iterator.currentChar === paramsEndToken) {
                 closedCount++;
             }
-            if(openCount === closedCount) {
+            if (openCount === closedCount) {
                 // Skip return type
                 const oldPos = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
                 iterator.skipChar();
                 iterator.skipWhiteSpace();
-                if(!iterator.isValidPosition) {
+                if (!iterator.isValidPosition) {
                     return oldPos;
                 }
-                if(":".indexOf(iterator.currentChar) > -1) {
+                if (":".indexOf(iterator.currentChar) > -1) {
                     iterator.skipChar();
                     iterator.skipWhiteSpace();
                     iterator.skipWord();
-                    if(iterator.isValidPosition) {
+                    if (iterator.isValidPosition) {
                         return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
                     }
-                } else if(iterator.currentLine.substr(iterator.charIndex).startsWith("returns")) {
+                } else if (iterator.currentLine.substr(iterator.charIndex).startsWith("returns")) {
                     iterator.skipToChar(")");
-                    if(iterator.isValidPosition) {
+                    if (iterator.isValidPosition) {
                         return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
                     }
                 }
@@ -267,44 +267,44 @@ export class DocumentDecorator {
 
     public findInsertionPointOfContract(memberStart: vscode.Position, lastDependentDeclaration: vscode.Position = null) {
         const startOfTopLevelContracts = this.findBeginOfContractsOfMethod(memberStart);
-        if(!lastDependentDeclaration) {
+        if (!lastDependentDeclaration) {
             return startOfTopLevelContracts;
         }
         const iterator = new DocumentIterator(this, startOfTopLevelContracts);
-        while(iterator.isInfrontOf(lastDependentDeclaration)) {
+        while (iterator.isInfrontOf(lastDependentDeclaration)) {
             iterator.skipChar();
             iterator.skipToChar("{");
         }
-        if(iterator.isValidPosition) {
+        if (iterator.isValidPosition) {
             return vscode.Position.create(iterator.lineIndex, iterator.charIndex - 2);
         }
         return startOfTopLevelContracts;
 
     }
 
-    public tryFindBeginOfBlock(_position: vscode.Position): vscode.Position {
-        const position = this.validatePosition(_position);
+    public tryFindBeginOfBlock(beginPosition: vscode.Position): vscode.Position {
+        const position = this.validatePosition(beginPosition);
         const blockStartToken = ")";
         const start: vscode.Position = null;
         const iterator = new DocumentIterator(this, position);
         iterator.moveBackToChar(blockStartToken);
-        if(iterator.isValidPosition) {
+        if (iterator.isValidPosition) {
             return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         }
         return start;
     }
 
-    public parseArrayIdentifier(_position: vscode.Position): string {
-        const position = this.validatePosition(_position);
+    public parseArrayIdentifier(arrayPosition: vscode.Position): string {
+        const position = this.validatePosition(arrayPosition);
         const iterator = new DocumentIterator(this, position);
         iterator.skipToChar("[");
-        if(!iterator.isValidPosition) {
+        if (!iterator.isValidPosition) {
             return "";
         }
         const end = vscode.Position.create(iterator.lineIndex, iterator.charIndex);
         iterator.moveBack();
         iterator.skipWordBack();
-        if(!iterator.isValidPosition) {
+        if (!iterator.isValidPosition) {
             return "";
         }
         const start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);

@@ -3,7 +3,7 @@ import { Disposable, TextDocument } from "vscode-languageserver";
 import { Context } from "../backend/context";
 import { DafnyCompiler } from "../backend/dafnyCompiler";
 import { DafnyServer } from "../backend/dafnyServer";
-import { DafnySettings } from "../backend/dafnySettings";
+import { IDafnySettings } from "../backend/dafnySettings";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
 import { NotificationService } from "../notificationService";
@@ -26,7 +26,7 @@ export class DafnyServerProvider {
     private dafnyStatusbar: Statusbar;
     private context: Context;
 
-    constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: DafnySettings) {
+    constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: IDafnySettings) {
 
         this.context = new Context(this.notificationService);
         this.context.serverversion = serverVersion;

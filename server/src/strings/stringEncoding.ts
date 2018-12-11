@@ -2,7 +2,7 @@
 
 import * as b64 from "base64-js";
 import * as utf8 from "utf8";
-import {ByteOutOfRangeException} from "../errorHandling/errors";
+import { ByteOutOfRangeException } from "../errorHandling/ByteOutOfRangeException";
 
 export function encodeBase64(task: any): string {
     const jsonString: string = JSON.stringify(task);
@@ -26,7 +26,7 @@ function convertStringToBytes(bytesString: string): Uint8Array {
 export function decodeBase64(task: string): any {
     const byteArray = b64.toByteArray(task.trim());
     let ret = "";
-    for(const byte of byteArray) {
+    for (const byte of byteArray) {
         ret += String.fromCharCode(byte);
     }
     return JSON.parse(ret);

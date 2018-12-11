@@ -1,15 +1,15 @@
 "use strict";
 
-import * as https from "https";
-const redirect = require("follow-redirects").https;
+import * as DecompressZip from "decompress-zip";
+import { https as redirect } from "follow-redirects";
 import * as fs from "fs";
+import * as https from "https";
 import * as os from "os";
-import uri from "vscode-uri";
-import { EnvironmentConfig, Installer } from "../strings/stringRessources";
-const DecompressZip = require("decompress-zip");
-const semver = require("semver");
 import * as pathHelper from "path";
+import * as semver from "semver";
+import uri from "vscode-uri";
 import { NotificationService } from "../notificationService";
+import { EnvironmentConfig, Installer } from "../strings/stringRessources";
 
 export class DafnyInstaller {
 

@@ -2,9 +2,9 @@ import { EOL } from "os";
 import { Command } from "vscode-languageserver";
 import { Position, TextEdit } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
-import { DocumentDecorator } from "./../../../vscodeFunctions/documentDecorator";
 import { methodAt } from "./../semanticAnalysis";
 import { DafnySymbol } from "./../symbols";
+import { ArrayInformation } from "./ArrayInformation";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class IndexCommandGenerator extends BaseCommandGenerator {
@@ -62,20 +62,5 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         this.commands.push(Command.create(`Add bound checks: ${lowerBoundMessage} and ${upperBoundMessage}`,
             Commands.EditTextCommand, this.uri,
             this.dummyDocId, [editLower, editHigher]));
-    }
-}
-
-class ArrayInformation {
-    public identifier: string;
-    public indexExpression: string;
-
-    constructor(documentDecorator: DocumentDecorator, startPosition: Position) {
-        const arrayExprRange = documentDecorator.readArrayExpression(startPosition);
-        this.indexExpression = documentDecorator.getText(arrayExprRange);
-        this.identifier = documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line,
-            arrayExprRange.start.character));
-    }
-    public isValid(): boolean {
-        return this.identifier !== "" && this.indexExpression !== "";
     }
 }

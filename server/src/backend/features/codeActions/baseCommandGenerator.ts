@@ -20,7 +20,6 @@ export abstract class BaseCommandGenerator {
         this.doc = this.server.symbolService.getTextDocument(this.uri);
         this.diagnostic = diagnostic;
     }
-    protected abstract calculateCommands(): Promise<Command[]>;
 
     public generateCommands(): Promise<Command[]> {
         if (!this.doc) {
@@ -29,6 +28,7 @@ export abstract class BaseCommandGenerator {
         this.documentDecorator = new DocumentDecorator(this.doc);
         return this.calculateCommands();
     }
+    protected abstract calculateCommands(): Promise<Command[]>;
     protected findInsertionPosition(startSymbol: DafnySymbol = null): Position {
         let insertPosition: Position = this.dummyPosition;
         insertPosition = this.findExactInsertPosition(startSymbol);

@@ -2,15 +2,15 @@
 import * as cp from "child_process";
 import Uri from "vscode-uri";
 import { NotificationService } from "../notificationService";
+import { Command } from "./Command";
 import { CompilerResult } from "./CompilerResult";
 import { Context } from "./context";
-import { DafnySettings } from "./dafnySettings";
-import { Command } from "./environment";
+import { IDafnySettings } from "./dafnySettings";
 import { Environment } from "./environment";
 
 export class DafnyCompiler {
 
-    constructor(private notificationService: NotificationService, private context: Context, private settings: DafnySettings) {
+    constructor(private notificationService: NotificationService, private context: Context, private settings: IDafnySettings) {
     }
 
     public compile(uri: Uri): Promise<CompilerResult> {

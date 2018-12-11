@@ -4,7 +4,8 @@ import Uri from "vscode-uri";
 import { Commands, ToolTipText } from "../../strings/stringRessources";
 import { DafnyServer } from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
-import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
+import { ReferencesCodeLens } from "./codeLenses";
+import { ReferenceInformation } from "./ReferenceInformation";
 import { DafnySymbol } from "./symbols";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {

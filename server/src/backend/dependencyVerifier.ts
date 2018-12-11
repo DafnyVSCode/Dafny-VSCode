@@ -3,8 +3,8 @@
 import * as cp from "child_process";
 import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
-import { DafnySettings } from "./dafnySettings";
-import { Command } from "./environment";
+import { Command } from "./Command";
+import { IDafnySettings } from "./dafnySettings";
 import { Environment } from "./environment";
 
 export class DependencyVerifier {
@@ -16,7 +16,7 @@ export class DependencyVerifier {
     private callbackError: (error: any) => any;
     private serverVersion: string;
 
-    public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: DafnySettings,
+    public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: IDafnySettings,
                              callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any) {
         const environment: Environment = new Environment(rootPath, notificationService, dafnySettings);
         const spawnOptions = environment.getStandardSpawnOptions();
@@ -56,7 +56,10 @@ export class DependencyVerifier {
                     this.callbackError(e);
                 }
             },
-            (code: number) => { /*this.handleProcessExit(code);*/ });
+            (code: number) => {
+                console.log(`The verifyer process ended with code ${code}`);
+            },
+        );
     }
 
     private handleProcessExit(code: number) {

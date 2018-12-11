@@ -1,7 +1,8 @@
 "use strict";
 
 import * as cp from "child_process";
-import { CommandFailedException, DafnyServerExeption } from "../errorHandling/errors";
+import { CommandFailedException } from "../errorHandling/CommandFailedException";
+import { DafnyServerExeption } from "../errorHandling/DafnyServerExeption";
 
 export class ProcessWrapper {
     public pid: number;
@@ -63,7 +64,7 @@ export class ProcessWrapper {
     private writeRequestToServer(request: string, verb: string, serverEndTag: string): void {
         this.serverProc.stdin.write(verb + "\n", () => {
             this.serverProc.stdin.write(request + "\n", () => {
-                this.serverProc.stdin.write(serverEndTag + "\n", () => {});
+                this.serverProc.stdin.write(serverEndTag + "\n");
             });
         });
     }

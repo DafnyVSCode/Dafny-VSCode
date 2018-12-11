@@ -9,7 +9,7 @@ import {
 import Uri from "vscode-uri";
 import { CompilerResult } from "./backend/CompilerResult";
 import { DafnyInstaller } from "./backend/dafnyInstaller";
-import { DafnySettings } from "./backend/dafnySettings";
+import { IDafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { ReferencesCodeLens } from "./backend/features/codeLenses";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
@@ -163,7 +163,7 @@ connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
 });
 
 interface ISettings {
-    dafny: DafnySettings;
+    dafny: IDafnySettings;
 }
 
 connection.onDidChangeConfiguration((change) => {

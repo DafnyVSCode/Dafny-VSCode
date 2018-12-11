@@ -1,7 +1,6 @@
 "use strict";
 
 import {CodeLens, Command, Range} from "vscode-languageserver";
-import Uri from "vscode-uri";
 import { DafnySymbol } from "./symbols";
 
 export class ReferencesCodeLens implements CodeLens {
@@ -10,14 +9,5 @@ export class ReferencesCodeLens implements CodeLens {
     public data?: any;
     constructor(public symbol: DafnySymbol) {
         this.range = symbol.range;
-    }
-}
-
-export class ReferenceInformation {
-    public fileName: Uri;
-    public range: Range;
-    constructor(range: Range, file: Uri) {
-        this.range = range;
-        this.fileName = file;
     }
 }
