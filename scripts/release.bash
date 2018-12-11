@@ -73,6 +73,7 @@ popd
 echo "Update repository with release information (commit, tag and push to master)..."
 git add client/README.md client/CHANGELOG.md {client,server}/package.json {client,server}/package-lock.json
 git commit -m "Update changelog and bump version to ${RELEASE_VERSION}"
+git push
 git checkout master
 git merge develop
 git tag v${RELEASE_VERSION}
