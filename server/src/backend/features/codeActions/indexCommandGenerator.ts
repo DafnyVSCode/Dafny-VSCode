@@ -4,7 +4,7 @@ import { Position, TextEdit } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
 import { DocumentDecorator } from "./../../../vscodeFunctions/documentDecorator";
 import { methodAt } from "./../semanticAnalysis";
-import { Symbol } from "./../symbols";
+import { DafnySymbol } from "./../symbols";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class IndexCommandGenerator extends BaseCommandGenerator {
@@ -13,7 +13,7 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         if (this.diagnostic.message === DafnyReports.IndexBounding) {
             const arr = new ArrayInformation(this.documentDecorator, this.diagnostic.range.start);
             if (arr.isValid()) {
-                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
+                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: DafnySymbol[]) => {
                     this.addNecessaryConstraints(symbols, arr);
                     return Promise.resolve(this.commands);
                 }).catch((err: Error) => { console.error(err); return Promise.resolve([]); });
@@ -26,14 +26,14 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(methodStart: Symbol): Position {
+    protected findExactInsertPosition(methodStart: DafnySymbol): Position {
         if (!methodStart) {
             return null;
         }
         return this.documentDecorator.findInsertionPointOfContract(methodStart.start);
      }
 
-     private addNecessaryConstraints(symbols: Symbol[], array: ArrayInformation): void {
+     private addNecessaryConstraints(symbols: DafnySymbol[], array: ArrayInformation): void {
         const definingMethod = methodAt(symbols, this.diagnostic.range);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
         if (insertPosition && insertPosition !== this.dummyPosition) {

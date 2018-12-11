@@ -7,7 +7,7 @@ import {
     TextDocumentItem, TextDocumentPositionParams, TextDocuments, WorkspaceEdit,
 } from "vscode-languageserver";
 import Uri from "vscode-uri";
-import { CompilerResult } from "./backend/dafnyCompiler";
+import { CompilerResult } from "./backend/CompilerResult";
 import { DafnyInstaller } from "./backend/dafnyInstaller";
 import { DafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";

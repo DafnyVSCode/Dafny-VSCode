@@ -2,12 +2,13 @@
 import * as vscode from "vscode-languageserver";
 import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
 import { DafnyServer } from "../dafnyServer";
-import { Symbol, SymbolTable, SymbolType } from "./symbols";
+import { DafnySymbol, SymbolType } from "./symbols";
+import { SymbolTable } from "./SymbolTable";
 
 export class DafnyDefinitionInformtation {
     public filePath: string;
-    public symbol: Symbol;
-    constructor(symbol: Symbol) {
+    public symbol: DafnySymbol;
+    constructor(symbol: DafnySymbol) {
         this.symbol = symbol;
         this.filePath = symbol.document.uri;
     }
@@ -32,14 +33,14 @@ export class DafnyDefinitionProvider {
 
     public provideDefinitionInternal(document: vscode.TextDocument, position: vscode.Position): Promise<DafnyDefinitionInformtation> {
         const documentDecorator: DocumentDecorator = new DocumentDecorator(document);
-        if(documentDecorator.isMethodCall(position)) {
+        if (documentDecorator.isMethodCall(position)) {
             return this.findExactDefinition(position, documentDecorator);
         }
         return this.findPossibleDefinition(position, documentDecorator);
     }
     private findPossibleDefinition(position: vscode.Position, documentDecorator: DocumentDecorator): Promise<DafnyDefinitionInformtation> {
         const word = documentDecorator.getValidIdentifierOrNull(position);
-        if(!word) {
+        if (!word) {
             return null;
         }
         return this.findDefinition(documentDecorator.document, word);
@@ -48,10 +49,10 @@ export class DafnyDefinitionProvider {
     private findExactDefinition(position: vscode.Position, documentDecorator: DocumentDecorator): Promise<DafnyDefinitionInformtation>  {
             const call = documentDecorator.getFullyQualifiedNameOfCalledMethod(position);
             return this.server.symbolService.getSymbols(documentDecorator.document).then((symbolTables: SymbolTable[]) => {
-                for(const symbolTable of symbolTables) {
-                    for(const symb of symbolTable.symbols.filter((s: Symbol) => s.isOfType([SymbolType.Call]) && s.call === call)) {
-                        const definitionSymbol = symbolTable.symbols.find((s: Symbol) => s.isFuzzyDefinitionForSymbol(symb));
-                        if(definitionSymbol) {
+                for (const symbolTable of symbolTables) {
+                    for (const symb of symbolTable.symbols.filter((s: DafnySymbol) => s.isOfType([SymbolType.Call]) && s.call === call)) {
+                        const definitionSymbol = symbolTable.symbols.find((s: DafnySymbol) => s.isFuzzyDefinitionForSymbol(symb));
+                        if (definitionSymbol) {
                             return new DafnyDefinitionInformtation(definitionSymbol);
                         }
                     }
@@ -60,9 +61,9 @@ export class DafnyDefinitionProvider {
             }).catch((err: any) => err);
     }
     private findDefinition(document: vscode.TextDocument, symbolName: string): Promise<DafnyDefinitionInformtation> {
-        return this.server.symbolService.getAllSymbols(document).then((symbols: Symbol[]) => {
-            const definingSymbol = symbols.find((symbol: Symbol) => symbol.name === symbolName);
-            if(definingSymbol) {
+        return this.server.symbolService.getAllSymbols(document).then((symbols: DafnySymbol[]) => {
+            const definingSymbol = symbols.find((symbol: DafnySymbol) => symbol.name === symbolName);
+            if (definingSymbol) {
                 return new DafnyDefinitionInformtation(definingSymbol);
             }
             return null;

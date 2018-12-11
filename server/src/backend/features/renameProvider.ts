@@ -3,7 +3,8 @@ import { TextEdit } from "vscode-languageserver-types";
 import { DocumentDecorator } from "../../vscodeFunctions/documentDecorator";
 import { DafnyServer } from "./../dafnyServer";
 import { SymbolType } from "./symbols";
-import { Reference, Symbol} from "./symbols";
+import { DafnySymbol} from "./symbols";
+import { Reference } from "./Reference";
 
 export class DafnyRenameProvider {
     public constructor(public server: DafnyServer) { }
@@ -27,7 +28,7 @@ export class DafnyRenameProvider {
     }
 
     private collectRenamings(document: TextDocument, word: string, newName: string, position: Position): Promise<WorkspaceEdit> {
-        return this.server.symbolService.getAllSymbols(document).then((symbols: Symbol[]) => {
+        return this.server.symbolService.getAllSymbols(document).then((symbols: DafnySymbol[]) => {
             const renamer = new WorkSpaceRenameHolder(word, newName, symbols, position);
             const workSpaceEdit: WorkspaceEdit = {};
             workSpaceEdit.changes = renamer.collectRenamings();
@@ -48,9 +49,9 @@ class WorkSpaceRenameHolder {
     private changeSet: {[uri: string]: TextEdit[]};
     private word: string;
     private newName: string;
-    private symbols: Symbol[];
+    private symbols: DafnySymbol[];
     private symbolPosition: Position;
-    constructor(word: string, newName: string, symbols: Symbol[], position: Position) {
+    constructor(word: string, newName: string, symbols: DafnySymbol[], position: Position) {
         this.changeSet = {};
         this.word = word;
         this.newName = newName;
@@ -59,9 +60,9 @@ class WorkSpaceRenameHolder {
     }
 
     public collectRenamings(): {[uri: string]: TextEdit[]} {
-        const definingClass: Symbol = this.getDefiningClass();
+        const definingClass: DafnySymbol = this.getDefiningClass();
         if (definingClass) {
-            const relevantSymbols: Symbol[] = this.getRelevantSymbolsForClass(definingClass.name);
+            const relevantSymbols: DafnySymbol[] = this.getRelevantSymbolsForClass(definingClass.name);
             for (const symbol of relevantSymbols) {
                 if (symbol.symbolType !== SymbolType.Call) {
                     this.addEdit(symbol.document.uri, this.buildSymbolEdit(symbol));
@@ -74,15 +75,15 @@ class WorkSpaceRenameHolder {
         return this.changeSet;
     }
 
-    private getRelevantSymbolsForClass(className: string): Symbol[] {
-        return this.symbols.filter((s: Symbol) => s.isCompletableMemberOfClass(this.word, className));
+    private getRelevantSymbolsForClass(className: string): DafnySymbol[] {
+        return this.symbols.filter((s: DafnySymbol) => s.isCompletableMemberOfClass(this.word, className));
     }
-    private getDefiningClass(): Symbol {
-        return this.symbols.find((s: Symbol) => s.isClassDefinedAtPosition(this.symbolPosition));
+    private getDefiningClass(): DafnySymbol {
+        return this.symbols.find((s: DafnySymbol) => s.isClassDefinedAtPosition(this.symbolPosition));
     }
 
     private addEdit(uri: string, edit: TextEdit): void {
-        if(!this.changeSet[uri]) {
+        if (!this.changeSet[uri]) {
             this.changeSet[uri] = [];
         }
         this.changeSet[uri].push(edit);
@@ -91,7 +92,7 @@ class WorkSpaceRenameHolder {
         return TextEdit.replace(ref.range, this.newName);
     }
 
-    private buildSymbolEdit(symbol: Symbol): TextEdit {
+    private buildSymbolEdit(symbol: DafnySymbol): TextEdit {
         return TextEdit.replace(Range.create(symbol.start,
             Position.create(symbol.start.line, symbol.start.character + symbol.name.length)), this.newName);
     }

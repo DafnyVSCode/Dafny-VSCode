@@ -3,13 +3,13 @@ import {Command} from "vscode-languageserver";
 import { Position, TextEdit} from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyKeyWords, DafnyReports } from "./../../../strings/stringRessources";
 import { methodAt } from "./../semanticAnalysis";
-import { Symbol } from "./../symbols";
+import { DafnySymbol } from "./../symbols";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class GuardCommandGenerator extends BaseCommandGenerator {
 
     protected calculateCommands(): Promise<Command[]> {
-        return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
+        return this.server.symbolService.getAllSymbols(this.doc).then((symbols: DafnySymbol[]) => {
             for (const guardKeyWord of DafnyKeyWords.GuardKeyWords) {
                 this.addGuards(guardKeyWord, symbols);
             }
@@ -24,13 +24,13 @@ export class GuardCommandGenerator extends BaseCommandGenerator {
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(definingMethod: Symbol): Position {
+    protected findExactInsertPosition(definingMethod: DafnySymbol): Position {
         if (definingMethod === null) {
             return null;
         }
         return this.documentDecorator.findInsertionPointOfContract(definingMethod.start, this.diagnostic.range.start);
     }
-    private addGuards(guardKeyWord: string, symbols: Symbol[]): void {
+    private addGuards(guardKeyWord: string, symbols: DafnySymbol[]): void {
         const message = this.diagnostic.message;
         if (message.indexOf(guardKeyWord) < 0 || message.startsWith(DafnyReports.UnresolvedDecreaseWarning)) {
             return;

@@ -3,7 +3,7 @@ import {Command} from "vscode-languageserver";
 import { Position, TextEdit} from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
 import { methodAt } from "./../semanticAnalysis";
-import { Symbol } from "./../symbols";
+import { DafnySymbol } from "./../symbols";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class NullCommandGenerator extends BaseCommandGenerator {
@@ -11,7 +11,7 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         if (this.diagnostic.message.indexOf(DafnyReports.NullWarning) > -1) {
             const designator = this.parseDesignator();
             if (designator !== "") {
-                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
+                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: DafnySymbol[]) => {
                     this.addNecessaryNullCheck(symbols, designator);
                     return this.commands;
                 }).catch((err: Error) => {console.error(err); return Promise.resolve([]); });
@@ -24,14 +24,14 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(methodStart: Symbol): Position {
+    protected findExactInsertPosition(methodStart: DafnySymbol): Position {
         if (!methodStart) {
         return null;
         }
         return this.documentDecorator.findBeginOfContractsOfMethod(methodStart.start);
     }
 
-    private addNecessaryNullCheck(symbols: Symbol[], designator: string): void {
+    private addNecessaryNullCheck(symbols: DafnySymbol[], designator: string): void {
         const definingMethod = methodAt(symbols, this.diagnostic.range);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
         if (insertPosition && insertPosition !== this.dummyPosition) {

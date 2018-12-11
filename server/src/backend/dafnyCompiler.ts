@@ -2,6 +2,7 @@
 import * as cp from "child_process";
 import Uri from "vscode-uri";
 import { NotificationService } from "../notificationService";
+import { CompilerResult } from "./CompilerResult";
 import { Context } from "./context";
 import { DafnySettings } from "./dafnySettings";
 import { Command } from "./environment";
@@ -44,10 +45,4 @@ export class DafnyCompiler {
             });
         });
     }
-}
-
-export class CompilerResult {
-    public error: boolean;
-    public message?: string;
-    public executable?: boolean;
 }

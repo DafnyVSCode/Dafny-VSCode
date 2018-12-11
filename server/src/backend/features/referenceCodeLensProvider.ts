@@ -5,7 +5,7 @@ import { Commands, ToolTipText } from "../../strings/stringRessources";
 import { DafnyServer } from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
 import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
-import { Symbol } from "./symbols";
+import { DafnySymbol } from "./symbols";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {
@@ -61,7 +61,7 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     }
     private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
         const lensSymbol = codeLens.symbol;
-        return this.server.symbolService.getAllSymbols(lensSymbol.document).then((symbols: Symbol[]) => {
+        return this.server.symbolService.getAllSymbols(lensSymbol.document).then((symbols: DafnySymbol[]) => {
             const references: ReferenceInformation[] = [];
             for (const symbol of symbols) {
                 if (symbol.name === lensSymbol.name && symbol.document.uri === lensSymbol.document.uri) {
