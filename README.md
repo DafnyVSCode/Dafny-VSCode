@@ -2,9 +2,11 @@
 
 This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
 
-* master: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
-* develop: [![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)
-* [![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
+| master | develop |
+| --- | --- |
+|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
+
+[![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
 
 ## Architecture
 
@@ -22,8 +24,8 @@ It is pretty simple to contribute to this plugin.
 All it takes is having Visual Studio Code and npm installed.
 Simply clone this repository and switch into the new folder. On the command line, execute one of the following scripts:
 
-* Linux & macOS: `scripts/startup.bash`
-* Windows: `scripts\startup.bat`
+* Linux & macOS: `scripts/dev-env.bash`
+* Windows: `scripts\dev-env.bat`
 
 These scripts install node dependencies and start `code` for both the server and client.
 
