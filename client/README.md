@@ -4,27 +4,19 @@ This extension adds the support of _Dafny_ to Visual Studio Code.
 
 ## Features
 
-* Provides `.dfy` language support to VSCode.
-* Automatic installation of _Dafny_.
-* Compile and run `.dfy` files.
-* Automatic verification as one types.
-* Errors, warnings and hints are shown through the VSCode interface. When there are no errors, you get a :thumbsup: on the status bar.
-* Spawns a _DafnyServer_ in the background and sends verification requests upon opening and saving _Dafny_ files.
-* Context menu for most commands.
-* Left hand side status bar item provides information about the current file.
-* Right hand size status bar item relates to the state of the _DafnyServer_.
-* _IntelliSense_ for classes.
-* _CodeLens_ showing method references.
-* Shows warning if the _Dafny_ plugin is used without a workspace. Can cause features to not work correctly.
+* **Compile and run `.dfy` files.**
+  * Automatic installation of the newest _Dafny_ version.
+* **Automatic verification as one types.**
+  * Errors, warnings and hints are shown through the VSCode interface.
+  * When there are no errors, you get a 👍 on the status bar.
+* **Syntax highlighting** thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
+* _IntelliSense_ for classes and _CodeLens_ showing method references.
 * Display counter example for failing proof (requires _Dafny_ 1.9.15+).
-* _CounterExamples_ are not shown directly. You can set `dafny.automaticShowCounterModel` to true or use `F7`.
-* Syntax highlighting thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
 * _DafnyDefinition_ provider to support refactorings in the future.
-* Update notification if there is a newer release of _Dafny_.
 
 ![assertions animation](simpleassert.gif)
 
-More examples at the end...
+You can find [more Examples below](#user-content-examples).
 
 ## Shortcuts
 
@@ -48,9 +40,9 @@ Choose `Tasks -> Run Task...` to run one of the following:
 
 ## Requirements
 
-* The plugin needs a _C#_ runtime to run the _DafnyServer_. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
+* The plugin needs a _.NET_ runtime to run the _DafnyServer_. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
 * In case you would like the plugin to use a different _Dafny_ distribution, set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
-* Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_.
+* Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_ and Mono.
 
 ## Extension Settings
 
@@ -94,4 +86,6 @@ Pressed `F7` to show counter examples.
 
 ## Contribute
 
-This is an open-source project that lives from coding contributions. We welcome your help! For a description of how you can contribute, as well as a list of issues you can work on, please visit the [Dafny-VSCode GitHub site](https://github.com/DafnyVSCode/Dafny-VSCode).
+This is a MIT licensed open-source project that lives from code contributions. All contributors are listed in our [project readme](https://github.com/DafnyVSCode/Dafny-VSCode#contributors).
+
+We welcome your help! For a description of how you can contribute, as well as a list of issues you can work on, please visit the [Dafny-VSCode GitHub repository](https://github.com/DafnyVSCode/Dafny-VSCode#contribute).
