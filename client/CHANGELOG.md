@@ -1,12 +1,16 @@
 # Release Notes
 
+## 0.14.1
+* Clearify mono installation message on macOS.
+* Fix incomplete copyright notice and improve contributors section in readme ([#37](https://github.com/DafnyVSCode/Dafny-VSCode/issues/37)).
+
 ## 0.14.0
-* Fix installation of Dafny on some constellations on Windows (#7).
+* Fix installation of Dafny on some constellations on Windows ([#7](https://github.com/DafnyVSCode/Dafny-VSCode/issues/7)).
 * Check for a recent mono version on launch.
 
 ## 0.13.0
 
-* Fixed the CodeLens references counter (Thanks @GoryMoon!)
+* Fixed the CodeLens references counter (Thanks [@GoryMoon](https://github.com/GoryMoon)!)
 * Dependencies were upgraded to prevent several vulnerabilities.
 
 ## 0.12.0
