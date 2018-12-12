@@ -48,7 +48,7 @@ A new instance of Visual Studio Code will be started that has the Dafny plugin r
 Sometimes, Visual Studio Code does not recognize changes and does not apply them to the running test instance.
 If this is the case, simply close and restart the test instance, the changes should then be applied.
 
-#### Tests
+#### Tests and Linting
 
 Make sure that your changes don't break the existing tests in the client/test folder.
 You can run the tests with `npm test` while in the client folder.
@@ -58,6 +58,7 @@ Alternatively, you can execute tests with docker (Linux & macOS only) using `scr
 
 If you add new features, please make sure to include unit tests to cover as much code as possible.
 
+To get some code-consistency, we check against tslint in all automated builds. Please check that your client and server complies: `tslint --project .`.
 
 ### Release
 
