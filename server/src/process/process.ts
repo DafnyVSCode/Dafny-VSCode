@@ -1,8 +1,7 @@
 "use strict";
 
 import * as cp from "child_process";
-import { CommandFailedException } from "../errorHandling/CommandFailedException";
-import { DafnyServerExeption } from "../errorHandling/DafnyServerExeption";
+import { CommandFailedException, DafnyServerExeption } from "../errors";
 
 export class ProcessWrapper {
     public pid: number;

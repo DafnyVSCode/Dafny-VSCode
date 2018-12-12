@@ -2,7 +2,7 @@
 
 import * as cp from "child_process";
 import * as os from "os";
-import { IncorrectPathExeption } from "../errorHandling/IncorrectPathExeption";
+import { IncorrectPathExeption } from "../errors";
 import {NotificationService} from "../notificationService";
 import {Application, EnvironmentConfig, ErrorMsg, WarningMsg } from "../strings/stringRessources";
 import { Command } from "./Command";
