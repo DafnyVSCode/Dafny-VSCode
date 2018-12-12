@@ -11,10 +11,10 @@ export default class DafnyLanguageClient extends LanguageClient {
         const serverOptions = {
             debug: {
                 module: serverModule,
-                transport: TransportKind.ipc,
                 options: {
                     execArgv: ["--nolazy", "--inspect=6009"],
                 },
+                transport: TransportKind.ipc,
             },
             run: {
                 module: serverModule,

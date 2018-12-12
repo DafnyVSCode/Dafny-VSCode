@@ -1,4 +1,4 @@
-"use strict";
+// tslint:disable:max-classes-per-file
 
 export class Severity {
     public static Warning: string = "Warning";

@@ -3,14 +3,9 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 
 import { Context } from "./context";
+import { StatusbarPriority } from "./StatusbarPriority";
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
-
-class Priority {
-    public static low: number = 1;
-    public static medium: number = 5;
-    public static high: number = 10;
-}
 
 export class Statusbar {
     public serverStatus: string;
@@ -23,9 +18,9 @@ export class Statusbar {
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
     constructor(languageServer: LanguageClient, private context: Context) {
-        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
-        this.progressBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
-        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
+        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, StatusbarPriority.high);
+        this.progressBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, StatusbarPriority.high);
+        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, StatusbarPriority.high);
 
         languageServer.onNotification(LanguageServerNotification.QueueSize, (queueSize: number) => {
             this.queueSize = queueSize === undefined ? 0 : queueSize;

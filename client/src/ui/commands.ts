@@ -47,6 +47,7 @@ export default class Commands {
         {name: CommandStrings.CompileAndRun,  callback: () => this.compile(vscode.window.activeTextEditor.document.uri, true)},
         {
             name: CommandStrings.EditText,
+            // tslint:disable-next-line:object-literal-sort-keys
             callback: (uri: string, version: number, edits: vscode.TextEdit[]) => this.applyTextEdits(uri, version, edits),
         },
     ];

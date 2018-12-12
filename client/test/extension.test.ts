@@ -14,10 +14,12 @@ const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
 export class UnitTestCallback {
-    public backendStarted = () => { };
+    // tslint:disable-next-line:no-empty
+    public backendStarted = () => {};
     public verificationComplete = (verificationResult: VerificationResult) => {
         log("Status:" + verificationResult.verificationStatus.toString());
     }
+    // tslint:disable-next-line:no-empty
     public activated = () => { };
 }
 

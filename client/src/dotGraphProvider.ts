@@ -1,8 +1,8 @@
 "use strict";
 
 import * as fs from "fs";
+import * as viz from "viz.js";
 import * as vscode from "vscode";
-const viz = require("viz.js");
 import { LanguageClient } from "vscode-languageclient";
 import { TextDocumentItem } from "vscode-languageserver-types";
 import { LanguageServerRequest } from "./stringRessources";

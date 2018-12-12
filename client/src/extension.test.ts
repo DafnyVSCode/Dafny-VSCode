@@ -1,7 +1,7 @@
 //
 // note: This example test is leveraging the Mocha test framework.
 // please refer to their documentation on https://mochajs.org/ for help.
-//
+// tslint:disable:only-arrow-functions
 
 // the module 'assert' provides assertion methods from node
 import * as path from "path";
@@ -13,12 +13,14 @@ const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
 export class UnitTestCallback {
+    // tslint:disable:no-empty
     public backendStarted = () => { };
     public verificationComplete = (/*verificationResult: VerificationResult*/) => {  };
     public ideIsIdle = () => { };
     public activated = () => { };
     public viperUpdateComplete = () => { };
     public viperUpdateFailed = () => { };
+    // tslint:enable:no-empty
 }
 
 Context.unitTest = new UnitTestCallback();

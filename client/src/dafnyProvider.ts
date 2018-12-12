@@ -82,8 +82,8 @@ export class DafnyClientProvider {
     public dispose(): void {
         this.dafnyStatusbar.hide();
         if (this.subscriptions && this.subscriptions.length > 0) {
-            for (let i: number = 0; i < this.subscriptions.length; i++) {
-                this.subscriptions[i].dispose();
+            for (const subscription of this.subscriptions) {
+                subscription.dispose();
             }
         }
     }
