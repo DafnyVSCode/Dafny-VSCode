@@ -9,9 +9,7 @@ addons:
     token:
       secure: "CqxeC5xLixqUU+n4B4R9mqZqcLt44Q5aqB0VWiGMW5HjC+kOITDLJpdN/WsAiS+W14twjnWbNHpTh3ffAwimNLPX5EFOa4byX0ehQvtJ+KXRF9JIV2FXIuv4ZxH2I8wiPHthzl+nSAXeyP6L6/aAYyu4f1syhEJEqKSb/9RgtQbb8NIcKwFflb1M/UWCjoUJaAuTToaJWNoPZYWVEuvnhARoyUP+S6OmHj1QwYU8k7JcWbFyv+Mr/ERtTNZkqdiAHJayCulGfb8JBANUjC19a9gPoOyeyg2OjDOI594Jj2e/PtT6W3iKbqyUpJKncXqW7yIWaPHOR6oFnjEuroJTnXDCt3KcD+kvnhq3CQCLtQF9+fXU7Vupjp21PBTSiCDgLQSzkzLuFdPybigtrWZPCLoPFSvUnjXX1YJJYGGxaj/Mh1yqlagc/Va5o09ViJf2GKXWREFO9zihdOxkikd8IR9uJztFqG9qFgUisV7Uezv1T64wdfZhomFHC3jRkPI4oOi33i04xXO9ibaaIvktNKBfubu6TZsK+/n3xTpT2iyarD5AQy9JN9ZV+ixCSCtrosMxZ3a1lF2l5apI6fYw53/Z+mMg01xDcxDH5/2ULrmlTTRhVPGvJPJT19hrM+kk2zYnvRXobbUzxmCWF6C9sM3JoYIsLNmdcVHE9wYml+g="
 node_js:
-  - "10.4.1"
-install:
-  - npm install -g tslint
+  - "10"
 
 script:
   - scripts/test-docker.bash
