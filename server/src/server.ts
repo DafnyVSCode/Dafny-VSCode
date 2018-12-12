@@ -95,12 +95,14 @@ connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
     if (provider && provider.renameProvider) {
         return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location> => {
     if (provider && provider.definitionProvider) {
         return provider.definitionProvider.provideDefinition(documents.get(handler.textDocument.uri), handler.position);
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 const MAX_RETRIES = 30;
@@ -160,6 +162,7 @@ connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
             console.error("key not found ");
         }
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 interface ISettings {
@@ -182,6 +185,7 @@ connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: 
     if (provider && provider.compiler) {
         return provider.compiler.compile(uri);
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string): Thenable<void> => {
@@ -273,12 +277,14 @@ connection.onCodeAction((params: CodeActionParams) => {
     if (provider && provider.codeActionProvider) {
         return provider.codeActionProvider.provideCodeAction(params);
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 connection.onCompletion((handler: TextDocumentPositionParams) => {
     if (provider && provider.completionProvider) {
         return provider.completionProvider.provideCompletion(handler);
     }
+    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
 });
 
 connection.listen();
