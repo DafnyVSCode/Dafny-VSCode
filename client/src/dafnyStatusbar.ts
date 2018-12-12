@@ -65,13 +65,13 @@ export class Statusbar {
     }
 
     public formatProgress(progress: number): string {
-        if (!progress) { return "0%"; };
+        if (!progress) { return "0%"; }
         return progress.toFixed(0) + "%";
     }
 
     public progressBarText(progress: number): string {
-        if (progress < 0) { progress = 0; };
-        if (progress > 100) { progress = 100; };
+        if (progress < 0) { progress = 0; }
+        if (progress > 100) { progress = 100; }
         const completed = Math.floor(progress / 10);
         return "⚫".repeat(completed) + " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
     }
@@ -91,7 +91,7 @@ export class Statusbar {
 
         if (this.serverpid) {
             this.serverStatusBar.text = `${StatusString.ServerUp} | ${this.serverStatus} | Queue: ${this.queueSize}`;
-            this.serverStatusBar.tooltip = `Dafny Version ${this.serverversion.trim()} | Dafny PID ${this.serverpid}`
+            this.serverStatusBar.tooltip = `Dafny Version ${this.serverversion.trim()} | Dafny PID ${this.serverpid}`;
 
         } else {
             this.serverStatusBar.text = StatusString.ServerDown;

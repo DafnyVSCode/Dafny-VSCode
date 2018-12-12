@@ -13,12 +13,11 @@ import { VerificationResult } from "../src/verificationResult";
 const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
-
 export class UnitTestCallback {
     public backendStarted = () => { };
     public verificationComplete = (verificationResult: VerificationResult) => {
         log("Status:" + verificationResult.verificationStatus.toString());
-    };
+    }
     public activated = () => { };
 }
 
@@ -33,7 +32,7 @@ function waitForBackendStarted(): Promise<boolean> {
         Context.unitTest.backendStarted = () => {
             log("Backend started");
             resolve(true);
-        }
+        };
     });
 }
 
@@ -65,7 +64,7 @@ function openFile(fileName: string): Promise<vscode.TextDocument> {
     return new Promise((resolve) => {
         const filePath = path.join(samplesFolder, fileName);
         log("open " + filePath);
-        vscode.workspace.openTextDocument(filePath).then(document => {
+        vscode.workspace.openTextDocument(filePath).then((document) => {
             vscode.window.showTextDocument(document).then(() => {
                 resolve(document);
             });
@@ -128,4 +127,3 @@ suite("DafnyServer Tests", () => {
         await closeActiveEditor();
     });
 });
-

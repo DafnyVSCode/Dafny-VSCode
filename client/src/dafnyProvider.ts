@@ -76,7 +76,7 @@ export class DafnyClientProvider {
         const that = this;
         vscode.workspace.onDidChangeConfiguration(this.loadConfig, that);
 
-        if (Context.unitTest) { Context.unitTest.activated(); };
+        if (Context.unitTest) { Context.unitTest.activated(); }
     }
 
     public dispose(): void {

@@ -7,26 +7,26 @@ export default class DafnyLanguageClient extends LanguageClient {
 
     constructor(extensionContext: ExtensionContext) {
         const serverModule = extensionContext.asAbsolutePath(path.join("server", "server.js"));
-        
+
         const serverOptions = {
             debug: {
                 module: serverModule,
                 transport: TransportKind.ipc,
                 options: {
-                    execArgv: ["--nolazy", "--inspect=6009"]
-                }
+                    execArgv: ["--nolazy", "--inspect=6009"],
+                },
             },
             run: {
                 module: serverModule,
-                transport: TransportKind.ipc
-            }
+                transport: TransportKind.ipc,
+            },
         };
-    
+
         const clientOptions = {
             documentSelector: ["dafny"],
             synchronize: {
-                configurationSection: "dafny"
-            }
+                configurationSection: "dafny",
+            },
         };
 
         super("dafny-vscode", "Dafny Language Server", serverOptions, clientOptions);

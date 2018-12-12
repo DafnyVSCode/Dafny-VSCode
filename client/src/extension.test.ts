@@ -6,20 +6,19 @@
 // the module 'assert' provides assertion methods from node
 import * as path from "path";
 import * as vscode from "vscode";
-//import { VerificationResult } from "../src/verificationResult";
+// import { VerificationResult } from "../src/verificationResult";
 import { Context } from "../src/context";
 
 const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
-
 export class UnitTestCallback {
-    backendStarted = () => { };
-    verificationComplete = (/*verificationResult: VerificationResult*/) => {  };
-    ideIsIdle = () => { };
-    activated = () => { };
-    viperUpdateComplete = () => { };
-    viperUpdateFailed = () => { };
+    public backendStarted = () => { };
+    public verificationComplete = (/*verificationResult: VerificationResult*/) => {  };
+    public ideIsIdle = () => { };
+    public activated = () => { };
+    public viperUpdateComplete = () => { };
+    public viperUpdateFailed = () => { };
 }
 
 Context.unitTest = new UnitTestCallback();
@@ -41,7 +40,7 @@ function waitForBackendStarted(): Promise<boolean> {
         Context.unitTest.backendStarted = () => {
             log("Backend started");
             resolve(true);
-        }
+        };
     });
 }
 
@@ -50,10 +49,9 @@ function waitForVerification(fileName: string): Promise<boolean> {
         Context.unitTest.verificationComplete = (/*verificationResult: VerificationResult*/) => {
             log("Verification finished: " + fileName);
             resolve(true);
-        }
+        };
     });
 }
-
 
 /*function checkAssert(seen, expected, message: string) {
     assert(expected === seen, message + ": Expected: " + expected + " Seen: " + seen);
@@ -61,9 +59,9 @@ function waitForVerification(fileName: string): Promise<boolean> {
 
 function openFile(fileName: string): Promise<vscode.TextDocument> {
     return new Promise((resolve) => {
-        let filePath = path.join(samplesFolder, fileName);
+        const filePath = path.join(samplesFolder, fileName);
         log("open " + filePath);
-        vscode.workspace.openTextDocument(filePath).then(document => {
+        vscode.workspace.openTextDocument(filePath).then((document) => {
             vscode.window.showTextDocument(document).then(() => {
                 resolve(document);
             });
@@ -78,9 +76,9 @@ function openFile(fileName: string): Promise<vscode.TextDocument> {
 }*/
 
 function StartViperIdeTests() {
-    describe("ViperIDE Startup tests:", function () {
+    describe("ViperIDE Startup tests:", function() {
 
-        it("Language Detection, and Backend Startup test.", function (done) {
+        it("Language Detection, and Backend Startup test.", function(done) {
             log("Language Detection, and Backend Startup test.");
             this.timeout(40000);
 
@@ -93,12 +91,12 @@ function StartViperIdeTests() {
                 //     selectBackend(CARBON);
                 //     return waitForBackendStarted(CARBON);
                 // }).then(() => {
-                //backend ready
+                // backend ready
                 done();
             });
         });
 
-        it("Test simple verification", function (done) {
+        it("Test simple verification", function(done) {
             log("Test simple verification");
             this.timeout(25000);
 
@@ -110,4 +108,3 @@ function StartViperIdeTests() {
 }
 
 StartViperIdeTests();
-
