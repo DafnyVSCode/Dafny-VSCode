@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.14.2
+* Add workaround for dafny counterExample bug ([#23](https://github.com/DafnyVSCode/Dafny-VSCode/issues/23)).
+
 ## 0.14.1
 * Clearify mono installation message on macOS.
 * Fix incomplete copyright notice and improve contributors section in readme ([#37](https://github.com/DafnyVSCode/Dafny-VSCode/issues/37)).
