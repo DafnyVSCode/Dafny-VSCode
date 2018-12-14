@@ -36,7 +36,7 @@ export class DafnyClientProvider {
                 this.context.verificationResults[docPathName] = verificationResult;
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
-                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); };
+                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); }
             });
     }
 
