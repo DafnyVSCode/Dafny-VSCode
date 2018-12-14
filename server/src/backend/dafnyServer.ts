@@ -7,9 +7,7 @@ import { Statusbar } from "../frontend/dafnyStatusbar";
 import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
 import { encodeBase64 } from "../strings/stringEncoding";
-import {
-    DafnyVerbs, ErrorMsg, InfoMsg, ServerStatus, StatusString, WarningMsg
-} from "../strings/stringRessources";
+import { DafnyVerbs, ErrorMsg, InfoMsg, LanguageServerNotification, ServerStatus, StatusString } from "../strings/stringRessources";
 import { Context } from "./context";
 import { DafnySettings } from "./dafnySettings";
 import { Command } from "./environment";
@@ -76,6 +74,9 @@ export class DafnyServer {
         const request: VerificationRequest = new VerificationRequest(doc.getText(), doc, verb, callback, error);
         this.context.enqueueRequest(request);
         this.notificationService.sendQueueSize(this.context.queue.size());
+        if (verb === LanguageServerNotification.CounterExample) {
+            this.resetProcess();
+        }
         this.sendNextRequest();
     }
 

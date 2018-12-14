@@ -33,10 +33,10 @@ export class DafnyClientProvider {
             (docPathName: string, json: string) => {
                 this.context.localQueue.remove(docPathName);
                 const verificationResult: VerificationResult = JSON.parse(json);
-                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); };
                 this.context.verificationResults[docPathName] = verificationResult;
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
+                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); };
             });
     }
 
