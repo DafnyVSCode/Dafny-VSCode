@@ -104,11 +104,12 @@ suite("DafnyServer Tests", () => {
 
     // tslint:disable-next-line:only-arrow-functions
     test("Verify countermodel", async function() {
-        this.timeout(40000);
+        this.timeout(60000);
 
         const verification = waitForVerification(samplesFolder + "abs_failing.dfy", { crashed: false, errorCount: 1, proofObligations: 1 });
         await openFile("abs_failing.dfy");
         await verification;
+        await new Promise(resolve => setTimeout(resolve, 5000)); // wait until everything is loaded
         await executeCommand("dafny.showCounterExample");
         await waitForCounterExample("abs_failing.dfy", false);
         await closeActiveEditor();
@@ -116,12 +117,12 @@ suite("DafnyServer Tests", () => {
 
     // tslint:disable-next-line:only-arrow-functions
     test("Verify countermodel empty", async function() {
-        this.timeout(40000);
+        this.timeout(60000);
 
         const verification = waitForVerification(samplesFolder + "simple2.dfy", { crashed: false, errorCount: 0, proofObligations: 2 });
         await openFile("simple2.dfy");
         await verification;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // wait until everything is loaded
+        await new Promise(resolve => setTimeout(resolve, 5000)); // wait until everything is loaded
         await executeCommand("dafny.showCounterExample");
         await waitForCounterExample("simple2.dfy", true);
         await closeActiveEditor();
