@@ -4,9 +4,9 @@ This repository contains the infrastructure necessary to support _Dafny_ for Vis
 
 | master | develop |
 | --- | --- |
-|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
+|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
 
-[![Sounarcloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)
+
 
 ## Architecture
 
