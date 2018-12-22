@@ -1,6 +1,7 @@
-# Dafny VSCode Extension
+# Dafny for Visual Studio Code
 
-This extension adds the support of _Dafny_ to Visual Studio Code.
+
+This extension adds support of _Dafny_ to Visual Studio Code.
 
 ## Features
 
@@ -16,7 +17,7 @@ This extension adds the support of _Dafny_ to Visual Studio Code.
 
 ![assertions animation](simpleassert.gif)
 
-You can find [more Examples below](#user-content-examples).
+You can find [more Examples below](#examples).
 
 ## Shortcuts
 
@@ -57,7 +58,7 @@ The following are optional:
 | Setting          | Description                              |
 | :--------------- |:---------------------------------------- |
 | `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in _PATH_ (you'll get an error if that's the case). |
-| `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.0 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
+| `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.5 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
 | `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
 | `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
 | `dafny.automaticShowCounterModel` | Show _CounterModel_ automatically if a proof fails. Can cause performance issues. |

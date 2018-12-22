@@ -1,7 +1,7 @@
 {
     "name": "dafny-vscode",
-    "displayName": "Dafny VSCode",
-    "description": "Dafny support for Visual Studio Code",
+    "displayName": "Dafny",
+    "description": "Dafny for Visual Studio Code",
     "version": "0.14.2",
     "publisher": "FunctionalCorrectness",
     "homepage": "https://github.com/DafnyVSCode/",
@@ -9,10 +9,21 @@
         "type": "git",
         "url": "https://github.com/DafnyVSCode/Dafny-VSCode.git"
     },
+    "bugs": {
+        "url": "https://github.com/DafnyVSCode/Dafny-VSCode/issues"
+    },
+    "badges": [
+        {
+            "url": "https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master",
+            "href": "https://travis-ci.com/DafnyVSCode/Dafny-VSCode",
+            "description": "Continuous integration (Travis)"
+        }
+    ],
+    "qna": false,
     "license": "MIT",
     "galleryBanner": {
-        "color": "#639ECA",
-        "theme": "dark"
+        "color": "#FFEC50",
+        "theme": "light"
     },
     "icon": "logo.png",
     "engines": {
