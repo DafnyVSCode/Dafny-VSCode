@@ -15,7 +15,7 @@ EOF
 
 cd server
 npm install
-code .
+code . &
 
 cat << EOF
 
@@ -25,7 +25,7 @@ EOF
 
 cd ../client
 npm install
-code .
+code . &
 
 cd ..
 
