@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.14.3
+* Rebranding and small readme fixes
+
 ## 0.14.2
 * Add workaround for dafny counterExample bug ([#23](https://github.com/DafnyVSCode/Dafny-VSCode/issues/23)).
 
