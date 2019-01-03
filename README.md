@@ -1,10 +1,12 @@
-# Dafny VSCode
+# Dafny VSCode [![Marketplace Downloads Count](https://vsmarketplacebadge.apphb.com/installs-short/FunctionalCorrectness.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=FunctionalCorrectness.dafny-vscode)
 
-This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
+> This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
+
+To add Dafny to VSCode, please go to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=FunctionalCorrectness.dafny-vscode).
 
 | master | develop |
 | --- | --- |
-|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
+|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)<br>[![VSCode Marketplace](https://vsmarketplacebadge.apphb.com/version-short/FunctionalCorrectness.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=FunctionalCorrectness.dafny-vscode)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
 
 
 
