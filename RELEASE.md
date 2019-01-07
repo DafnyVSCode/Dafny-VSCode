@@ -27,14 +27,14 @@ Build the server and the client as described in [README.md](README.md).
 
 Run the following commands on the `develop`-branch in the `client` folder:
 
-* `npx vsce login FunctionalCorrectness`
+* `npx vsce login correctnessLab`
 * Depending on your changes:
   * `npx vsce publish patch` (if you only committed bug fixes)
   * `npx vsce publish minor` (if you introduced new features)
   * `npx vsce publish major` (if backward compatibility is no longer given)
 
 * Note: This will automatically adjust your _package.json_ file.
-* Hint 1: For this to work, you need the proper permissions (manage permissions [here](https://marketplace.visualstudio.com/manage/publishers/FunctionalCorrectness?auth_redirect=True)).
+* Hint 1: For this to work, you need the proper permissions (manage permissions [here](https://marketplace.visualstudio.com/manage/publishers/correctnessLab?auth_redirect=True)).
 * Hint 2: All the information about publishing extensions can be found [here](https://code.visualstudio.com/docs/extensions/publish-extension).
 
 ## Merge into Master and create Tag

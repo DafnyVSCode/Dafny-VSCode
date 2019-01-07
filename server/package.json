@@ -3,7 +3,7 @@
   "displayName": "Dafny VSCode",
   "description": "Dafny support for Visual Studio Code",
   "version": "0.14.3",
-  "publisher": "FunctionalCorrectness",
+  "publisher": "correctnessLab",
   "homepage": "https://github.com/DafnyVSCode/",
   "repository": {
     "type": "git",

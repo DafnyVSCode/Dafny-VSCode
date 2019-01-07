@@ -10,7 +10,7 @@ import * as vscode from "vscode";
 import { Context } from "../src/context";
 import { VerificationResult } from "../src/verificationResult";
 
-const extensionID = "FunctionalCorrectness.dafny-vscode";
+const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
 

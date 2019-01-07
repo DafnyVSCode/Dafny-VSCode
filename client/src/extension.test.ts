@@ -9,7 +9,7 @@ import * as vscode from "vscode";
 //import { VerificationResult } from "../src/verificationResult";
 import { Context } from "../src/context";
 
-const extensionID = "FunctionalCorrectness.dafny-vscode";
+const extensionID = "correctnessLab.dafny-vscode";
 const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
 
 

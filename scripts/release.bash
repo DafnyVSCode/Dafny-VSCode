@@ -24,9 +24,9 @@ if [ "$CUR_BRANCH" != "develop" ] || [ "$CUR_CHANGES" -gt 0 ]; then
     exit 1
 fi
 
-echo -e "Please make sure you are logged into the FunctionalCorrectness account with permissions to publish.\n"\
-     "Execute 'npx vsce login FunctionalCorrectness' manually to do so.\n"\
-     "Hint 1: For this to work, you need the proper permissions (manage permissions here: https://marketplace.visualstudio.com/manage/publishers/FunctionalCorrectness?auth_redirect=True)\n"\
+echo -e "Please make sure you are logged into the correctnessLab account with permissions to publish.\n"\
+     "Execute 'npx vsce login correctnessLab' manually to do so.\n"\
+     "Hint 1: For this to work, you need the proper permissions (manage permissions here: https://marketplace.visualstudio.com/manage/publishers/correctnessLab?auth_redirect=True)\n"\
      "Hint 2: All the information about publishing extensions can be found here: https://code.visualstudio.com/docs/extensions/publish-extension\n"
 
 
