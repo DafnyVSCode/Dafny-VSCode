@@ -4,8 +4,9 @@ import Uri from "vscode-uri";
 import { Commands, ToolTipText } from "../../strings/stringRessources";
 import { DafnyServer } from "../dafnyServer";
 import { DafnyBaseCodeLensProvider } from "./baseCodeLensProvider";
-import { ReferenceInformation, ReferencesCodeLens } from "./codeLenses";
-import { Symbol, SymbolTable } from "./symbols";
+import { ReferencesCodeLens } from "./codeLenses";
+import { ReferenceInformation } from "./ReferenceInformation";
+import { DafnySymbol } from "./symbols";
 
 export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     public constructor(server: DafnyServer) {
@@ -56,19 +57,19 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
     private buildEmptyCommand(): any {
         return {
             command: Commands.EmptyCommand,
-            title: ToolTipText.NoReferences
+            title: ToolTipText.NoReferences,
         };
     }
     private getReferences(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
         const lensSymbol = codeLens.symbol;
-        return this.server.symbolService.getAllSymbols(lensSymbol.document).then((symbols: Symbol[]) => {
+        return this.server.symbolService.getAllSymbols(lensSymbol.document).then((symbols: DafnySymbol[]) => {
             const references: ReferenceInformation[] = [];
             for (const symbol of symbols) {
-                if(symbol.name === lensSymbol.name && symbol.document.uri === lensSymbol.document.uri) {
+                if (symbol.name === lensSymbol.name && symbol.document.uri === lensSymbol.document.uri) {
                     for (const reference of symbol.References) {
                         references.push(new ReferenceInformation(reference.range, Uri.parse(symbol.document.uri)));
                     }
-                } else if(symbol.name === lensSymbol.name && symbol.parentClass ===
+                } else if (symbol.name === lensSymbol.name && symbol.parentClass ===
                         lensSymbol.parentClass && symbol.module === lensSymbol.module) {
                     references.push(new ReferenceInformation(symbol.range, Uri.parse(symbol.document.uri)));
                 }

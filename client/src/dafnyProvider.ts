@@ -36,7 +36,7 @@ export class DafnyClientProvider {
                 this.context.verificationResults[docPathName] = verificationResult;
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
-                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); };
+                if (Context.unitTest) { Context.unitTest.verificationComplete(verificationResult); }
             });
     }
 
@@ -76,14 +76,14 @@ export class DafnyClientProvider {
         const that = this;
         vscode.workspace.onDidChangeConfiguration(this.loadConfig, that);
 
-        if (Context.unitTest) { Context.unitTest.activated(); };
+        if (Context.unitTest) { Context.unitTest.activated(); }
     }
 
     public dispose(): void {
         this.dafnyStatusbar.hide();
         if (this.subscriptions && this.subscriptions.length > 0) {
-            for (let i: number = 0; i < this.subscriptions.length; i++) {
-                this.subscriptions[i].dispose();
+            for (const subscription of this.subscriptions) {
+                subscription.dispose();
             }
         }
     }

@@ -3,14 +3,9 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 
 import { Context } from "./context";
+import { StatusbarPriority } from "./StatusbarPriority";
 import { EnvironmentConfig, LanguageServerNotification, StatusString } from "./stringRessources";
 import { VerificationResult } from "./verificationResult";
-
-class Priority {
-    public static low: number = 1;
-    public static medium: number = 5;
-    public static high: number = 10;
-}
 
 export class Statusbar {
     public serverStatus: string;
@@ -23,9 +18,9 @@ export class Statusbar {
     private currentDocumentStatucBar: vscode.StatusBarItem = null;
 
     constructor(languageServer: LanguageClient, private context: Context) {
-        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
-        this.progressBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, Priority.high);
-        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Priority.high);
+        this.currentDocumentStatucBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, StatusbarPriority.high);
+        this.progressBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, StatusbarPriority.high);
+        this.serverStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, StatusbarPriority.high);
 
         languageServer.onNotification(LanguageServerNotification.QueueSize, (queueSize: number) => {
             this.queueSize = queueSize === undefined ? 0 : queueSize;
@@ -65,13 +60,13 @@ export class Statusbar {
     }
 
     public formatProgress(progress: number): string {
-        if (!progress) { return "0%"; };
+        if (!progress) { return "0%"; }
         return progress.toFixed(0) + "%";
     }
 
     public progressBarText(progress: number): string {
-        if (progress < 0) { progress = 0; };
-        if (progress > 100) { progress = 100; };
+        if (progress < 0) { progress = 0; }
+        if (progress > 100) { progress = 100; }
         const completed = Math.floor(progress / 10);
         return "⚫".repeat(completed) + " (" + this.formatProgress(progress) + ") " + "⚪".repeat(10 - completed);
     }
@@ -91,7 +86,7 @@ export class Statusbar {
 
         if (this.serverpid) {
             this.serverStatusBar.text = `${StatusString.ServerUp} | ${this.serverStatus} | Queue: ${this.queueSize}`;
-            this.serverStatusBar.tooltip = `Dafny Version ${this.serverversion.trim()} | Dafny PID ${this.serverpid}`
+            this.serverStatusBar.tooltip = `Dafny Version ${this.serverversion.trim()} | Dafny PID ${this.serverpid}`;
 
         } else {
             this.serverStatusBar.text = StatusString.ServerDown;

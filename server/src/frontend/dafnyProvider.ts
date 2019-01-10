@@ -1,14 +1,13 @@
 "use strict";
 import { Disposable, TextDocument } from "vscode-languageserver";
-import Uri from "vscode-uri";
 import { Context } from "../backend/context";
 import { DafnyCompiler } from "../backend/dafnyCompiler";
 import { DafnyServer } from "../backend/dafnyServer";
-import { DafnySettings } from "../backend/dafnySettings";
+import { IDafnySettings } from "../backend/dafnySettings";
 import { DafnyDefinitionProvider } from "../backend/features/definitionProvider";
 import { DafnyReferencesCodeLensProvider } from "../backend/features/referenceCodeLensProvider";
 import { NotificationService } from "../notificationService";
-import { Config, DafnyVerbs, EnvironmentConfig, LanguageServerNotification } from "../strings/stringRessources";
+import { DafnyVerbs, EnvironmentConfig } from "../strings/stringRessources";
 import { CodeActionProvider } from "./../backend/features/codeActionProvider";
 import { DafnyCompletionProvider } from "./../backend/features/completionProvider";
 import { DafnyRenameProvider } from "./../backend/features/renameProvider";
@@ -27,7 +26,7 @@ export class DafnyServerProvider {
     private dafnyStatusbar: Statusbar;
     private context: Context;
 
-    constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: DafnySettings) {
+    constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: IDafnySettings) {
 
         this.context = new Context(this.notificationService);
         this.context.serverversion = serverVersion;
@@ -45,8 +44,8 @@ export class DafnyServerProvider {
 
     public dispose(): void {
         if (this.subscriptions && this.subscriptions.length > 0) {
-            for (let i: number = 0; i < this.subscriptions.length; i++) {
-                this.subscriptions[i].dispose();
+            for (const subscription of this.subscriptions) {
+                subscription.dispose();
             }
         }
     }

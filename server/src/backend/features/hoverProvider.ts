@@ -1,6 +1,6 @@
 "use strict";
 
-import { Hover, Location, Position, TextDocument } from "vscode-languageserver";
+import { Hover, Position, TextDocument } from "vscode-languageserver";
 
 export class DafnyHoverProvider {
 

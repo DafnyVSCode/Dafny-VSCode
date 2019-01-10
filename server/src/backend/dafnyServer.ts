@@ -2,15 +2,15 @@
 import * as cp from "child_process";
 import * as vscode from "vscode-languageserver";
 import Uri from "vscode-uri";
-import { IncorrectPathExeption } from "../errorHandling/errors";
+import { IncorrectPathExeption } from "../errors";
 import { Statusbar } from "../frontend/dafnyStatusbar";
 import { NotificationService } from "../notificationService";
 import { ProcessWrapper } from "../process/process";
 import { encodeBase64 } from "../strings/stringEncoding";
 import { DafnyVerbs, ErrorMsg, InfoMsg, LanguageServerNotification, ServerStatus, StatusString } from "../strings/stringRessources";
+import { Command } from "./Command";
 import { Context } from "./context";
-import { DafnySettings } from "./dafnySettings";
-import { Command } from "./environment";
+import { IDafnySettings } from "./dafnySettings";
 import { Environment } from "./environment";
 import { SymbolService } from "./features/symbolService";
 import { VerificationRequest } from "./verificationRequest";
@@ -31,7 +31,7 @@ export class DafnyServer {
     private restart: boolean = true;
     private retries: number = 0;
     constructor(private notificationService: NotificationService, private statusbar: Statusbar,
-                private context: Context, private settings: DafnySettings) {
+                private context: Context, private settings: IDafnySettings) {
         this.symbolService = new SymbolService(this);
     }
 
@@ -200,7 +200,7 @@ export class DafnyServer {
             args: [],
             filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
-            sourceIsFile: false
+            sourceIsFile: false,
         };
         const encoded: string = encodeBase64(task);
         if (this.isRunning()) {

@@ -2,23 +2,17 @@
 
 import * as cp from "child_process";
 import * as os from "os";
-import * as vscode from "vscode-languageserver";
-import {IncorrectPathExeption} from "../errorHandling/errors";
+import { IncorrectPathExeption } from "../errors";
 import {NotificationService} from "../notificationService";
-import {Application, Config, EnvironmentConfig, ErrorMsg, LanguageServerNotification, WarningMsg } from "../strings/stringRessources";
-import {DafnySettings} from "./dafnySettings";
-
-export class Command {
-    public notFound: boolean = false;
-    // tslint:disable-next-line:no-empty
-    public constructor(public command: string = null, public args: string[]= null) {};
-}
+import {Application, EnvironmentConfig, ErrorMsg, WarningMsg } from "../strings/stringRessources";
+import { Command } from "./Command";
+import {IDafnySettings} from "./dafnySettings";
 
 export class Environment {
 
     public usesMono: boolean;
 
-    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: DafnySettings) {
+    constructor(private rootPath: string, private notificationService: NotificationService, private dafnySettings: IDafnySettings) {
         this.usesMono = this.dafnySettings.useMono || os.platform() !== EnvironmentConfig.Win32;
     }
 
@@ -73,9 +67,9 @@ export class Environment {
      * or, if not available from there, from the environment variable DAFNY_PATH.
      * @return {String} A string containing the determined Dafny base path.
      */
-    private getBasePath(): String {
-        if(this.dafnySettings.basePath === "") {
-            if(process.env.DAFNY_PATH === undefined || process.env.DAFNY_PATH === "") {
+    private getBasePath(): string {
+        if (this.dafnySettings.basePath === "") {
+            if (process.env.DAFNY_PATH === undefined || process.env.DAFNY_PATH === "") {
                 return "";
             } else {
                 return process.env.DAFNY_PATH;
@@ -88,7 +82,7 @@ export class Environment {
         let baseCommand: string;
         let args: string[];
         let monoPath: string = this.dafnySettings.monoPath;
-        if(commandName === undefined || commandName === "") {
+        if (commandName === undefined || commandName === "") {
             throw new IncorrectPathExeption();
         }
         if (!this.usesMono) {

@@ -31,15 +31,15 @@ export class CounterModelProvider {
                     after: {
                         backgroundColor: "#cccccc",
                         color: "#161616",
-                        margin: "0 0 0 30px"
-                    }
+                        margin: "0 0 0 30px",
+                    },
                 },
                 light: {
                     after: {
                         backgroundColor: "#161616",
-                        color: "#cccccc"
-                    }
-                }
+                        color: "#cccccc",
+                    },
+                },
             });
             this.context.decorators[editor.document.uri.toString()] = variableDisplay;
             vscode.window.activeTextEditor.setDecorations(variableDisplay, decorators);
@@ -49,23 +49,23 @@ export class CounterModelProvider {
     private createDecorator(state: any): vscode.DecorationOptions {
 
         const line = state.Line - 1;
-        if (line < 0) { return null; };
+        if (line < 0) { return null; }
 
         let variables = "";
         for (let j = 0; j < state.Variables.length; j++) {
-            if (j > 0) { variables += ", "; };
+            if (j > 0) { variables += ", "; }
             variables += state.Variables[j].Name + "=" + state.Variables[j].Value;
         }
 
         const renderOptions: vscode.DecorationRenderOptions = {
             after: {
-                contentText: variables
-            }
+                contentText: variables,
+            },
         };
 
         return {
             range: new vscode.Range(new vscode.Position(line, state.Column), new vscode.Position(line, Number.MAX_VALUE)),
-            renderOptions
+            renderOptions,
         };
     }
 }

@@ -2,7 +2,8 @@
 import * as Collections from "typescript-collections";
 import { NotificationService } from "../notificationService";
 import { VerificationRequest } from "./verificationRequest";
-import { VerificationResult, VerificationResults } from "./verificationResults";
+import { VerificationResult } from "./VerificationResult";
+import { VerificationResults } from "./verificationResults";
 
 export class Context {
     public queue: Collections.Queue<VerificationRequest> = new Collections.Queue<VerificationRequest>();

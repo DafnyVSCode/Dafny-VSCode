@@ -62,6 +62,9 @@ echo -e "\n---------------------------------------------------------"\
         "---------------------------------------------------------\n"
 pushd server >/dev/null
     npm install
+    echo "Run tslint..."
+    npx tslint --project .
+    echo "Compile..."
     npm run compile
 popd >/dev/null
 
@@ -71,7 +74,11 @@ echo -e "\n---------------------------------------------------------"\
         "---------------------------------------------------------\n"
 pushd client >/dev/null
     npm install
+    echo "Run tslint..."
+    npx tslint --project .
+    echo "Compile..."
     npm run vscode:prepublish
+    echo "Run test..."
     npm run test
 popd >/dev/null
 

@@ -1,19 +1,11 @@
 import {Position, Range, TextDocument} from "vscode-languageserver";
 import { DafnyKeyWords, SymbolString } from "./../../strings/stringRessources";
 import { containsPosition } from "./../../vscodeFunctions/positionHelper";
+import { Reference } from "./Reference";
 export enum SymbolType {
-    Unknown, Class, Method, Function, Field, Call, Definition, Predicate
+    Unknown, Class, Method, Function, Field, Call, Definition, Predicate,
 }
-export class SymbolTable {
-    public symbols: Symbol[];
-    public hash: number;
-    public fileName: string;
-    constructor(fileName: string) {
-        this.symbols = [];
-        this.fileName = fileName;
-    }
-}
-export class Symbol {
+export class DafnySymbol {
     public column: number;
     public endColumn: number;
     public line: number;
@@ -52,7 +44,7 @@ export class Symbol {
         this.ensures = [];
     }
     public setSymbolType(type: string): void {
-        switch(type) {
+        switch (type) {
             case SymbolString.Class: this.symbolType = SymbolType.Class; break;
             case SymbolString.Method: this.symbolType = SymbolType.Method; break;
             case SymbolString.Function: this.symbolType = SymbolType.Function; break;
@@ -91,12 +83,12 @@ export class Symbol {
         return !(this.name === DafnyKeyWords.DefaultModuleName && this.isOfType([SymbolType.Class])) &&
                     !this.isOfType([SymbolType.Unknown, SymbolType.Call, SymbolType.Definition]);
     }
-    public canProvideCodeCompletionForDefinition(symbol: Symbol) {
+    public canProvideCodeCompletionForDefinition(symbol: DafnySymbol) {
         return this.isDefinedInSameClass(symbol) &&
             this.isOfType([SymbolType.Field, SymbolType.Method]) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
     }
-    public canProvideCodeCompletionForClass(symbol: Symbol) {
+    public canProvideCodeCompletionForClass(symbol: DafnySymbol) {
         return this.hasParentClass(symbol.name) &&
             this.hasModule(symbol.module) &&
             this.isOfType([SymbolType.Field, SymbolType.Method]) &&
@@ -109,13 +101,13 @@ export class Symbol {
     public isField(word: string, position: Position = null): boolean {
         return this.isTypeAt(word, SymbolType.Field, position);
     }
-    public isDefiningClassForFieldType(symbol: Symbol): boolean {
+    public isDefiningClassForFieldType(symbol: DafnySymbol): boolean {
         return this.isOfType([SymbolType.Class]) && this.hasName(symbol.referencedClass) && this.hasModule(symbol.referencedModule);
     }
     public containsPosition(uri: string, position: Position): boolean {
         return this.document.uri === uri && containsPosition(this.range, position);
     }
-    public isFuzzyDefinitionForSymbol(symbol: Symbol): boolean {
+    public isFuzzyDefinitionForSymbol(symbol: DafnySymbol): boolean {
         return this.isDefinedInSameClass(symbol)
             && this.hasName(symbol.name) && !this.isOfType([SymbolType.Call]);
     }
@@ -131,7 +123,7 @@ export class Symbol {
     public isOfType(types: SymbolType[]): boolean {
         return types.includes(this.symbolType);
     }
-    private isDefinedInSameClass(symbol: Symbol): boolean {
+    private isDefinedInSameClass(symbol: DafnySymbol): boolean {
         return this.hasParentClass(symbol.parentClass) && this.hasModule(symbol.module);
     }
 
@@ -145,10 +137,10 @@ export class Symbol {
         return this.name === name;
     }
 
-    private addClauses(clauses: any, ): string[] {
+    private addClauses(clauses: any): string[] {
         const clauseHolder: string[] = [];
-        if(clauses && clauses.length) {
-            for(const clause of clauses) {
+        if (clauses && clauses.length) {
+            for (const clause of clauses) {
                 clauseHolder.push(clause);
             }
         }
@@ -157,36 +149,10 @@ export class Symbol {
 
     private isTypeAt(word: string, type: SymbolType, position: Position = null): boolean {
         const isTypeOfName = this.isOfType([type]) && this.hasName(word);
-        if(position !== null) {
+        if (position !== null) {
             return isTypeOfName && containsPosition(this.range, position);
         }
         return isTypeOfName;
-    }
-}
-export class Reference {
-    public column: number;
-    public line: number;
-    public position: number;
-    public methodName: string;
-    public start: Position;
-    public end: Position;
-    public range: Range;
-    public document: TextDocument;
-    public referencedName: string;
-
-    constructor(reference: any, document: TextDocument) {
-        this.column = adjustDafnyColumnPositionInfo(reference.Column);
-        this.line = adjustDafnyLinePositionInfo(reference.Line);
-        this.position = reference.Position;
-        this.methodName = reference.MethodName;
-        this.referencedName = reference.ReferencedName;
-        this.start = Position.create(this.line, this.column);
-        this.end = Position.create(this.line, this.column + this.referencedName.length);
-        this.range = Range.create(this.start, this.end);
-        this.document = document;
-    }
-    public isValid(): boolean {
-        return !isNaN(this.column) && !isNaN(this.line) && this.methodName !== "";
     }
 }
 

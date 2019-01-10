@@ -1,17 +1,17 @@
 import {EOL} from "os";
 import {Command} from "vscode-languageserver";
-import { Position, TextDocument, TextEdit} from "vscode-languageserver-types/lib/main";
+import { Position, TextEdit} from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
 import { methodAt } from "./../semanticAnalysis";
-import { Symbol } from "./../symbols";
+import { DafnySymbol } from "./../symbols";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class NullCommandGenerator extends BaseCommandGenerator {
     public calculateCommands(): Promise<Command[]> {
-        if(this.diagnostic.message.indexOf(DafnyReports.NullWarning) > -1) {
+        if (this.diagnostic.message.indexOf(DafnyReports.NullWarning) > -1) {
             const designator = this.parseDesignator();
-            if(designator !== "") {
-                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
+            if (designator !== "") {
+                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: DafnySymbol[]) => {
                     this.addNecessaryNullCheck(symbols, designator);
                     return this.commands;
                 }).catch((err: Error) => {console.error(err); return Promise.resolve([]); });
@@ -24,17 +24,17 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(methodStart: Symbol): Position {
-        if(!methodStart) {
+    protected findExactInsertPosition(methodStart: DafnySymbol): Position {
+        if (!methodStart) {
         return null;
         }
         return this.documentDecorator.findBeginOfContractsOfMethod(methodStart.start);
     }
 
-    private addNecessaryNullCheck(symbols: Symbol[], designator: string): void {
+    private addNecessaryNullCheck(symbols: DafnySymbol[], designator: string): void {
         const definingMethod = methodAt(symbols, this.diagnostic.range);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
-        if(insertPosition && insertPosition !== this.dummyPosition) {
+        if (insertPosition && insertPosition !== this.dummyPosition) {
                 this.buildNullCheckCommand(insertPosition, designator);
         }
     }
@@ -43,7 +43,7 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         return this.removeMemberAcces(expression);
     }
     private removeMemberAcces(designator: string): string {
-        if(designator.lastIndexOf(".") > 0) {
+        if (designator.lastIndexOf(".") > 0) {
             designator = designator.substr(0, designator.lastIndexOf("."));
         }
         return designator;
@@ -56,9 +56,7 @@ export class NullCommandGenerator extends BaseCommandGenerator {
     private buildNullCheckCommand(insertPosition: Position, designator: string): void {
         const nullCheckMessage = "requires " + designator + " != null";
         const edit = TextEdit.insert(insertPosition, " " + nullCheckMessage + EOL);
-        this.commands.push(Command.create(`Add null check: ${nullCheckMessage}`,
-            Commands.EditTextCommand, this.uri,
-            this.dummyDocId, [edit])
-        );
+        const command = Command.create(`Add null check: ${nullCheckMessage}`, Commands.EditTextCommand, this.uri, this.dummyDocId, [edit]);
+        this.commands.push(command);
     }
 }

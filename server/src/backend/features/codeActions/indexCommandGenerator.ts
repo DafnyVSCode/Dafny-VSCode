@@ -1,12 +1,10 @@
 import { EOL } from "os";
-import { Command, Diagnostic } from "vscode-languageserver";
-import { Position, TextDocument, TextEdit } from "vscode-languageserver-types/lib/main";
+import { Command } from "vscode-languageserver";
+import { Position, TextEdit } from "vscode-languageserver-types/lib/main";
 import { Commands, DafnyReports } from "./../../../strings/stringRessources";
-import { DocumentDecorator } from "./../../../vscodeFunctions/documentDecorator";
-import { DafnyServer } from "./../../dafnyServer";
 import { methodAt } from "./../semanticAnalysis";
-import { SymbolType } from "./../symbols";
-import { Symbol } from "./../symbols";
+import { DafnySymbol } from "./../symbols";
+import { ArrayInformation } from "./ArrayInformation";
 import { BaseCommandGenerator } from "./baseCommandGenerator";
 
 export class IndexCommandGenerator extends BaseCommandGenerator {
@@ -15,7 +13,7 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         if (this.diagnostic.message === DafnyReports.IndexBounding) {
             const arr = new ArrayInformation(this.documentDecorator, this.diagnostic.range.start);
             if (arr.isValid()) {
-                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: Symbol[]) => {
+                return this.server.symbolService.getAllSymbols(this.doc).then((symbols: DafnySymbol[]) => {
                     this.addNecessaryConstraints(symbols, arr);
                     return Promise.resolve(this.commands);
                 }).catch((err: Error) => { console.error(err); return Promise.resolve([]); });
@@ -28,14 +26,14 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(methodStart: Symbol): Position {
+    protected findExactInsertPosition(methodStart: DafnySymbol): Position {
         if (!methodStart) {
             return null;
         }
         return this.documentDecorator.findInsertionPointOfContract(methodStart.start);
      }
 
-     private addNecessaryConstraints(symbols: Symbol[], array: ArrayInformation): void {
+     private addNecessaryConstraints(symbols: DafnySymbol[], array: ArrayInformation): void {
         const definingMethod = methodAt(symbols, this.diagnostic.range);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
         if (insertPosition && insertPosition !== this.dummyPosition) {
@@ -64,20 +62,5 @@ export class IndexCommandGenerator extends BaseCommandGenerator {
         this.commands.push(Command.create(`Add bound checks: ${lowerBoundMessage} and ${upperBoundMessage}`,
             Commands.EditTextCommand, this.uri,
             this.dummyDocId, [editLower, editHigher]));
-    }
-}
-
-class ArrayInformation {
-    public identifier: string;
-    public indexExpression: string;
-
-    constructor(documentDecorator: DocumentDecorator, startPosition: Position) {
-        const arrayExprRange = documentDecorator.readArrayExpression(startPosition);
-        this.indexExpression = documentDecorator.getText(arrayExprRange);
-        this.identifier = documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line,
-            arrayExprRange.start.character));
-    }
-    public isValid(): boolean {
-        return this.identifier !== "" && this.indexExpression !== "";
     }
 }

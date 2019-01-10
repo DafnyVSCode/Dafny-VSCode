@@ -1,54 +1,16 @@
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import { CommandStrings, LanguageServerRequest, InfoMsg, ErrorMsg, Config, EnvironmentConfig } from "../stringRessources";
 import { DafnyClientProvider } from "../dafnyProvider";
-import { CompilerResult } from "../serverHelper/compilerResult";
 import { DafnyRunner } from "../dafnyRunner";
+import { CompilerResult } from "../serverHelper/compilerResult";
+import { CommandStrings, Config, EnvironmentConfig, ErrorMsg, InfoMsg, LanguageServerRequest } from "../stringRessources";
 
 /**
  * VSCode UI Commands
  */
 export default class Commands {
 
-    extensionContext: vscode.ExtensionContext;
-    languageServer: LanguageClient;
-    provider: DafnyClientProvider;
-    runner: DafnyRunner;
-    commands = [
-        {name: CommandStrings.ShowReferences, callback: Commands.showReferences, doNotDispose: true},
-        {name: CommandStrings.RestartServer,  callback: () => this.restartServer()},
-        {name: CommandStrings.InstallDafny,   callback: () => this.installDafny()},
-        {name: CommandStrings.UninstallDafny, callback: () => this.uninstallDafny()},
-        {name: CommandStrings.Compile,        callback: () => this.compile(vscode.window.activeTextEditor.document.uri)},
-        {name: CommandStrings.CompileAndRun,  callback: () => this.compile(vscode.window.activeTextEditor.document.uri, true)},
-        {
-            name: CommandStrings.EditText,
-            callback: (uri: string, version: number, edits: vscode.TextEdit[]) => this.applyTextEdits(uri, version, edits)
-        }
-    ];
-
-    constructor(extensionContext: vscode.ExtensionContext, languageServer: LanguageClient, provider: DafnyClientProvider, runner: DafnyRunner) {
-        this.languageServer = languageServer;
-        this.provider = provider;
-        this.runner = runner;
-        this.extensionContext = extensionContext;
-    }
-
-    /**
-     * Register commands listed in @var this.commands to vscode
-     */
-    registerCommands() {
-        for(const cmd of this.commands) {
-            const disposable = vscode.commands.registerCommand(cmd.name, cmd.callback);
-
-            if(cmd.doNotDispose) {
-                continue;
-            }
-            this.extensionContext.subscriptions.push(disposable);
-        }
-    }
-
-    static showReferences(uri: any, position: any, locations: any) {
+    public static showReferences(uri: any, position: any, locations: any) {
         function parsePosition(p: any): vscode.Position {
             return new vscode.Position(p.line, p.character);
         }
@@ -72,15 +34,53 @@ export default class Commands {
         vscode.commands.executeCommand("editor.action.showReferences", parsedUri, parsedPosition, parsedLocations);
     }
 
-    restartServer() {
+    public extensionContext: vscode.ExtensionContext;
+    public languageServer: LanguageClient;
+    public provider: DafnyClientProvider;
+    public runner: DafnyRunner;
+    public commands = [
+        {name: CommandStrings.ShowReferences, callback: Commands.showReferences, doNotDispose: true},
+        {name: CommandStrings.RestartServer,  callback: () => this.restartServer()},
+        {name: CommandStrings.InstallDafny,   callback: () => this.installDafny()},
+        {name: CommandStrings.UninstallDafny, callback: () => this.uninstallDafny()},
+        {name: CommandStrings.Compile,        callback: () => this.compile(vscode.window.activeTextEditor.document.uri)},
+        {name: CommandStrings.CompileAndRun,  callback: () => this.compile(vscode.window.activeTextEditor.document.uri, true)},
+        {
+            name: CommandStrings.EditText,
+            // tslint:disable-next-line:object-literal-sort-keys
+            callback: (uri: string, version: number, edits: vscode.TextEdit[]) => this.applyTextEdits(uri, version, edits),
+        },
+    ];
+
+    constructor(extensionContext: vscode.ExtensionContext, languageServer: LanguageClient, provider: DafnyClientProvider, runner: DafnyRunner) {
+        this.languageServer = languageServer;
+        this.provider = provider;
+        this.runner = runner;
+        this.extensionContext = extensionContext;
+    }
+
+    /**
+     * Register commands listed in @var this.commands to vscode
+     */
+    public registerCommands() {
+        for (const cmd of this.commands) {
+            const disposable = vscode.commands.registerCommand(cmd.name, cmd.callback);
+
+            if (cmd.doNotDispose) {
+                continue;
+            }
+            this.extensionContext.subscriptions.push(disposable);
+        }
+    }
+
+    public restartServer() {
         this.languageServer.sendRequest(LanguageServerRequest.Reset)
         .then(() => true, () => {
             vscode.window.showErrorMessage("Can't restart dafny");
         });
     }
 
-
-    installDafny() {
+    public installDafny() {
         this.provider.dafnyStatusbar.hideProgress();
         this.provider.dafnyStatusbar.hide();
         this.languageServer.sendRequest(LanguageServerRequest.Install).then((basePath) => {
@@ -96,7 +96,7 @@ export default class Commands {
         });
     }
 
-    uninstallDafny() {
+    public uninstallDafny() {
         this.languageServer.sendRequest(LanguageServerRequest.Uninstall).then(() => {
             vscode.window.showInformationMessage("Uninstall complete");
             this.provider.dafnyStatusbar.hideProgress();
@@ -108,8 +108,7 @@ export default class Commands {
         });
     }
 
-
-    compile(uri: vscode.Uri, run: boolean = false) {
+    public compile(uri: vscode.Uri, run: boolean = false) {
         vscode.window.activeTextEditor.document.save();
         vscode.window.showInformationMessage(InfoMsg.CompilationStarted);
 
@@ -127,7 +126,7 @@ export default class Commands {
         });
     }
 
-    applyTextEdits(uri: string, documentVersion: number, edits: vscode.TextEdit[]) {
+    public applyTextEdits(uri: string, documentVersion: number, edits: vscode.TextEdit[]) {
         const textEditor = vscode.window.activeTextEditor;
 
         if (textEditor && textEditor.document.uri.toString() === uri) {

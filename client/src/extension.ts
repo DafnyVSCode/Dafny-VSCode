@@ -1,16 +1,16 @@
 "use strict";
 
-import * as vscode from "vscode";
 import { platform } from "os";
+import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
+import { Context } from "./context";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
-import { WarningMsg, LanguageServerNotification, ErrorMsg, EnvironmentConfig } from "./stringRessources";
-import DafnyLanguageClient from './server/dafnyLanguageClient';
-import Notifications from "./ui/notifications";
-import Commands from "./ui/commands";
-import { Context } from "./context";
 import Capabilities from "./helpers/capabilities";
+import DafnyLanguageClient from "./server/dafnyLanguageClient";
+import { EnvironmentConfig, ErrorMsg, LanguageServerNotification, WarningMsg } from "./stringRessources";
+import Commands from "./ui/commands";
+import Notifications from "./ui/notifications";
 
 let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
@@ -23,14 +23,14 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         vscode.window.showWarningMessage(WarningMsg.NoWorkspace);
     }
 
-    if(!Capabilities.hasSupportedMonoVersion()) {
+    if (!Capabilities.hasSupportedMonoVersion()) {
         // Promt the user to install Mono and stop extension execution.
         vscode.window.showErrorMessage(ErrorMsg.NoSupportedMono, ErrorMsg.ConfigureMonoPath, ErrorMsg.GetMono)
-        .then(selection => {
-            if(selection === ErrorMsg.GetMono) {
-                vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(ErrorMsg.GetMonoUri));
+        .then((selection) => {
+            if (selection === ErrorMsg.GetMono) {
+                vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(ErrorMsg.GetMonoUri));
                 let restartMessage;
-                if(platform() === EnvironmentConfig.OSX) {
+                if (platform() === EnvironmentConfig.OSX) {
                     // Mono adds a new folder to PATH; so give the easiest advice... ;)
                     restartMessage = ErrorMsg.RestartMacAfterMonoInstall;
                 } else {
@@ -39,8 +39,8 @@ export function activate(extensionContext: vscode.ExtensionContext) {
                 vscode.window.showWarningMessage(restartMessage);
             }
 
-            if(selection === ErrorMsg.ConfigureMonoPath) {
-                vscode.commands.executeCommand('workbench.action.configureLanguageBasedSettings');
+            if (selection === ErrorMsg.ConfigureMonoPath) {
+                vscode.commands.executeCommand("workbench.action.configureLanguageBasedSettings");
             }
         });
         return;

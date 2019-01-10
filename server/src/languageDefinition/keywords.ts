@@ -25,5 +25,5 @@ export const dafnyKeywords: string[] = [
     "struct",
     "switch",
     "type",
-    "var"
+    "var",
 ];

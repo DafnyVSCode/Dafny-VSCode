@@ -1,8 +1,9 @@
 "use strict";
-import {CodeLens, TextDocument} from "vscode-languageserver";
-import {DafnyServer} from "../dafnyServer";
+import { TextDocument } from "vscode-languageserver";
+import { DafnyServer } from "../dafnyServer";
 import { ReferencesCodeLens } from "./codeLenses";
-import { Symbol, SymbolTable } from "./symbols";
+import { DafnySymbol } from "./symbols";
+import { SymbolTable } from "./SymbolTable";
 export class DafnyBaseCodeLensProvider {
     private enabled: boolean = true;
 
@@ -14,8 +15,8 @@ export class DafnyBaseCodeLensProvider {
         return this.server.symbolService.getSymbols(document)
         .then((symbolTables: SymbolTable[]) => {
             return symbolTables.find((table: SymbolTable) => table.fileName === document.uri).symbols
-                .filter((info: Symbol) => info.needsCodeLens())
-                .map((info: Symbol) => new ReferencesCodeLens(info));
+                .filter((info: DafnySymbol) => info.needsCodeLens())
+                .map((info: DafnySymbol) => new ReferencesCodeLens(info));
         }).catch((err: Error) => {
             console.error(err);
             return [];
