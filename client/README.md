@@ -1,7 +1,7 @@
 # Dafny for Visual Studio Code
 
 
-This extension adds support of _Dafny_ to Visual Studio Code.
+This extension adds _Dafny_ support to Visual Studio Code.
 
 ## Features
 
