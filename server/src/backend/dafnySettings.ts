@@ -6,4 +6,5 @@ export interface IDafnySettings {
     monoPath: string;
     automaticVerification: boolean;
     automaticVerificationDelayMS: number;
+    serverVerifyArguments: string[];
 }

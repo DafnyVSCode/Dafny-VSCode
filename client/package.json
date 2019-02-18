@@ -161,6 +161,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Show countermodel if a program does not hold. Can cause much longer verification time."
+                },
+                "dafny.serverVerifyArguments": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Arguments to pass to the \"verify\" command of the Dafny Server. E.g., [\"/timeLimit:40\", \"/vcsLoad:1\"] "
                 }
             }
         },
