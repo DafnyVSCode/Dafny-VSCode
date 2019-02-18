@@ -219,7 +219,7 @@
         "tslint": "^5.11.0",
         "typescript": "^2.0.3",
         "vsce": "^1.53.2",
-        "vscode": "^1.1.18"
+        "vscode": "^1.1.29"
     },
     "dependencies": {
         "viz.js": "^1.7.1",
