@@ -13,4 +13,4 @@ node_js:
 
 script:
   - scripts/test-docker.bash
-  - sonar-scanner
+  - if [ -n "${SONAR_TOKEN}" ]; then sonar-scanner; fi
