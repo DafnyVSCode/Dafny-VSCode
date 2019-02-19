@@ -62,6 +62,7 @@ The following are optional:
 | `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
 | `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
 | `dafny.automaticShowCounterModel` | Show _CounterModel_ automatically if a proof fails. Can cause performance issues. |
+| `dafny.serverVerifyArguments` | Additional arguments to pass to the "verify" command of the Dafny Server. E.g.`["/timeLimit:40", "/vcsLoad:1"]` |
 
 ## Examples
 
