@@ -82,3 +82,4 @@ Note that by submitting a Pull Request, you agree to release your changes under 
 * [@misto](https://github.com/misto)
 * [@pipeaesac](https://github.com/pipeaesac)
 * [@fabianhauser](https://github.com/fabianhauser)
+* [@ssaavedra](https://github.com/ssaavedra)
