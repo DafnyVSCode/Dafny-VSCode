@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.16.0
+* Allow customizing the arguments passed to the verify backend ([#42](https://github.com/DafnyVSCode/Dafny-VSCode/pull/42)).
+* Update insecure dependencies
+
 ## 0.15.0
 * Change extension key from FunctionalCorrectness to correctnessLab.
 * Fix tslint errors ([#38](https://github.com/DafnyVSCode/Dafny-VSCode/pull/38)).
