@@ -197,7 +197,7 @@ export class DafnyServer {
             this.statusbar.changeServerStatus(StatusString.Verifying);
         }
         const task: IVerificationTask = {
-            args: [],
+            args: this.settings.serverVerifyArguments,
             filename: Uri.parse(request.document.uri).fsPath,
             source: request.source,
             sourceIsFile: false,
