@@ -45,7 +45,7 @@ export class DafnyClientProvider {
             this.doVerify(e);
         }, this);*/
 
-        vscode.window.onDidChangeActiveTextEditor((editor: vscode.TextEditor) => {
+        vscode.window.onDidChangeActiveTextEditor((editor) => {
             if (editor) {
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
