@@ -21,7 +21,7 @@ export class WorkSpaceRenameHolder {
     public collectRenamings(): {
         [uri: string]: TextEdit[];
     } {
-        const definingClass: DafnySymbol = this.getDefiningClass();
+        const definingClass = this.getDefiningClass();
         if (definingClass) {
             const relevantSymbols: DafnySymbol[] = this.getRelevantSymbolsForClass(definingClass.name);
             for (const symbol of relevantSymbols) {
@@ -38,7 +38,7 @@ export class WorkSpaceRenameHolder {
     private getRelevantSymbolsForClass(className: string): DafnySymbol[] {
         return this.symbols.filter((s: DafnySymbol) => s.isCompletableMemberOfClass(this.word, className));
     }
-    private getDefiningClass(): DafnySymbol {
+    private getDefiningClass(): DafnySymbol | undefined {
         return this.symbols.find((s: DafnySymbol) => s.isClassDefinedAtPosition(this.symbolPosition));
     }
     private addEdit(uri: string, edit: TextEdit): void {

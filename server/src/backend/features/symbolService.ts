@@ -42,24 +42,22 @@ export class SymbolService {
             return Promise.resolve(symbolTables);
         }
     }
-    public getAllSymbols(document: TextDocument): Promise<DafnySymbol[]> {
-        return this.getSymbols(document, true).then((tables: SymbolTable[]) => {
-            return [].concat.apply([], tables.map((table: SymbolTable) => table.symbols));
-        });
+    public async getAllSymbols(document: TextDocument): Promise<DafnySymbol[]> {
+        const tables = await this.getSymbols(document, true);
+        return ([] as DafnySymbol[]).concat.apply([], tables.map((table: SymbolTable) => table.symbols));
     }
 
-    public getSymbolsFromDafny(document: TextDocument): Promise<SymbolTable> {
+    public async getSymbolsFromDafny(document: TextDocument): Promise<SymbolTable> {
         if (!document) {
-            return Promise.resolve(null);
+            return Promise.reject("No document to create symbol table from.");
         }
-        return new Promise<any>((resolve, reject) => {
-                return this.askDafnyForSymbols(resolve, reject, document);
-        }).then((symbols: any) => {
-            return Promise.resolve(this.parseSymbols(symbols, document));
-        }, (err: Error) => {
+        try {
+            const symbols = await this.askDafnyForSymbols(document);
+            return this.parseSymbols(symbols, document);
+        } catch (err) {
             console.error(err);
-            return Promise.resolve(null);
-        });
+            return Promise.reject(`Could not create Dafny symbol table (Error: ${err})`);
+        }
     }
 
     private getAllCachedExcept(uri: string): SymbolTable[] {
@@ -71,17 +69,16 @@ export class SymbolService {
         }
         return symbolTables;
     }
-    private loadSymbols(doc: TextDocument, symbolTables: SymbolTable[], symbols: SymbolTable): Promise<SymbolTable[]> {
-        return this.getSymbolsFromDafny(doc).then((symb: SymbolTable) => {
-            if (symb.symbols.length >  0) {
-                symb.hash = hashString(doc.getText());
-                this.addSymbols(doc, symb, true);
-                symbolTables.push(symb);
-            } else if (symbols) {
-                symbolTables.push(symbols);
-            }
-            return Promise.resolve(symbolTables);
-        });
+    private async loadSymbols(doc: TextDocument, symbolTables: SymbolTable[], symbols: SymbolTable): Promise<SymbolTable[]> {
+        const symb = await this.getSymbolsFromDafny(doc);
+        if (symb.symbols.length > 0) {
+            symb.hash = hashString(doc.getText());
+            this.addSymbols(doc, symb, true);
+            symbolTables.push(symb);
+        } else if (symbols) {
+            symbolTables.push(symbols);
+        }
+        return Promise.resolve(symbolTables);
     }
     private parseSymbols(response: any, document: TextDocument): SymbolTable {
         const symbolTable = new SymbolTable(document.uri);
@@ -129,13 +126,18 @@ export class SymbolService {
         }
         return parsedSymbol;
     }
-    private askDafnyForSymbols(resolve: any, reject: any, document: TextDocument) {
-        this.server.addDocument(document, DafnyVerbs.Symbols, (response: string) =>  {
-            this.handleProcessData(response, ((data) => {resolve(data); }));
-        }, () => {reject(null); });
+    private askDafnyForSymbols(document: TextDocument): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.server.addDocument(
+                document,
+                DafnyVerbs.Symbols,
+                (response: string) => this.handleProcessData(response, resolve),
+                () => reject(`Error while requesting symbols from dafny for document "${document.uri}"`),
+            );
+        });
     }
 
-    private handleProcessData(response: string, callback: (data: any) => any): void {
+    private handleProcessData(response: string, callback: (data: any) => void): void {
         if (response && response.indexOf(EnvironmentConfig.DafnySuccess) > 0
                 && response.indexOf(EnvironmentConfig.DafnyFailure) < 0 && response.indexOf(EnvironmentConfig.SymbolStart) > -1) {
             const startOfSymbols: number = response.indexOf(EnvironmentConfig.SymbolStart) + EnvironmentConfig.SymbolStart.length;

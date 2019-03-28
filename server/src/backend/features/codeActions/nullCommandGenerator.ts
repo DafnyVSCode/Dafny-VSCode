@@ -20,19 +20,29 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         return Promise.resolve(this.commands);
     }
 
-    protected findBestEffortInsertPosition(): Position {
+    protected findBestEffortInsertPosition(): Position | null {
+        if (!this.documentDecorator) {
+            throw new Error("Document Decorator was not available to find best effort insert position");
+        }
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
-    protected findExactInsertPosition(methodStart: DafnySymbol): Position {
-        if (!methodStart) {
-        return null;
+    protected findExactInsertPosition(methodStart: DafnySymbol): Position | undefined {
+        if (!this.documentDecorator) {
+            throw new Error("Document Decorator was not available to find insert position");
         }
-        return this.documentDecorator.findBeginOfContractsOfMethod(methodStart.start);
+        const beginningOfMethod = this.documentDecorator.findBeginOfContractsOfMethod(methodStart.start);
+        if (beginningOfMethod === null) {
+            return undefined;
+        }
+        return beginningOfMethod;
     }
 
     private addNecessaryNullCheck(symbols: DafnySymbol[], designator: string): void {
         const definingMethod = methodAt(symbols, this.diagnostic.range);
+        if (!definingMethod) {
+            throw new Error(`Could not find defining method to add neccessary null check (designator: ${designator}`);
+        }
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
         if (insertPosition && insertPosition !== this.dummyPosition) {
                 this.buildNullCheckCommand(insertPosition, designator);
@@ -49,7 +59,13 @@ export class NullCommandGenerator extends BaseCommandGenerator {
         return designator;
     }
     private parseExpressionWhichMayBeNull(diagnosisStart: Position): string {
+        if (!this.documentDecorator) {
+            throw new Error(`Document Decorator was not available to parse the expression which might be null at ${diagnosisStart}`);
+        }
         const wordRangeBeforeIdentifier = this.documentDecorator.matchWordRangeAtPosition(diagnosisStart, false);
+        if (wordRangeBeforeIdentifier === undefined) {
+            throw new Error(`Could not find word range before identifier at ${diagnosisStart.line}:${diagnosisStart.character}`);
+        }
         return this.documentDecorator.getText(wordRangeBeforeIdentifier);
     }
 

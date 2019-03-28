@@ -10,7 +10,7 @@ export class VerificationRequest {
     public timeFinished: number = 0;
 
     constructor(public source: string, public document: TextDocument, public verb: string,
-                public callback: ((data: any) => any), public error: ((data: any) => any)) {
+                public callback?: ((data: any) => any), public error?: ((data: any) => any)) {
         this.timeCreated = Date.now();
 
         const lines: string[] = source.split(EnvironmentConfig.NewLine);

@@ -6,16 +6,17 @@ import { WorkSpaceRenameHolder } from "./WorkSpaceRenameHolder";
 
 export class DafnyRenameProvider {
     public constructor(public server: DafnyServer) { }
-    public provideRenameEdits(document: TextDocument, position: Position, newName: string): Thenable<WorkspaceEdit> {
-        return this.provideRenameInternal(newName, document, position).then((definitionInfo: WorkspaceEdit) => {
-            if (definitionInfo != null) {
-                return definitionInfo;
+    public async provideRenameEdits(document: TextDocument, position: Position, newName: string): Promise<WorkspaceEdit> {
+        try {
+            const definitionInfo = await this.provideRenameInternal(newName, document, position);
+            if (!definitionInfo) {
+                throw new Error("No Definition Information provided");
             }
-            return null;
-        }, (err) => {
+            return definitionInfo;
+        } catch (err) {
             console.error(err);
-            return null;
-        });
+            throw err;
+        }
     }
 
     private provideRenameInternal(newName: string, document: TextDocument, position: Position): Promise<WorkspaceEdit> {

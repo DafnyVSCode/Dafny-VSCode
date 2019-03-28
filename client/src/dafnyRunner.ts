@@ -18,15 +18,12 @@ export class DafnyRunner {
 
     private getCommand(filename: string): string {
         const executable = filename.replace(".dfy", ".exe");
-        const monoPath: string = this.config.get<string>(Config.MonoPath);
+        const monoPath: string = this.config.get<string>(Config.MonoPath, "mono");
         const useMono: boolean = this.config.get<boolean>(Config.UseMono) || os.platform() !== EnvironmentConfig.Win32;
         if (!useMono) {
-            return "& " + '"' + executable + '"';
+            return `& "${executable}"`; // TODO: this is not safe for "creative" paths.
         } else {
-            if (monoPath) {
-                return monoPath + " " + '"' + executable + '"';
-            }
-            return "mono " + executable;
+            return `${monoPath} "${executable}"`; // TODO: this is not safe for "creative" paths.
         }
     }
 }

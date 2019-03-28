@@ -11,14 +11,14 @@ export class DocumentIterator {
     public currentChar: string;
     public isValidPosition: boolean = true;
 
-    constructor(documentDecorator: DocumentDecorator, startPosition: Position = null) {
+    constructor(documentDecorator: DocumentDecorator, startPosition?: Position) {
         this.documentDecorator = documentDecorator;
-        if (startPosition) {
-            this.lineIndex = startPosition.line;
-            this.charIndex = startPosition.character;
-            this.currentLine = this.documentDecorator.documentLines[this.lineIndex];
-            this.currentChar = this.currentLine.charAt(this.charIndex);
-        }
+
+        const position = startPosition ? startPosition : Position.create(0, 0);
+        this.lineIndex = position.line;
+        this.charIndex = position.character;
+        this.currentLine = this.documentDecorator.documentLines[this.lineIndex];
+        this.currentChar = this.currentLine.charAt(this.charIndex);
     }
 
     public skipChar() {

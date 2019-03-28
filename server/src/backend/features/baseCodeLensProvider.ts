@@ -2,24 +2,28 @@
 import { TextDocument } from "vscode-languageserver";
 import { DafnyServer } from "../dafnyServer";
 import { ReferencesCodeLens } from "./codeLenses";
-import { DafnySymbol } from "./symbols";
 import { SymbolTable } from "./SymbolTable";
 export class DafnyBaseCodeLensProvider {
     private enabled: boolean = true;
 
     public constructor(public server: DafnyServer) {}
-    public provideCodeLenses(document: TextDocument): Promise<ReferencesCodeLens[]> {
+    public async provideCodeLenses(document: TextDocument): Promise<ReferencesCodeLens[]> {
         if (!this.enabled || !document) {
-            return Promise.resolve([]);
+            return [];
         }
-        return this.server.symbolService.getSymbols(document)
-        .then((symbolTables: SymbolTable[]) => {
-            return symbolTables.find((table: SymbolTable) => table.fileName === document.uri).symbols
-                .filter((info: DafnySymbol) => info.needsCodeLens())
-                .map((info: DafnySymbol) => new ReferencesCodeLens(info));
-        }).catch((err: Error) => {
+
+        try {
+            const symbolTables = await this.server.symbolService.getSymbols(document);
+            const symbolTable = symbolTables.find((table: SymbolTable) => table.fileName === document.uri);
+            if (!symbolTable) {
+                return [];
+            }
+            return symbolTable.symbols
+                .filter((symbol) => symbol.needsCodeLens())
+                .map((symbol) => new ReferencesCodeLens(symbol));
+        } catch (err) {
             console.error(err);
             return [];
-        });
+        }
     }
 }

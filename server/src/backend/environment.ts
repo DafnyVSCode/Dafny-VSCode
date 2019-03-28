@@ -53,7 +53,7 @@ export class Environment {
     public getMonoPath(): string {
         let monoPath: string = this.dafnySettings.monoPath;
         const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
-        const monoAtConfigPath: boolean = this.dafnySettings.monoPath && this.testCommand(monoPath);
+        const monoAtConfigPath: boolean = this.dafnySettings.monoPath !== "" && this.testCommand(monoPath);
         if (monoInSystemPath && !monoAtConfigPath) {
             monoPath = EnvironmentConfig.Mono;
         } else if (!monoInSystemPath && !monoAtConfigPath) {
@@ -91,7 +91,7 @@ export class Environment {
             return new Command(baseCommand, args);
         } else {
             const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
-            const monoAtConfigPath: boolean = this.dafnySettings.monoPath && this.testCommand(monoPath);
+            const monoAtConfigPath: boolean = !!this.dafnySettings.monoPath && this.testCommand(monoPath);
             if (monoInSystemPath && !monoAtConfigPath) {
                 if (this.dafnySettings.monoPath) {
                     this.notificationService.sendWarning(WarningMsg.MonoPathWrong);
@@ -99,7 +99,7 @@ export class Environment {
                 monoPath = EnvironmentConfig.Mono;
             } else if (!monoInSystemPath && !monoAtConfigPath) {
                 this.notificationService.sendError(ErrorMsg.NoMono);
-                const command: Command = new Command();
+                const command: Command = new Command("");
                 command.notFound = true;
                 return command;
             }

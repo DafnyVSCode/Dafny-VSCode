@@ -1,8 +1,10 @@
+import { IGeneralVerificationResult } from "./IGeneralVerificationResult";
 import { VerificationStatus } from "./verificationResults";
-export class VerificationResult {
-    public verificationStatus: VerificationStatus;
-    public proofObligations: number;
-    public errorCount: number;
-    public crashed: boolean = false;
-    public counterModel: any;
+
+export class VerificationResult implements IGeneralVerificationResult {
+    public verificationStatus: VerificationStatus | undefined;
+    public readonly crashed: boolean = false;
+
+    constructor(public counterModel: any, public errorCount: number, public proofObligations: number) {
+    }
 }

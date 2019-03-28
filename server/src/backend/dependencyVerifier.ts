@@ -7,14 +7,15 @@ import { Command } from "./Command";
 import { IDafnySettings } from "./dafnySettings";
 import { Environment } from "./environment";
 
+// TODO: This file should be reimplemented and the dafny process / parsing abstracted cleanly.
 export class DependencyVerifier {
 
     private version = "VERSION:";
 
-    private serverProc: ProcessWrapper;
-    private callbackSuccess: (serverVersion: string) => any;
-    private callbackError: (error: any) => any;
-    private serverVersion: string;
+    private serverProc?: ProcessWrapper;
+    private callbackSuccess?: (serverVersion: string) => any;
+    private callbackError?: (error: any) => any;
+    private serverVersion?: string;
 
     public verifyDafnyServer(rootPath: string, notificationService: NotificationService, dafnySettings: IDafnySettings,
                              callbackSuccess: (serverVersion: string) => any, callbackError: (error: any) => any) {
@@ -32,28 +33,28 @@ export class DependencyVerifier {
             this.serverProc = this.spawnNewProcess(command, spawnOptions);
             this.serverProc.sendRequestToDafnyServer("", "version");
         } catch (e) {
-            this.callbackError(e);
+            this.callbackError!(e);
         }
     }
 
     private spawnNewProcess(dafnyCommand: Command, options: cp.SpawnOptions): ProcessWrapper {
         const process = cp.spawn(dafnyCommand.command, dafnyCommand.args, options);
-        process.on("error", (e) => { this.callbackError(e); });
+        process.on("error", (e) => { this.callbackError!(e); });
         process.on("exit", (e) => { this.handleProcessExit(e); });
-        process.stdin.on("error", (e) => { this.callbackError(e); });
+        process.stdin.on("error", (e) => { this.callbackError!(e); });
 
         return new ProcessWrapper(process,
-            (err: Error) => { this.callbackError(err); },
+            (err: Error) => { this.callbackError!(err); },
             () => {
                 try {
-                    if (this.serverProc.outBuf.indexOf(this.version) > -1) {
-                        const start = this.serverProc.outBuf.indexOf(this.version);
-                        const end = this.serverProc.outBuf.indexOf("\n", start);
-                        this.serverVersion = this.serverProc.outBuf.substring(start + this.version.length, end);
-                        this.serverProc.sendQuit();
+                    if (this.serverProc!.outBuf.indexOf(this.version) > -1) {
+                        const start = this.serverProc!.outBuf.indexOf(this.version);
+                        const end = this.serverProc!.outBuf.indexOf("\n", start);
+                        this.serverVersion = this.serverProc!.outBuf.substring(start + this.version.length, end);
+                        this.serverProc!.sendQuit();
                     }
                 } catch (e) {
-                    this.callbackError(e);
+                    this.callbackError!(e);
                 }
             },
             (code: number) => {
@@ -64,9 +65,9 @@ export class DependencyVerifier {
 
     private handleProcessExit(code: number) {
         if (code !== 0) {
-            this.callbackError(code);
+            this.callbackError!(code);
         } else {
-            this.callbackSuccess(this.serverVersion);
+            this.callbackSuccess!(this.serverVersion!);
         }
     }
 }

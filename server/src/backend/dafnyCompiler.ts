@@ -3,19 +3,19 @@ import * as cp from "child_process";
 import Uri from "vscode-uri";
 import { NotificationService } from "../notificationService";
 import { Command } from "./Command";
-import { CompilerResult } from "./CompilerResult";
 import { Context } from "./context";
 import { IDafnySettings } from "./dafnySettings";
 import { Environment } from "./environment";
+import { ICompilerResult } from "./ICompilerResult";
 
 export class DafnyCompiler {
 
     constructor(private notificationService: NotificationService, private context: Context, private settings: IDafnySettings) {
     }
 
-    public compile(uri: Uri): Promise<CompilerResult> {
+    public compile(uri: Uri): Promise<ICompilerResult> {
 
-        return new Promise<CompilerResult>((resolve, reject) => {
+        return new Promise<ICompilerResult>((resolve, reject) => {
             let executable = false;
             const environment: Environment = new Environment(this.context.rootPath, this.notificationService, this.settings);
             const dafnyCommand: Command = environment.getDafnyExe();

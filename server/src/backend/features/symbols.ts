@@ -7,14 +7,14 @@ export enum SymbolType {
 }
 export class DafnySymbol {
     public column: number;
-    public endColumn: number;
+    public endColumn: number | undefined;
     public line: number;
-    public endLine: number;
+    public endLine: number | undefined;
     public module: string;
     public name: string;
     public position: number;
-    public endPosition: number;
-    public symbolType: SymbolType;
+    public endPosition: number | undefined;
+    public symbolType: SymbolType | undefined;
     public parentClass: string;
     public References: Reference[];
     public start: Position;
@@ -24,8 +24,8 @@ export class DafnySymbol {
     public document: TextDocument;
     public requires: string[];
     public ensures: string[];
-    public referencedClass: string;
-    public referencedModule: string;
+    public referencedClass: string | undefined;
+    public referencedModule: string | undefined;
 
     constructor(symbol: any, document: TextDocument) {
         this.column = adjustDafnyColumnPositionInfo(symbol.Column);
@@ -94,14 +94,17 @@ export class DafnySymbol {
             this.isOfType([SymbolType.Field, SymbolType.Method]) &&
             this.name !== DafnyKeyWords.ConstructorMethod;
     }
-    public isDefinitionFor(word: string, position: Position = null): boolean {
+    public isDefinitionFor(word: string, position?: Position): boolean {
         return this.isTypeAt(word, SymbolType.Definition, position);
 
     }
-    public isField(word: string, position: Position = null): boolean {
+    public isField(word: string, position?: Position): boolean {
         return this.isTypeAt(word, SymbolType.Field, position);
     }
     public isDefiningClassForFieldType(symbol: DafnySymbol): boolean {
+        if (!symbol.referencedClass || !symbol.referencedModule) {
+            throw new Error(`The symbol type of symbol "${symbol.name}" was not set before checking for defining class for field type`);
+        }
         return this.isOfType([SymbolType.Class]) && this.hasName(symbol.referencedClass) && this.hasModule(symbol.referencedModule);
     }
     public containsPosition(uri: string, position: Position): boolean {
@@ -121,6 +124,9 @@ export class DafnySymbol {
             && this.name.includes(word) && this.hasParentClass(parentClass);
     }
     public isOfType(types: SymbolType[]): boolean {
+        if (!this.symbolType) {
+            throw new Error(`The symbol type of symbol "${this.name}" was not set before checking for specific types`);
+        }
         return types.includes(this.symbolType);
     }
     private isDefinedInSameClass(symbol: DafnySymbol): boolean {
@@ -147,9 +153,9 @@ export class DafnySymbol {
         return clauseHolder;
     }
 
-    private isTypeAt(word: string, type: SymbolType, position: Position = null): boolean {
+    private isTypeAt(word: string, type: SymbolType, position?: Position): boolean {
         const isTypeOfName = this.isOfType([type]) && this.hasName(word);
-        if (position !== null) {
+        if (position) {
             return isTypeOfName && containsPosition(this.range, position);
         }
         return isTypeOfName;

@@ -20,13 +20,16 @@ export class GuardCommandGenerator extends BaseCommandGenerator {
         });
     }
 
-    protected findBestEffortInsertPosition(): Position {
+    protected findBestEffortInsertPosition(): Position | null {
+        if (!this.documentDecorator) {
+            throw new Error("Document Decorator was not available to find best effort insert position");
+        }
         return this.documentDecorator.tryFindBeginOfBlock(this.diagnostic.range.start);
     }
 
     protected findExactInsertPosition(definingMethod: DafnySymbol): Position {
-        if (definingMethod === null) {
-            return null;
+        if (!this.documentDecorator) {
+            throw new Error("Document Decorator was not available to find insert position");
         }
         return this.documentDecorator.findInsertionPointOfContract(definingMethod.start, this.diagnostic.range.start);
     }
@@ -36,6 +39,10 @@ export class GuardCommandGenerator extends BaseCommandGenerator {
             return;
         }
         const definingMethod = methodAt(symbols, this.diagnostic.range);
+        if (!definingMethod) {
+            throw new Error(`Could not find defining method to add guard ${guardKeyWord}`);
+        }
+
         const guardedExpression = this.parseGuardedExpression(guardKeyWord);
         const insertPosition: Position = this.findInsertionPosition(definingMethod);
         if (insertPosition && insertPosition !== this.dummyPosition) {

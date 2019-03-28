@@ -6,6 +6,7 @@ import { isPositionInString } from "./../strings/stringUtils";
 import { DocumentIterator } from "./documentIterator";
 import { translate } from "./positionHelper";
 import { ensureValidWordDefinition, getWordAtText, matchWordAtText } from "./wordHelper";
+
 export class DocumentDecorator {
 
     public documentLines: string[];
@@ -105,26 +106,27 @@ export class DocumentDecorator {
             vscode.Position.create(currentLine, positionOfInsertion +  insertBefore.length));
 
     }
-    public readArrayExpression(arrayPosition: vscode.Position): vscode.Range {
+    public readArrayExpression(arrayPosition: vscode.Position): vscode.Range | null {
         const position = this.validatePosition(arrayPosition);
         const iterator = new DocumentIterator(this, position);
         const exprStartChar = "[";
         const exprEndChar = "]";
         let openCount = 0;
         let closedCount = 0;
-        let start: vscode.Position = null;
-        const range: vscode.Range = null;
+        let start: vscode.Position;
         iterator.skipToChar(exprStartChar);
         if (iterator.isValidPosition) {
             openCount = 1;
             start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         } else {
-            return range;
+            console.warn("Could not read array, as the iterator start is an invalid position");
+            return null;
         }
         while (openCount !== closedCount) {
             iterator.skipChar();
             if (!iterator.isValidPosition) {
-                return range;
+                console.warn(`Could not read array, as the iterator position ${iterator} is at an invalid position`);
+                return null;
             }
             if (iterator.currentChar === exprStartChar) {
                 openCount++;
@@ -137,9 +139,10 @@ export class DocumentDecorator {
                 return vscode.Range.create(start, end);
             }
         }
-        return range;
+        console.warn("Could not read array, as the end is an unknown position");
+        return null;
     }
-    public matchWordRangeAtPosition(rangePosition: vscode.Position, adjust: boolean = true): vscode.Range {
+    public matchWordRangeAtPosition(rangePosition: vscode.Position, adjust: boolean = true): vscode.Range | undefined {
         const position = this.validatePosition(rangePosition);
         const wordAtText = matchWordAtText(
             position.character + 1,
@@ -158,7 +161,7 @@ export class DocumentDecorator {
         }
         return undefined;
     }
-    public getWordRangeAtPosition(wordRangePosition: vscode.Position, regexp?: RegExp): vscode.Range {
+    public getWordRangeAtPosition(wordRangePosition: vscode.Position, regexp?: RegExp): vscode.Range | undefined {
         const position = this.validatePosition(wordRangePosition);
         const wordAtText = getWordAtText(
             position.character + 1,
@@ -188,16 +191,19 @@ export class DocumentDecorator {
         }
         // matches if a point is between the identifer and the word before it -> its a method call
         const match = seperator.match(/\w*\.\w*/);
-        return match && match.length > 0;
+        return !!match && match.length > 0;
     }
 
-    public getFullyQualifiedNameOfCalledMethod(position: vscode.Position): string {
+    public getFullyQualifiedNameOfCalledMethod(position: vscode.Position): string | undefined {
         const wordRange = this.matchWordRangeAtPosition(position, false);
+        if (wordRange === undefined) {
+           return undefined;
+        }
         const call = this.getText(wordRange);
         return call;
     }
 
-    public getValidIdentifierOrNull(position: vscode.Position): string {
+    public getValidIdentifierOrNull(position: vscode.Position): string | null {
         const lineText = this.lineAt(position);
         const wordRange = this.getWordRangeAtPosition(position);
         const word = wordRange ? this.getText(wordRange) : "";
@@ -213,19 +219,18 @@ export class DocumentDecorator {
         return wordRange ? this.getText(wordRange) : "";
     }
 
-    public findBeginOfContractsOfMethod(beginPosition: vscode.Position): vscode.Position {
+    public findBeginOfContractsOfMethod(beginPosition: vscode.Position): vscode.Position | null {
         const position = this.validatePosition(beginPosition);
         const iterator = new DocumentIterator(this, position);
         const paramsEndToken = ")";
         const paramsStartToken = "(";
         let openCount = 0;
         let closedCount = 0;
-        let start: vscode.Position = null;
         iterator.skipToChar(paramsStartToken);
         if (!iterator.isValidPosition) {
-            return start;
+            return null;
         }
-        start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
+        const start = vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1 + this.boogieCharOffset);
         openCount = 1;
         while (openCount !== closedCount) {
             iterator.skipChar();
@@ -265,12 +270,15 @@ export class DocumentDecorator {
         return start;
     }
 
-    public findInsertionPointOfContract(memberStart: vscode.Position, lastDependentDeclaration: vscode.Position = null) {
+    public findInsertionPointOfContract(memberStart: vscode.Position, lastDependentDeclaration: vscode.Position | null = null): vscode.Position {
         const startOfTopLevelContracts = this.findBeginOfContractsOfMethod(memberStart);
+        if (startOfTopLevelContracts === null) {
+            throw new Error("Start of top level contracts could not be found");
+        }
         if (!lastDependentDeclaration) {
             return startOfTopLevelContracts;
         }
-        const iterator = new DocumentIterator(this, startOfTopLevelContracts);
+        const iterator = new DocumentIterator(this, startOfTopLevelContracts || undefined); // TODO: Does it make sense to pass a undefined value here or just stop?
         while (iterator.isInfrontOf(lastDependentDeclaration)) {
             iterator.skipChar();
             iterator.skipToChar("{");
@@ -282,16 +290,16 @@ export class DocumentDecorator {
 
     }
 
-    public tryFindBeginOfBlock(beginPosition: vscode.Position): vscode.Position {
+    public tryFindBeginOfBlock(beginPosition: vscode.Position): vscode.Position | null {
         const position = this.validatePosition(beginPosition);
         const blockStartToken = ")";
-        const start: vscode.Position = null;
+        const start: vscode.Position | null = null;
         const iterator = new DocumentIterator(this, position);
         iterator.moveBackToChar(blockStartToken);
         if (iterator.isValidPosition) {
             return vscode.Position.create(iterator.lineIndex, iterator.charIndex + 1);
         }
-        return start;
+        return start; // TODO: This makes no sense, start is *always* null!
     }
 
     public parseArrayIdentifier(arrayPosition: vscode.Position): string {

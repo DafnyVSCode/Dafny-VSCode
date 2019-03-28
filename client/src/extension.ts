@@ -2,7 +2,6 @@
 
 import { platform } from "os";
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient";
 import { Context } from "./context";
 import { DafnyClientProvider } from "./dafnyProvider";
 import { DafnyRunner } from "./dafnyRunner";
@@ -12,7 +11,6 @@ import { EnvironmentConfig, ErrorMsg, LanguageServerNotification, WarningMsg } f
 import Commands from "./ui/commands";
 import Notifications from "./ui/notifications";
 
-let languageServer: LanguageClient = null;
 let provider: DafnyClientProvider;
 const runner: DafnyRunner = new DafnyRunner();
 
@@ -46,7 +44,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
         return;
     }
 
-    languageServer = new DafnyLanguageClient(extensionContext);
+    const languageServer = new DafnyLanguageClient(extensionContext);
 
     languageServer.onReady().then(() => {
         provider = new DafnyClientProvider(extensionContext, languageServer);

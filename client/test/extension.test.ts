@@ -8,15 +8,15 @@ import * as assert from "assert";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Context } from "../src/context";
-import { VerificationResult } from "../src/verificationResult";
+import { IVerificationResult } from "../src/IVerificationResult";
 
 const extensionID = "correctnessLab.dafny-vscode";
-const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
+const samplesFolder = vscode.extensions.getExtension(extensionID)!.extensionPath + "/test/sampleFolder/";
 
 export class UnitTestCallback {
     // tslint:disable-next-line:no-empty
     public backendStarted = () => {};
-    public verificationComplete = (verificationResult: VerificationResult) => {
+    public verificationComplete = (verificationResult: IVerificationResult) => {
         log("Status:" + verificationResult.verificationStatus.toString());
     }
     // tslint:disable-next-line:no-empty
@@ -49,7 +49,7 @@ async function waitForVerification(fileName: string, expectedResult: any): Promi
 
 async function waitForCounterExample(fileName: string, isCounterModelEmpty: boolean): Promise<void> {
     const counterModel: any = await new Promise((resolve) => {
-        Context.unitTest.verificationComplete = (verificationResult1: VerificationResult) => {
+        Context.unitTest.verificationComplete = (verificationResult1: IVerificationResult) => {
             log("CounterExample finished: " + fileName);
             log(JSON.stringify(verificationResult1.counterModel));
             resolve(verificationResult1.counterModel);

@@ -8,16 +8,16 @@ import {DafnySymbol, SymbolType } from "./symbols";
 export class DafnyCompletionProvider {
     public constructor(public server: DafnyServer) { }
 
-    public provideCompletion(handler: TextDocumentPositionParams): Promise<CompletionItem[]> {
+    public async provideCompletion(handler: TextDocumentPositionParams): Promise<CompletionItem[]> {
         const document =  this.server.symbolService.getTextDocument(handler.textDocument.uri);
         const word = this.parseWordForCompletion(document, handler.position);
-        return this.server.symbolService.getAllSymbols(document).then((allSymbols: DafnySymbol[]) => {
-            const  definition: DafnySymbol = allSymbols.find((e: DafnySymbol) => e.isDefinitionFor(word));
-            if (definition) {
-                return this.provideExactCompletions(allSymbols, definition);
-            }
-            return this.provideBestEffortCompletion(allSymbols, word);
-        });
+        const allSymbols = await this.server.symbolService.getAllSymbols(document);
+        const definition = allSymbols.find((e) => e.isDefinitionFor(word));
+
+        if (definition) {
+            return this.provideExactCompletions(allSymbols, definition);
+        }
+        return this.provideBestEffortCompletion(allSymbols, word);
     }
 
     private provideExactCompletions(symbols: DafnySymbol[], definition: DafnySymbol): CompletionItem[] {
@@ -28,7 +28,7 @@ export class DafnyCompletionProvider {
 
     private provideBestEffortCompletion(symbols: DafnySymbol[], word: string): CompletionItem[] {
         const fields: DafnySymbol[] = symbols.filter((e: DafnySymbol) => e.isField(word));
-        const definingClass: DafnySymbol = this.findDefiningClassForField(symbols, fields);
+        const definingClass = this.findDefiningClassForField(symbols, fields);
         if (definingClass) {
             const possibleSymbolForCompletion: DafnySymbol[] = symbols.filter(
                 (symbol: DafnySymbol) => symbol.canProvideCodeCompletionForClass(definingClass));
@@ -37,7 +37,7 @@ export class DafnyCompletionProvider {
         return [];
     }
 
-    private findDefiningClassForField(symbols: DafnySymbol[], fields: DafnySymbol[]): DafnySymbol {
+    private findDefiningClassForField(symbols: DafnySymbol[], fields: DafnySymbol[]): DafnySymbol | undefined {
         return symbols.find((e: DafnySymbol) => {
             for (const field of fields) {
                 if (e.isDefiningClassForFieldType(field)) {

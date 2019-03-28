@@ -35,7 +35,7 @@ export default class Notifications {
     }
 
     public askToInstall(text: string) {
-        vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value: string) => {
+        vscode.window.showInformationMessage(text, Answer.Yes, Answer.No).then((value) => {
             if (Answer.Yes === value) {
                 this.commands.installDafny();
             }

@@ -15,13 +15,17 @@ export class DotGraphProvider implements vscode.TextDocumentContentProvider {
 
     public provideTextDocumentContent(_: vscode.Uri): Thenable<string> {
         return new Promise((resolve, reject) => {
-            const textDocument = vscode.window.activeTextEditor.document;
+            const editor = vscode.window.activeTextEditor;
+            if (!editor) {
+                return reject("No open Editor Window to provide Text Document Content");
+            }
+            const textDocument = editor.document;
             const tditem = JSON.stringify(TextDocumentItem.create(textDocument.uri.toString(),
                 textDocument.languageId, textDocument.version, textDocument.getText()));
-            const filename = vscode.window.activeTextEditor.document.uri.fsPath.split("/").pop().split("\\").pop();
+            const filename = editor.document.uri.fsPath.split("/").pop()!.split("\\").pop()!; // TODO: The OS specific separator should be used.
             console.log("**/*" + filename + "*.dot");
             this.languageServer.sendRequest(LanguageServerRequest.Dotgraph, tditem).then(() => {
-                vscode.workspace.findFiles("**/*" + filename + "*.dot", "**/node_modules/**").then((files) => {
+                vscode.workspace.findFiles("**/*" + filename + "*.dot", "**/node_modules/**").then((files) => { // TODO: Is this safe to search by filename?
                     let graphs = "";
                     for (const file of files) {
                         const filecontent = this.getSvgContent(file.fsPath);

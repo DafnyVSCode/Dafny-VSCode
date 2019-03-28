@@ -10,7 +10,7 @@ import * as vscode from "vscode";
 import { Context } from "../src/context";
 
 const extensionID = "correctnessLab.dafny-vscode";
-const samplesFolder = vscode.extensions.getExtension(extensionID).extensionPath + "/test/sampleFolder/";
+const samplesFolder = vscode.extensions.getExtension(extensionID)!.extensionPath + "/test/sampleFolder/";
 
 export class UnitTestCallback {
     // tslint:disable:no-empty

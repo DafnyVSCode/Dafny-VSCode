@@ -3,35 +3,38 @@
 import {
     CodeActionParams, CodeLens, CodeLensParams,
     createConnection, IConnection, InitializeResult, IPCMessageReader,
-    IPCMessageWriter, Location, RenameParams, TextDocument,
-    TextDocumentItem, TextDocumentPositionParams, TextDocuments, WorkspaceEdit,
+    IPCMessageWriter, RenameParams, ResponseError,
+    TextDocument, TextDocumentItem, TextDocumentPositionParams, TextDocuments,
 } from "vscode-languageserver";
 import Uri from "vscode-uri";
-import { CompilerResult } from "./backend/CompilerResult";
 import { DafnyInstaller } from "./backend/dafnyInstaller";
 import { IDafnySettings } from "./backend/dafnySettings";
 import { DependencyVerifier } from "./backend/dependencyVerifier";
 import { ReferencesCodeLens } from "./backend/features/codeLenses";
+import { ICompilerResult } from "./backend/ICompilerResult";
+import ServerNotReadyResponseError from "./errors/ServerNotReadyResponseError";
 import { DafnyServerProvider } from "./frontend/dafnyProvider";
 import { NotificationService } from "./notificationService";
 import { InfoMsg } from "./strings/stringRessources";
 import { LanguageServerNotification, LanguageServerRequest } from "./strings/stringRessources";
 
+const MAX_CONNECTION_RETRIES = 30;
+
 const connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
 const documents: TextDocuments = new TextDocuments();
 const codeLenses: { [codeLens: string]: ReferencesCodeLens; } = {};
-let settings: ISettings = null;
+let settings: ISettings;
 let started: boolean = false;
-let notificationService: NotificationService = null;
-let dafnyInstaller: DafnyInstaller = null;
+let notificationService: NotificationService;
+let dafnyInstaller: DafnyInstaller;
 
 documents.listen(connection);
 
 let workspaceRoot: string;
-let provider: DafnyServerProvider = null;
+let provider: DafnyServerProvider;
 
 connection.onInitialize((params): InitializeResult => {
-    workspaceRoot = params.rootPath;
+    workspaceRoot = params.rootPath!; // TODO: This line is probably the main reason why only workspaces can be opened.
     notificationService = new NotificationService(connection);
     return {
         capabilities: {
@@ -91,25 +94,24 @@ function verifyAll() {
     }
 }
 
-connection.onRenameRequest((handler: RenameParams): Thenable<WorkspaceEdit> => {
+connection.onRenameRequest((handler: RenameParams) => {
     if (provider && provider.renameProvider) {
         return provider.renameProvider.provideRenameEdits(documents.get(handler.textDocument.uri), handler.position, handler.newName);
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return new ServerNotReadyResponseError();
 });
 
-connection.onDefinition((handler: TextDocumentPositionParams): Thenable<Location> => {
+connection.onDefinition((handler: TextDocumentPositionParams) => {
     if (provider && provider.definitionProvider) {
         return provider.definitionProvider.provideDefinition(documents.get(handler.textDocument.uri), handler.position);
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return new ServerNotReadyResponseError();
 });
 
-const MAX_RETRIES = 30;
 function waitForServer(handler: CodeLensParams) {
     return new Promise(async (resolve, reject) => {
         let tries = 0;
-        while (!(provider && provider.referenceProvider) && tries < MAX_RETRIES) {
+        while (!(provider && provider.referenceProvider) && tries < MAX_CONNECTION_RETRIES) {
             await sleep(2000);
             tries++;
         }
@@ -152,7 +154,7 @@ connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> =
     }
 });
 
-connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
+connection.onCodeLensResolve((handler: CodeLens) => {
 
     if (provider && provider.referenceProvider) {
         const item = codeLenses[JSON.stringify(handler)];
@@ -160,9 +162,10 @@ connection.onCodeLensResolve((handler: CodeLens): Promise<CodeLens> => {
             return provider.referenceProvider.resolveCodeLens(item);
         } else {
             console.error("key not found ");
+            return new ResponseError(9903, "Could not resolve CodeLens: Key not Found");
         }
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return new ServerNotReadyResponseError();
 });
 
 interface ISettings {
@@ -181,21 +184,21 @@ connection.onDidCloseTextDocument((handler) => {
     connection.sendDiagnostics({ diagnostics: [], uri: handler.textDocument.uri });
 });
 
-connection.onRequest<CompilerResult, void>(LanguageServerRequest.Compile, (uri: Uri): Thenable<CompilerResult> => {
+connection.onRequest<ICompilerResult, void>(LanguageServerRequest.Compile, (uri: Uri) => {
     if (provider && provider.compiler) {
         return provider.compiler.compile(uri);
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return new ServerNotReadyResponseError();
 });
 
-connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string): Thenable<void> => {
+connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string) => {
     const textDocumentItem: TextDocumentItem = JSON.parse(json);
     const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
         textDocumentItem.version, textDocumentItem.text);
     if (provider) {
         return provider.dotGraph(textDocument);
     }
-    return null;
+    return new ServerNotReadyResponseError();
 });
 
 connection.onRequest<string, void>(LanguageServerRequest.Install, () => {
@@ -229,7 +232,7 @@ function uninstallDafny(): Promise<void> {
             provider.stop();
             await sleep(1000);
             let tries = 0;
-            while (provider && provider.dafnyServer.isRunning() && tries < MAX_RETRIES) {
+            while (provider && provider.dafnyServer.isRunning() && tries < MAX_CONNECTION_RETRIES) {
                 await sleep(1000);
                 tries++;
             }
@@ -277,14 +280,14 @@ connection.onCodeAction((params: CodeActionParams) => {
     if (provider && provider.codeActionProvider) {
         return provider.codeActionProvider.provideCodeAction(params);
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return Promise.resolve([]);
 });
 
 connection.onCompletion((handler: TextDocumentPositionParams) => {
     if (provider && provider.completionProvider) {
         return provider.completionProvider.provideCompletion(handler);
     }
-    return null; // TODO: This probably never happens, but should be handled differently either way (not thenable)
+    return Promise.resolve([]);
 });
 
 connection.listen();

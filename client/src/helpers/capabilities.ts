@@ -29,7 +29,7 @@ export default class Capabilities {
         try {
             const monoVersionOutput = execFileSync(monoBinary, ["--version"]);
             const monoVersion = /compiler version (\d+)\.(\d+)\.(\d+)/i
-                .exec(monoVersionOutput).slice(1).map((str) => Number(str));
+                .exec(monoVersionOutput)!.slice(1).map((str) => Number(str));
 
             if (monoVersion.length !== 3 || monoVersion.some((num) => isNaN(num))) {
                 log("Mono version could not be parsed from version output.");

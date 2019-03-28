@@ -33,7 +33,7 @@ export function hashString(str: string) {
 export function extractIdentifiers(expression: string): string[] {
     const identifiers: string[] = [];
     const identifiersRegex = /(\w+)/g;
-    let match: RegExpExecArray;
+    let match: RegExpExecArray | null;
     // tslint:disable-next-line:no-conditional-assignment
     while ((match = identifiersRegex.exec(expression)) !== null) {
         identifiers.push(match[0]);

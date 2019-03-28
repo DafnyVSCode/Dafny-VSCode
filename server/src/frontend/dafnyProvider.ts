@@ -22,15 +22,13 @@ export class DafnyServerProvider {
     public compiler: DafnyCompiler;
     public dafnyServer: DafnyServer;
 
-    private subscriptions: Disposable[];
+    private subscriptions: Disposable[] = [];
     private dafnyStatusbar: Statusbar;
     private context: Context;
 
     constructor(public notificationService: NotificationService, serverVersion: string, rootPath: string, settings: IDafnySettings) {
 
-        this.context = new Context(this.notificationService);
-        this.context.serverversion = serverVersion;
-        this.context.rootPath = rootPath;
+        this.context = new Context(this.notificationService, serverVersion, rootPath);
         this.dafnyStatusbar = new Statusbar(this.notificationService);
         this.dafnyServer = new DafnyServer(this.notificationService, this.dafnyStatusbar, this.context, settings);
 
@@ -76,12 +74,12 @@ export class DafnyServerProvider {
     }
 
     public dotGraph(textDocument: TextDocument): Promise<void> {
-        if (textDocument !== null && textDocument.languageId === EnvironmentConfig.Dafny) {
+        if (textDocument && textDocument.languageId === EnvironmentConfig.Dafny) {
             return new Promise<void>((resolve, reject) => {
                 this.dafnyServer.addDocument(textDocument, "dotgraph", resolve, reject);
             });
         } else {
-            return null;
+            return Promise.reject("No document to plot available");
         }
     }
 }

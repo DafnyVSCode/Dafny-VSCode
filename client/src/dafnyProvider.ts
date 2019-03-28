@@ -6,8 +6,8 @@ import { Context } from "./context";
 import { CounterModelProvider } from "./counterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
 import { DotGraphProvider } from "./dotGraphProvider";
+import { IVerificationResult } from "./IVerificationResult";
 import { CommandStrings, Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
-import { VerificationResult } from "./verificationResult";
 
 export class DafnyClientProvider {
     public dafnyStatusbar: Statusbar;
@@ -15,7 +15,7 @@ export class DafnyClientProvider {
     private docChangeVerify: boolean = false;
     private docChangeDelay: number = 0;
     private automaticShowCounterExample: boolean = false;
-    private subscriptions: vscode.Disposable[];
+    private subscriptions: vscode.Disposable[] = [];
 
     private counterModelProvider: CounterModelProvider;
     private context: Context;
@@ -32,7 +32,7 @@ export class DafnyClientProvider {
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
             (docPathName: string, json: string) => {
                 this.context.localQueue.remove(docPathName);
-                const verificationResult: VerificationResult = JSON.parse(json);
+                const verificationResult: IVerificationResult = JSON.parse(json);
                 this.context.verificationResults[docPathName] = verificationResult;
                 this.dafnyStatusbar.update();
                 this.counterModelProvider.update();
@@ -66,11 +66,17 @@ export class DafnyClientProvider {
         });
 
         vscode.commands.registerCommand(CommandStrings.ShowCounterExample, () => {
-            this.doCounterModel(vscode.window.activeTextEditor.document);
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                this.doCounterModel(editor.document);
+            }
         });
 
         vscode.commands.registerCommand(CommandStrings.HideCounterExample, () => {
-            this.hideCounterModel(vscode.window.activeTextEditor.document);
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                this.hideCounterModel(editor.document);
+            }
         });
 
         const that = this;
@@ -90,9 +96,9 @@ export class DafnyClientProvider {
 
     private loadConfig() {
         const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(EnvironmentConfig.Dafny);
-        this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification);
-        this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay);
-        this.automaticShowCounterExample = config.get<boolean>(Config.AutomaticShowCounterExample);
+        this.docChangeVerify = config.get<boolean>(Config.AutomaticVerification)!;
+        this.docChangeDelay = config.get<number>(Config.AutomaticVerificationDelay)!;
+        this.automaticShowCounterExample = config.get<boolean>(Config.AutomaticShowCounterExample)!;
     }
 
     private doCounterModel(textDocument: vscode.TextDocument): void {

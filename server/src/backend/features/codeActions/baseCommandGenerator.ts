@@ -9,7 +9,7 @@ export abstract class BaseCommandGenerator {
     protected server: DafnyServer;
     protected dummyPosition: Position = Position.create(0, 0);
     protected dummyDocId: number = -1;
-    protected documentDecorator: DocumentDecorator;
+    protected documentDecorator: DocumentDecorator | undefined;
     protected diagnostic: Diagnostic;
     protected uri: string;
     protected doc: TextDocument;
@@ -29,15 +29,18 @@ export abstract class BaseCommandGenerator {
         return this.calculateCommands();
     }
     protected abstract calculateCommands(): Promise<Command[]>;
-    protected findInsertionPosition(startSymbol: DafnySymbol = null): Position {
-        let insertPosition: Position = this.dummyPosition;
-        insertPosition = this.findExactInsertPosition(startSymbol);
+    protected findInsertionPosition(startSymbol: DafnySymbol): Position {
+        let insertPosition = this.findExactInsertPosition(startSymbol);
         if (!insertPosition || insertPosition === this.dummyPosition) {
-            insertPosition = this.findBestEffortInsertPosition();
+            const bestEffort = this.findBestEffortInsertPosition();
+            if (bestEffort === null) {
+                throw new Error("Could not find a best effort insert position");
+            }
+            insertPosition = bestEffort;
         }
         return insertPosition;
     }
 
-    protected abstract findBestEffortInsertPosition(): Position;
-    protected abstract findExactInsertPosition(startSymbol: DafnySymbol): Position;
+    protected abstract findBestEffortInsertPosition(): Position | null;
+    protected abstract findExactInsertPosition(startSymbol: DafnySymbol): Position | undefined;
 }

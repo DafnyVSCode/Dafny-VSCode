@@ -6,7 +6,7 @@ import { CommandFailedException, DafnyServerExeption } from "../errors";
 export class ProcessWrapper {
     public pid: number;
     public outBuf: string = "";
-    private serverProc: cp.ChildProcess = null;
+    private serverProc: cp.ChildProcess;
     private commandEndRegex: RegExp = /\[\[DAFNY-SERVER: EOM\]\]/;
     constructor(
         process: cp.ChildProcess,

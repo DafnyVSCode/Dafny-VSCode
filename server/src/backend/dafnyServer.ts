@@ -27,7 +27,7 @@ export class DafnyServer {
     public symbolService: SymbolService;
     private MAX_RETRIES: number = 5;
     private active: boolean = false;
-    private serverProc: ProcessWrapper;
+    private serverProc: ProcessWrapper | undefined;
     private restart: boolean = true;
     private retries: number = 0;
     constructor(private notificationService: NotificationService, private statusbar: Statusbar,
@@ -36,9 +36,9 @@ export class DafnyServer {
     }
 
     public reset(): boolean {
-        if (this.isRunning()) {
+        if (this.serverProc && this.isRunning()) {
             this.serverProc.killServerProc();
-            this.serverProc = null;
+            this.serverProc = undefined;
         }
         this.context.clear();
         if (this.restart) {
@@ -63,11 +63,11 @@ export class DafnyServer {
     }
 
     public isRunning(): boolean {
-        return this.serverProc && this.serverProc.isAlive();
+        return !!(this.serverProc) && this.serverProc.isAlive();
     }
 
     public pid(): number {
-        return this.isRunning() ? this.serverProc.pid : -1;
+        return this.isRunning() ? this.serverProc!.pid : -1;
     }
 
     public addDocument(doc: vscode.TextDocument, verb: string, callback?: ((data: any) => any), error?: ((data: any) => any)): void {
@@ -106,28 +106,32 @@ export class DafnyServer {
     }
 
     private handleProcessError(err: Error): void {
-        this.notificationService.sendError("DafnyServer process " + this.serverProc.pid + " error: " + err);
-        console.error("dafny server stdout error:" + err.message);
-        this.context.activeRequest.error(err);
+        this.notificationService.sendError(`DafnyServer process${this.serverProc!.pid} error: ${err}`);
+        console.error(`dafny server stdout error: ${err.message}`);
+        if (this.context && this.context.activeRequest && this.context.activeRequest.error) {
+            this.context.activeRequest.error(err);
+        }
 
         this.statusbar.changeServerStatus(StatusString.Idle);
         this.active = false;
-        this.context.activeRequest = null;
+        this.context.activeRequest = undefined;
         this.sendNextRequest();
     }
 
     private handleProcessData(): void {
-        if (this.isRunning() && this.serverProc.commandFinished()) {
+        if (this.isRunning() && this.serverProc !== undefined && this.serverProc.commandFinished()) {
             const log: string = this.serverProc.outBuf.substr(0, this.serverProc.positionCommandEnd());
             if (this.context.activeRequest && (this.context.activeRequest.verb === DafnyVerbs.CounterExample
                 || this.context.activeRequest.verb === DafnyVerbs.Verify)) {
                 const result = this.context.collectRequest(log);
                 this.notificationService.sendVerificationResult([this.context.activeRequest.document.uri.toString(),
                 JSON.stringify(result)]);
-                this.context.activeRequest = null;
+                this.context.activeRequest = undefined;
             } else if (this.context.activeRequest) {
-                this.context.activeRequest.callback(log);
-                this.context.activeRequest = null;
+                if (this.context.activeRequest.callback) {
+                    this.context.activeRequest.callback(log);
+                }
+                this.context.activeRequest = undefined;
             } else {
                 console.error("active request was null");
             }
@@ -141,9 +145,9 @@ export class DafnyServer {
     }
 
     private handleProcessExit() {
-        this.serverProc = null;
+        this.serverProc = undefined;
         this.notificationService.sendError(ErrorMsg.DafnyServerRestart);
-        if (this.context != null) {
+        if (this.context && this.context.activeRequest) {
             const crashedRequest: VerificationRequest = this.context.activeRequest;
             this.context.clear();
             this.context.addCrashedRequest(crashedRequest);
@@ -203,7 +207,7 @@ export class DafnyServer {
             sourceIsFile: false,
         };
         const encoded: string = encodeBase64(task);
-        if (this.isRunning()) {
+        if (this.serverProc && this.isRunning()) {
             this.serverProc.clearBuffer();
             this.serverProc.sendRequestToDafnyServer(encoded, request.verb);
         }
@@ -212,10 +216,10 @@ export class DafnyServer {
     }
 
     private sendNextRequest(): void {
-        if (!this.active && (this.context.activeRequest === null)) {
-            if (this.context.queue.peek() != null) {
+        if (!this.active && (this.context.activeRequest === undefined)) {
+            if (this.context.queue.peek()) {
                 this.active = true;
-                const request: VerificationRequest = this.context.queue.dequeue();
+                const request: VerificationRequest = this.context.queue.dequeue()!;
                 this.notificationService.sendQueueSize(this.context.queue.size());
                 this.context.activeRequest = request;
                 this.sendVerificationRequest(request);

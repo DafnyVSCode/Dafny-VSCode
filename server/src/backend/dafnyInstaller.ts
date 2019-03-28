@@ -31,7 +31,7 @@ export class DafnyInstaller {
                     console.log("Remote:" + latestVersionSemVer[0]);
                     return semver.gte(localVersionSemVer[0], latestVersionSemVer[0]);
                 } else {
-                    console.log("can't parse version numbers");
+                    console.log("Can't parse version numbers");
                     return Promise.reject(false);
                 }
             } else {
@@ -77,29 +77,34 @@ export class DafnyInstaller {
     }
 
     public downloadRelease(json: any): Promise<boolean> {
-        if (json && json.assets) {
-
-            const assets = json.assets;
-            let url = "";
-
-            if (os.platform() === EnvironmentConfig.Win32) {
-                url = this.getReleaseUrl(assets, "win");
-            } else if (os.platform() === EnvironmentConfig.OSX) {
-                url = this.getReleaseUrl(assets, "osx");
-            } else if (os.platform() === EnvironmentConfig.Ubuntu) {
-                url = this.getReleaseUrl(assets, "ubuntu");
-            }
-
-            if (url === null) {
-                return Promise.reject("Unsupported platform: " + os.platform());
-            }
-
-            return this.download(url, this.downloadFile);
-        } else {
+        if (!json || !json.assets) {
             const msg = "Could not get Dafny Release assets from JSON response.";
             console.log(msg);
             return Promise.reject(msg);
         }
+
+        let platform;
+        switch (os.platform()) {
+            case EnvironmentConfig.Win32:
+                platform = "win";
+                break;
+            case EnvironmentConfig.OSX:
+                platform = "osx";
+                break;
+            case EnvironmentConfig.Ubuntu:
+                platform = "ubuntu";
+                break;
+        }
+        if (!platform) {
+            return Promise.reject(`Unsupported platform: "${os.platform()}"`);
+        }
+
+        const url = this.getReleaseUrl(json.assets, platform);
+        if (!url) {
+            return Promise.reject(`Could not find dafny release for platform "${platform}"`);
+        }
+
+        return this.download(url, this.downloadFile);
     }
 
     public prepareDafny(): Promise<string> {
@@ -148,13 +153,13 @@ export class DafnyInstaller {
         return pathHelper.resolve(str);
     }
 
-    private getReleaseUrl(assets: any, platform: string): string {
+    private getReleaseUrl(assets: any[], platform: string): string | undefined {
         for (const asset of assets) {
             if (asset.name.indexOf(platform) !== -1) {
                 return asset.browser_download_url;
             }
         }
-        return null;
+        return undefined;
     }
 
     private deleteFolderRecursive(path: string) {

@@ -4,7 +4,7 @@ import { IConnection, PublishDiagnosticsParams } from "vscode-languageserver";
 import { LanguageServerNotification } from "./strings/stringRessources";
 
 export class NotificationService {
-    private lastProgress: number;
+    private lastProgress: number = 0;
     constructor(private connection: IConnection) { }
 
     public sendError(message: string): void {
@@ -43,7 +43,7 @@ export class NotificationService {
         this.connection.sendNotification(LanguageServerNotification.ChangeServerStatus, status);
     }
 
-    public sendActiveVerifiyingDocument(document: string): void {
+    public sendActiveVerifiyingDocument(document: string | null): void {
         this.connection.sendNotification(LanguageServerNotification.ActiveVerifiyingDocument, document);
     }
 

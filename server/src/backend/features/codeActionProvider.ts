@@ -10,16 +10,19 @@ export class CodeActionProvider {
     public constructor(server: DafnyServer) {
         this.server = server;
     }
-    public provideCodeAction(params: CodeActionParams): Thenable<Command[]> {
+    public provideCodeAction(params: CodeActionParams): Promise<Command[]> {
         return new Promise<Command[]>((resolve) => {
-            return resolve(params.context.diagnostics.map((e: Diagnostic) => {
-               return this.getCodeActions(e, params);
-            }).reduceRight(
-                (collectorPromise: Promise<Command[]>, nextPromise: Promise<Command[]>) => collectorPromise.then(
-                    (collectorCommands: Command[]) => nextPromise.then(
-                        (nextCommands: Command[]) => collectorCommands.concat(nextCommands),
-                    ),
-                ), Promise.resolve([])));
+            const codeActions = params.context.diagnostics.map((e: Diagnostic) => {
+                return this.getCodeActions(e, params);
+            });
+
+            const command = codeActions.reduceRight(async (collectorPromise, nextPromise) => {
+                const collectorCommands = await collectorPromise;
+                const nextCommands = await nextPromise;
+                return collectorCommands.concat(nextCommands);
+            }, Promise.resolve([] as Command[]));
+
+            resolve(command);
         });
     }
 

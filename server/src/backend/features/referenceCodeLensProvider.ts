@@ -13,25 +13,23 @@ export class DafnyReferencesCodeLensProvider extends DafnyBaseCodeLensProvider {
         super(server);
     }
 
-    public resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
+    public async resolveCodeLens(inputCodeLens: CodeLens): Promise<CodeLens> {
         const codeLens = inputCodeLens as ReferencesCodeLens;
-        return this.provideReferenceInternal(codeLens).then((referenceInfo: ReferenceInformation[]) => {
-            if (!referenceInfo) {
-                return null;
-            }
+        try {
+            const referenceInfo = await this.provideReferenceInternal(codeLens);
             return this.buildReferenceCodeLens(codeLens, referenceInfo);
-        }, (err) => {
+        } catch (err) {
             codeLens.command = this.buildEmptyCommand();
             console.error(err);
             return codeLens;
-        });
+        }
     }
 
-     private provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
+     private async provideReferenceInternal(codeLens: ReferencesCodeLens): Promise<ReferenceInformation[]> {
         if (!codeLens.symbol) {
-            return null;
+            return [];
         }
-        return Promise.resolve(this.getReferences(codeLens));
+        return this.getReferences(codeLens);
     }
 
     private buildReferenceCodeLens(codeLens: ReferencesCodeLens, referenceInformation: ReferenceInformation[]): ReferencesCodeLens {

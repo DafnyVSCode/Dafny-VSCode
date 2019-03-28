@@ -5,6 +5,9 @@ export class ArrayInformation {
     public indexExpression: string;
     constructor(documentDecorator: DocumentDecorator, startPosition: Position) {
         const arrayExprRange = documentDecorator.readArrayExpression(startPosition);
+        if (arrayExprRange === null) {
+            throw new Error("Invalid Array Range during construction!");
+        }
         this.indexExpression = documentDecorator.getText(arrayExprRange);
         this.identifier = documentDecorator.parseArrayIdentifier(Position.create(arrayExprRange.start.line, arrayExprRange.start.character));
     }
