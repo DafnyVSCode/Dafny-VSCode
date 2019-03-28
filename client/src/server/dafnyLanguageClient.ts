@@ -23,7 +23,10 @@ export default class DafnyLanguageClient extends LanguageClient {
         };
 
         const clientOptions = {
-            documentSelector: ["dafny"],
+            documentSelector: [{
+                language: "dafny",
+                scheme: "file",
+            }],
             synchronize: {
                 configurationSection: "dafny",
             },
