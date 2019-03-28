@@ -33,7 +33,7 @@ export class ProcessWrapper {
     }
 
     public isAlive(): boolean {
-        return this.serverProc !== null;
+        return this.serverProc !== undefined;
     }
 
     public clearBuffer(): void {
