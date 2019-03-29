@@ -23,7 +23,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
 
     if (!Capabilities.hasSupportedMonoVersion()) {
         // Promt the user to install Mono and stop extension execution.
-        vscode.window.showErrorMessage(ErrorMsg.NoSupportedMono, ErrorMsg.ConfigureMonoPath, ErrorMsg.GetMono)
+        vscode.window.showErrorMessage(ErrorMsg.NoSupportedMono, ErrorMsg.ConfigureMonoExecutable, ErrorMsg.GetMono)
         .then((selection) => {
             if (selection === ErrorMsg.GetMono) {
                 vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(ErrorMsg.GetMonoUri));
@@ -37,7 +37,7 @@ export function activate(extensionContext: vscode.ExtensionContext) {
                 vscode.window.showWarningMessage(restartMessage);
             }
 
-            if (selection === ErrorMsg.ConfigureMonoPath) {
+            if (selection === ErrorMsg.ConfigureMonoExecutable) {
                 vscode.commands.executeCommand("workbench.action.configureLanguageBasedSettings");
             }
         });

@@ -46,20 +46,22 @@ export class Environment {
         return options;
     }
 
-    public usesNonStandardMonoPath(): boolean {
-        return this.dafnySettings.useMono && this.dafnySettings.monoPath !== "";
+    // deprecated monoPath configuration option #40
+    public usesNonStandardMonoExecutable(): boolean {
+        return this.dafnySettings.useMono && (this.dafnySettings.monoExecutable !== "" || this.dafnySettings.monoPath !== "");
     }
 
-    public getMonoPath(): string {
-        let monoPath: string = this.dafnySettings.monoPath;
-        const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
-        const monoAtConfigPath: boolean = this.dafnySettings.monoPath !== "" && this.testCommand(monoPath);
+    // deprecated monoPath configuration option #40
+    public getMonoExecutable(): string {
+        let monoExecutable = this.dafnySettings.monoExecutable || this.dafnySettings.monoPath;
+        const monoInSystemPath = this.testCommand(EnvironmentConfig.Mono);
+        const monoAtConfigPath = !!monoExecutable && this.testCommand(monoExecutable);
         if (monoInSystemPath && !monoAtConfigPath) {
-            monoPath = EnvironmentConfig.Mono;
+            monoExecutable = EnvironmentConfig.Mono;
         } else if (!monoInSystemPath && !monoAtConfigPath) {
             return "";
         }
-        return monoPath;
+        return monoExecutable;
     }
 
     /**
@@ -78,10 +80,11 @@ export class Environment {
         return this.dafnySettings.basePath;
     }
 
+     // deprecated monoPath configuration option #40
     private getCommand(commandName: string): Command {
         let baseCommand: string;
         let args: string[];
-        let monoPath: string = this.dafnySettings.monoPath;
+        let monoExecutable: string = this.dafnySettings.monoExecutable || this.dafnySettings.monoPath;
         if (commandName === undefined || commandName === "") {
             throw new IncorrectPathExeption();
         }
@@ -91,19 +94,19 @@ export class Environment {
             return new Command(baseCommand, args);
         } else {
             const monoInSystemPath: boolean = this.testCommand(EnvironmentConfig.Mono);
-            const monoAtConfigPath: boolean = !!this.dafnySettings.monoPath && this.testCommand(monoPath);
+            const monoAtConfigPath: boolean = !!monoExecutable && this.testCommand(monoExecutable);
             if (monoInSystemPath && !monoAtConfigPath) {
-                if (this.dafnySettings.monoPath) {
-                    this.notificationService.sendWarning(WarningMsg.MonoPathWrong);
+                if (monoExecutable) {
+                    this.notificationService.sendWarning(WarningMsg.MonoExecutableWrong);
                 }
-                monoPath = EnvironmentConfig.Mono;
+                monoExecutable = EnvironmentConfig.Mono;
             } else if (!monoInSystemPath && !monoAtConfigPath) {
                 this.notificationService.sendError(ErrorMsg.NoMono);
                 const command: Command = new Command("");
                 command.notFound = true;
                 return command;
             }
-            baseCommand = monoPath;
+            baseCommand = monoExecutable;
             args = [commandName];
             return new Command(baseCommand, args);
         }

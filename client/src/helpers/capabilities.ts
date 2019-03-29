@@ -13,10 +13,6 @@ export default class Capabilities {
 
     public static hasSupportedMonoVersion(): boolean {
         const useMono = Capabilities.config.get<boolean>(Config.UseMono);
-        let monoBinary = Capabilities.config.get<string>(Config.MonoPath);
-        if (!monoBinary) {
-            monoBinary = "mono";
-        }
 
         if (os.platform() === EnvironmentConfig.Win32 && !useMono) {
             // Sadly, it is not easy to find out the .NET-version on Windows.
@@ -26,8 +22,11 @@ export default class Capabilities {
             return true;
         }
 
+        const monoPath = Capabilities.config.get<string>(Config.MonoPath); // deprecated monoPath configuration option #40
+        const monoExecutable = Capabilities.config.get<string>(Config.MonoExecutable) || monoPath || "mono";
+
         try {
-            const monoVersionOutput = execFileSync(monoBinary, ["--version"]);
+            const monoVersionOutput = execFileSync(monoExecutable, ["--version"]);
             const monoVersion = /compiler version (\d+)\.(\d+)\.(\d+)/i
                 .exec(monoVersionOutput)!.slice(1).map((str) => Number(str));
 

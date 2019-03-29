@@ -135,32 +135,36 @@
             "properties": {
                 "dafny.basePath": {
                     "type": "string",
-                    "description": "Absolute path to the dafny directory, which contains the DafnyServer.exe"
+                    "description": "Absolute path to the _Dafny_ binary directory (which contains `DafnyServer.exe`)."
                 },
                 "dafny.useMono": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Only applicable to Windows; requires .net 4.0 or higher when false. Attempts to launch dafny process directly when set to false (default)."
+                    "description": "Only applicable to _Windows_! Requires _.NET_ 4.5 or higher when set to `false`."
                 },
                 "dafny.monoPath": {
                     "type": "string",
-                    "default": "",
-                    "description": "Absolute path to mono binary. Only necessary if mono is not in system PATH. Ignored on Windows when useMono is set to false."
+                    "description": "Mono binary with absolute path. Only necessary if mono is not in system PATH. Ignored on Windows when useMono is set to false.",
+                    "deprecationMessage": "Please use the dafny.monoExecutable property in the future."
+                },
+                "dafny.monoExecutable": {
+                    "type": "string",
+                    "description": "Mono executable with absolute path. Only necessary if mono is not in system PATH (you'll get an error if that's the case). Ignored on Windows when useMono is false."
                 },
                 "dafny.automaticVerification": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Verify as soon as the document is changed (default). When false, only verify on save."
+                    "description": "Verify as soon as the document is changed. When `false`, only verify on save."
                 },
                 "dafny.automaticVerificationDelayMS": {
                     "type": "number",
                     "default": 700,
-                    "description": "Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true."
+                    "description": "Delay in ms to wait after a document change before verifying document. This avoids syntax errors while typing. Only relevant if `automaticVerification` is `true`."
                 },
                 "dafny.automaticShowCounterModel": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Show countermodel if a program does not hold. Can cause much longer verification time."
+                    "description": "Show _CounterModel_ automatically if a proof fails. Might cause performance issues if `true`."
                 },
                 "dafny.serverVerifyArguments": {
                     "type": "array",

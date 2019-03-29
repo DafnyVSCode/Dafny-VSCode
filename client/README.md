@@ -11,9 +11,8 @@ This extension adds _Dafny_ support to Visual Studio Code.
   * Errors, warnings and hints are shown through the VSCode interface.
   * When there are no errors, you get a 👍 on the status bar.
 * **Syntax highlighting** thanks to [sublime-dafny](https://github.com/erggo/sublime-dafny). See file `LICENSE_sublime-dafny.rst` for license. 
+* **Display counter example** for failing proof.
 * _IntelliSense_ for classes and _CodeLens_ showing method references.
-* Display counter example for failing proof (requires _Dafny_ 1.9.15+).
-* _DafnyDefinition_ provider to support refactorings in the future.
 
 ![assertions animation](simpleassert.gif)
 
@@ -41,28 +40,21 @@ Choose `Tasks -> Run Task...` to run one of the following:
 
 ## Requirements
 
-* The plugin needs a _.NET_ runtime to run the _DafnyServer_. In case you do not have one, please download one from [Mono](http://www.mono-project.com).
+* The plugin needs a _.NET_ runtime to run the _DafnyServer_. If you are not on Windows, please download a distribution from [Mono](http://www.mono-project.com).
+  * Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_ and Mono.
 * In case you would like the plugin to use a different _Dafny_ distribution, set the path to the `DafnyServer.exe` file via the `dafny.dafnyServerPath` user setting.
-* Note: When you first open a _Dafny_ file, the extension will prompt you to automatically install _Dafny_ and Mono.
 
 ## Extension Settings
 
-The following are necessary:
-
-| Setting          | Description                             |
-| :--------------- |:--------------------------------------- |
-| `dafny.basePath` | Absolute path to the _Dafny_ directory. |
-
-The following are optional:
-
-| Setting          | Description                              |
-| :--------------- |:---------------------------------------- |
-| `dafny.monoPath` | Absolute path to `mono` binary. Only required if `mono` isn't found in _PATH_ (you'll get an error if that's the case). |
-| `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.5 or higher when set to false. Attempts to launch dafny process directly, when set to false. |
-| `dafny.automaticVerification` | Verify as soon as the document is changed (default). When false, only verify on save. |
-| `dafny.automaticVerificationDelayMS` | Delay to wait after a document change before actually sending a verification request. This is done to avoid getting syntax errors as one is typing. Only relevant when automaticVerification is true. |
-| `dafny.automaticShowCounterModel` | Show _CounterModel_ automatically if a proof fails. Can cause performance issues. |
-| `dafny.serverVerifyArguments` | Additional arguments to pass to the "verify" command of the Dafny Server. E.g.`["/timeLimit:40", "/vcsLoad:1"]` |
+| Setting          | Description                              | Default          |
+| :--------------- |:---------------------------------------- |:---------------- |
+| `dafny.basePath` | Absolute path to the _Dafny_ binary directory (which contains `DafnyServer.exe`). | |
+| `dafny.monoExecutable` | Mono executable with absolute path. Only necessary if mono is not in system PATH (you'll get an error if that's the case). Ignored on Windows when `useMono` is `false`.  | |
+| `dafny.useMono` | Only applicable to _Windows_! Requires _.NET_ 4.5 or higher when set to `false`. | `false` |
+| `dafny.automaticVerification` | Verify as soon as the document is changed. When `false`, only verify on save. | `true` |
+| `dafny.automaticVerificationDelayMS` | Delay in ms to wait after a document change before verifying document. This avoids syntax errors while typing. Only relevant if `automaticVerification` is `true`. | `700` |
+| `dafny.automaticShowCounterModel` | Show _CounterModel_ automatically if a proof fails. Might cause performance issues if `true`. | `false` |
+| `dafny.serverVerifyArguments` | Additional arguments to pass to the "verify" command of the Dafny Server. E.g.`["/timeLimit:40", "/vcsLoad:1"]` | `[]` |
 
 ## Examples
 

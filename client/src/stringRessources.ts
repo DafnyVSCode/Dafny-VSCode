@@ -6,18 +6,18 @@ export class Severity {
 
 }
 export class WarningMsg {
-    public static MonoPathWrong: string = "dafny.monoPath set incorrectly; found mono in system PATH and will use it";
+    public static MonoExecutableWrong: string = "dafny.monoExecutable set incorrectly; found mono in system PATH and will use it";
     public static NoWorkspace: string = "Please use a workspace (File - Open Folder). Otherwise some features aren't working properly";
 }
 
 export class ErrorMsg {
-    public static NoMono: string = "Could not find mono, neither in system PATH nor at dafny.monoPath";
+    public static NoMono: string = "Could not find mono, neither in system PATH nor at dafny.monoExecutable";
     public static NoSupportedMono: string = "Could not find compatible Mono. Dafny requires Mono >= 4.0. ";
     public static RestartCodeAfterMonoInstall: string = "Please restart Code after the Mono installation.";
     public static RestartMacAfterMonoInstall: string = "Please restart your Mac after the Mono installation.";
     public static GetMono: string = "Get Mono";
     public static GetMonoUri: string = "https://www.mono-project.com/download/stable/";
-    public static ConfigureMonoPath: string = "Change dafny.monoPath";
+    public static ConfigureMonoExecutable: string = "Change dafny.monoExecutable";
     public static DafnyServerRestart: string = "DafnyServer process quit unexpectedly; attempting restart";
     public static DafnyServerRestartFailed: string = "DafnyServer restart failed";
     public static DafnyServerWrongPath: string = "Failed to start DafnyServer, check paths in config";
@@ -29,7 +29,8 @@ export class ErrorMsg {
 }
 
 export class Config {
-    public static MonoPath: string = "monoPath";
+    public static MonoPath: string = "monoPath"; // deprecated monoPath configuration option #40
+    public static MonoExecutable: string = "monoExecutable";
     public static UseMono: string = "useMono";
     public static AutomaticVerification: string = "automaticVerification";
     public static AutomaticVerificationDelay: string = "automaticVerificationDelayMS";
