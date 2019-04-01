@@ -35,7 +35,7 @@ export class DafnyCompiler {
             process.stdout.on("data", (data: Buffer) => {
                 const str = data.toString();
 
-                if (str.toLowerCase().indexOf("error") !== -1 && !(str.toLowerCase().indexOf("0 errors") !== -1)) {
+                if (str.toLowerCase().includes("error") && !str.toLowerCase().includes("0 errors")) {
                     reject({ error: true, message: str });
                 }
                 if (str.toLowerCase().indexOf(".exe") !== -1) {

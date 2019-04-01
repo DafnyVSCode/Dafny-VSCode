@@ -143,8 +143,8 @@ connection.onCodeLens((handler: CodeLensParams): Promise<ReferencesCodeLens[]> =
 
     if (provider && provider.referenceProvider) {
         const result = provider.referenceProvider.provideCodeLenses(documents.get(handler.textDocument.uri));
-        result.then((lenses: ReferencesCodeLens[]) => {
-            lenses.forEach((lens: ReferencesCodeLens) => {
+        result.then((lenses) => {
+            lenses.forEach((lens) => {
                 codeLenses[JSON.stringify(getCodeLens(lens))] = lens;
             });
         });
@@ -158,7 +158,7 @@ connection.onCodeLensResolve((handler: CodeLens) => {
 
     if (provider && provider.referenceProvider) {
         const item = codeLenses[JSON.stringify(handler)];
-        if (item !== null && item as ReferencesCodeLens) {
+        if (item) {
             return provider.referenceProvider.resolveCodeLens(item);
         } else {
             console.error("key not found ");
