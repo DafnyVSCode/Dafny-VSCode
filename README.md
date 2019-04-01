@@ -6,7 +6,7 @@ To add Dafny to VSCode, please go to the [Visual Studio Marketplace](https://mar
 
 | master | develop |
 | --- | --- |
-|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337)<br>[![VSCode Marketplace](https://vsmarketplacebadge.apphb.com/version-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode) |
+|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![VSCode Marketplace](https://vsmarketplacebadge.apphb.com/version-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337) |
 
 
 
