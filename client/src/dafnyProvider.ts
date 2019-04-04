@@ -5,7 +5,6 @@ import { TextDocumentItem } from "vscode-languageserver-types";
 import { Context } from "./context";
 import { CounterModelProvider } from "./counterModelProvider";
 import { Statusbar } from "./dafnyStatusbar";
-import { DotGraphProvider } from "./dotGraphProvider";
 import { IVerificationResult } from "./IVerificationResult";
 import { CommandStrings, Config, EnvironmentConfig, LanguageServerNotification } from "./stringRessources";
 
@@ -19,15 +18,12 @@ export class DafnyClientProvider {
 
     private counterModelProvider: CounterModelProvider;
     private context: Context;
-    private dotGraphProvider: DotGraphProvider;
-    private previewUri = vscode.Uri.parse("dafny-preview:State Visualization");
 
     constructor(public vsCodeContext: vscode.ExtensionContext, public languageServer: LanguageClient) {
         this.loadConfig();
         this.context = new Context();
         this.dafnyStatusbar = new Statusbar(this.languageServer, this.context);
         this.counterModelProvider = new CounterModelProvider(this.context);
-        this.dotGraphProvider = new DotGraphProvider(this.languageServer);
 
         languageServer.onNotification(LanguageServerNotification.VerificationResult,
             (docPathName: string, json: string) => {
@@ -59,11 +55,6 @@ export class DafnyClientProvider {
         }
         vscode.workspace.onDidSaveTextDocument(this.doVerify, this);
         vscode.workspace.onDidCloseTextDocument(this.hideCounterModel, this);
-
-        vscode.workspace.registerTextDocumentContentProvider("dafny-preview", this.dotGraphProvider);
-        vscode.commands.registerCommand(CommandStrings.ShowDotGraph, () => {
-            vscode.commands.executeCommand("vscode.previewHtml", this.previewUri, vscode.ViewColumn.Two);
-        });
 
         vscode.commands.registerCommand(CommandStrings.ShowCounterExample, () => {
             const editor = vscode.window.activeTextEditor;

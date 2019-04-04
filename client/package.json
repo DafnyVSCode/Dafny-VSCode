@@ -53,11 +53,6 @@
                 },
                 {
                     "when": "editorTextFocus && editorLangId == dafny",
-                    "command": "dafny.showDotGraph",
-                    "group": "7_Dafny@3"
-                },
-                {
-                    "when": "editorTextFocus && editorLangId == dafny",
                     "command": "dafny.showCounterExample",
                     "group": "7_Dafny@1"
                 },
@@ -79,11 +74,6 @@
                 "command": "dafny.compileAndRun",
                 "key": "f5",
                 "mac": "f5",
-                "when": "editorTextFocus && editorLangId == dafny"
-            },
-            {
-                "command": "dafny.showDotGraph",
-                "key": "f6",
                 "when": "editorTextFocus && editorLangId == dafny"
             },
             {
@@ -198,10 +188,6 @@
                 "title": "Dafny: Compile and Run"
             },
             {
-                "command": "dafny.showDotGraph",
-                "title": "Dafny: Show Flow Graph"
-            },
-            {
                 "command": "dafny.showCounterExample",
                 "title": "Dafny: Show CounterExample"
             },
@@ -231,7 +217,6 @@
         "vscode": "^1.1.33"
     },
     "dependencies": {
-        "viz.js": "^1.8.2",
         "vscode-languageclient": "^3.5.1"
     }
 }

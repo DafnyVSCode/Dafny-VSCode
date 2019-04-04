@@ -50,7 +50,6 @@ export class CommandStrings {
     public static ShowReferences: string = "dafny.showReferences";
     public static Compile: string = "dafny.compile";
     public static CompileAndRun: string = "dafny.compileAndRun";
-    public static ShowDotGraph: string = "dafny.showDotGraph";
     public static ShowCounterExample: string = "dafny.showCounterExample";
     public static HideCounterExample: string = "dafny.hideCounterExample";
 }
@@ -101,7 +100,6 @@ export class LanguageServerRequest {
     public static Compile: string = "compile";
     public static Install: string = "install";
     public static Uninstall: string = "uninstall";
-    public static Dotgraph: string = "dotgraph";
 }
 
 export class LanguageServerNotification {

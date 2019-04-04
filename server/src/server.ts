@@ -191,16 +191,6 @@ connection.onRequest<ICompilerResult, void>(LanguageServerRequest.Compile, (uri:
     return new ServerNotReadyResponseError();
 });
 
-connection.onRequest<void, void>(LanguageServerRequest.Dotgraph, (json: string) => {
-    const textDocumentItem: TextDocumentItem = JSON.parse(json);
-    const textDocument: TextDocument = TextDocument.create(textDocumentItem.uri, textDocumentItem.languageId,
-        textDocumentItem.version, textDocumentItem.text);
-    if (provider) {
-        return provider.dotGraph(textDocument);
-    }
-    return new ServerNotReadyResponseError();
-});
-
 connection.onRequest<string, void>(LanguageServerRequest.Install, () => {
     return new Promise<string>(async (resolve, reject) => {
         uninstallDafny().then(() => {
