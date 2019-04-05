@@ -1,5 +1,13 @@
 # Release Notes
 
+## 0.17.0
+* Rename configuration option `monoPath` to `monoExecutable` ([#40](https://github.com/DafnyVSCode/Dafny-VSCode/pull/40))
+* Update deprecated API calls ([#39](https://github.com/DafnyVSCode/Dafny-VSCode/pull/39))
+* Remove deprecated Flow Graph Visualization
+* Update minimal VSCode version to 1.25.1
+* Update dependencies
+* Extension code clean up
+
 ## 0.16.0
 * Allow customizing the arguments passed to the verify backend ([#42](https://github.com/DafnyVSCode/Dafny-VSCode/pull/42)).
 * Update insecure dependencies
