@@ -66,7 +66,7 @@ pushd client >/dev/null
     confirm "Please test the plugin manually according to the API Documentation ( https://github.com/DafnyVSCode/apiDocumentation )\nPress [ENTER] to continue after testing."
 
     confirm "Publishing extension version '${RELEASE_VERSION}'. Press [ENTER] to confirm."
-    npx vsce publish ${RELEASE_VERSION}
+    npx vsce publish
     echo "The extension was published."
 popd
 
