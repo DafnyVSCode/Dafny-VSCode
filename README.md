@@ -14,6 +14,8 @@ To add Dafny to VSCode, please go to the [Visual Studio Marketplace](https://mar
 
 The infrastructure consists of a _Dafny_ language server, which can be found in the [server](server/) directory, and a VS Code extension, which in turn can be found in the [client](client/) directory. These components communicate with each other using the [_Language Server Protocol (LSP)_](https://microsoft.github.io/language-server-protocol/).
 
+![Dafny VSode Architecture](https://plantuml.dev.ifs.hsr.ch/svg/RP11Yy8m48NFpgyOwaL1R-9XaLxgfKjPPUDw4Gyn7KkWJSeqBfHb_xknZLN4EMNclNnl4cDpmgJKP1mUO7MAr_9iMjoBv250w7vIJ8qZbiffQsQOYUtTiTBnhgr9ADQrWoEOcryG_nA_mVO2VDFPeonhKpGzBGYlD5NQIuuzuWz67RphXWJqDRh710g6sh8jM5QLT5e5I9AbW-p3al7GTOSZ_0E4JvdFux3M1qQPDCL55iFJFDfPPSi8mk3cVjh1N_6McZKvoUqC9vLjNDbEyIGRMYxmKso-eYi0)
+
 ## Contribute
 
 We welcome all contributions! Please create a pull request and we will take care of releasing a new version when appropriate.
