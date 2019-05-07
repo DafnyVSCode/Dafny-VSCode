@@ -5,8 +5,8 @@ ARG UID=1000
 ARG GID=1000
 ARG USER=node
 
-ARG DAFNY_RELEASE=v2.2.0
-ARG DAFNY_RELEASEFILE=dafny-2.2.0.10923-x64-debian-8.5.zip
+ARG DAFNY_RELEASE=v2.3.0
+ARG DAFNY_RELEASEFILE=dafny-2.3.0.10506-x64-debian-8.11.zip
 
 RUN if [ "${USER}" != "node" ]; then \
       addgroup --gid ${GID} ${USER}; \
