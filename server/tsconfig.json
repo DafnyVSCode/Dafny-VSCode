@@ -3,6 +3,9 @@
         "module": "commonjs",
         "target": "es2017",
         "outDir": "../client/server",
+        "lib": [
+            "es2017"
+        ],
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
