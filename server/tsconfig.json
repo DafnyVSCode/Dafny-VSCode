@@ -1,11 +1,8 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es6",
+        "target": "es2017",
         "outDir": "../client/server",
-        "lib": [
-            "es2017"
-        ],
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
