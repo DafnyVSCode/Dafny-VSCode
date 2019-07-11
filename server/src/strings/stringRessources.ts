@@ -63,8 +63,8 @@ export class Answer {
 }
 
 export class Installer {
-    public static Repository = "Microsoft/dafny";
-    public static ReleaseUrl = "https://api.github.com/repos/" + Installer.Repository + "/releases/latest";
+    public static Repository = "dafny-lang/dafny";
+    public static ReleaseUrl = `https://api.github.com/repos/${Installer.Repository}/releases/latest`;
 }
 
 export class EnvironmentConfig {

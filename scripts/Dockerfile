@@ -7,6 +7,7 @@ ARG USER=node
 
 ARG DAFNY_RELEASE=v2.3.0
 ARG DAFNY_RELEASEFILE=dafny-2.3.0.10506-x64-debian-8.11.zip
+ARG REPOSITORY=dafny-lang/dafny
 
 RUN if [ "${USER}" != "node" ]; then \
       addgroup --gid ${GID} ${USER}; \
@@ -18,7 +19,7 @@ RUN apt-get update && \
                        libdbus-1-3 libgtk-3-0 libnotify-bin libgnome-keyring0 libgconf2-4 \
                        libasound2 libcap2 libcups2 libxtst6 libxss1 libnss3
 
-RUN wget -q -O /tmp/dafny.zip https://github.com/Microsoft/dafny/releases/download/${DAFNY_RELEASE}/${DAFNY_RELEASEFILE} && \
+RUN wget -q -O /tmp/dafny.zip https://github.com/${REPOSITORY}/releases/download/${DAFNY_RELEASE}/${DAFNY_RELEASEFILE} && \
     unzip /tmp/dafny.zip -d /usr/local/bin/ && \
     rm /tmp/dafny.zip && \
     chmod -R 755 /usr/local/bin/dafny
