@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.17.1
+* Correct Dafny Github repository name ([#49](https://github.com/DafnyVSCode/Dafny-VSCode/issues/49))
+* Change typescript target from es6 to es2017
+* Upgrade `js-yaml` to 3.13.1 to fix security vunerability
+* Upgrade Dafny in tests to 2.3.0
+
 ## 0.17.0
 * Rename configuration option `monoPath` to `monoExecutable` ([#40](https://github.com/DafnyVSCode/Dafny-VSCode/pull/40))
 * Update deprecated API calls ([#39](https://github.com/DafnyVSCode/Dafny-VSCode/pull/39))
