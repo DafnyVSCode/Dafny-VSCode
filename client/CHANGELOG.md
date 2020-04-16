@@ -1,5 +1,9 @@
 # Release Notes
 
+## 0.17.2
+* Improve highlighting for current dafny version ([#56](https://github.com/DafnyVSCode/Dafny-VSCode/pull/56))
+* Upgrade `https-proxy-agent` and `lodash` to fix security vulnerabilies
+
 ## 0.17.1
 * Correct Dafny Github repository name ([#49](https://github.com/DafnyVSCode/Dafny-VSCode/issues/49))
 * Change typescript target from es6 to es2017

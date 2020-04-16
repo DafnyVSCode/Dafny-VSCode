@@ -2,7 +2,7 @@
     "name": "dafny-vscode",
     "displayName": "Dafny",
     "description": "Dafny for Visual Studio Code",
-    "version": "0.17.1",
+    "version": "0.17.2",
     "publisher": "correctnessLab",
     "homepage": "https://github.com/DafnyVSCode/",
     "repository": {
@@ -213,7 +213,7 @@
         "mocha": "^5.2.0",
         "tslint": "^5.14.0",
         "typescript": "^2.9.2",
-        "vsce": "^1.59.0",
+        "vsce": "^1.75.0",
         "vscode": "^1.1.33"
     },
     "dependencies": {
