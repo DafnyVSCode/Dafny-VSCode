@@ -68,7 +68,7 @@ export class VerificationResults {
                 const lineNum: number = parseInt(errors[1], 10) - 1; // 1 based
                 const colNum: number = Math.max(0, parseInt(errors[2], 10) - 1); // 1 based, but 0 can appear in some cases
                 const typeStr: string = errors[3];
-                let msgStr: string = errors[4];
+                let msgStr: string =  errors[4];
 
                 const start: vscode.Position = vscode.Position.create(lineNum, colNum);
                 const end: vscode.Position = vscode.Position.create(lineNum, Number.MAX_VALUE);
@@ -92,6 +92,9 @@ export class VerificationResults {
 
                 if (typeStr === Severity.TimedOut) {
                     msgStr += " (timed out)";
+                } else if (typeStr === Severity.TimedOutAfter)
+                {
+                    msgStr = "Timed out after " + msgStr;
                 }
 
                 lastDiagnostic = vscode.Diagnostic.create(range, msgStr, severity);

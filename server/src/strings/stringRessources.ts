@@ -5,6 +5,7 @@ export class Severity {
     public static Warning: string = "Warning";
     public static Info: string = "Info";
     public static TimedOut: string = "Timed out on";
+    public static TimedOutAfter: string = "timed out after";
 }
 
 export class WarningMsg {
