@@ -22,7 +22,7 @@
  * SOFTWARE.
 */
 
-lemma lemma_mul_properties()
+lemma lemma_mul_properties() // The error "Timed out after 10 seconds" should be reported here
     ensures forall x:int, y:int  :: x*y == y*x;
     ensures forall x:int :: x*0 == 0*x == 0;
     ensures forall x:int :: x*1 == 1*x == x;
