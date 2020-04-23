@@ -92,8 +92,7 @@ export class VerificationResults {
 
                 if (typeStr === Severity.TimedOut) {
                     msgStr += " (timed out)";
-                } else if (typeStr === Severity.TimedOutAfter)
-                {
+                } else if (typeStr === Severity.TimedOutAfter) {
                     msgStr = "Timed out after " + msgStr;
                 }
 
