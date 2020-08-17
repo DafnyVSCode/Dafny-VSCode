@@ -19,7 +19,7 @@ function createWordRegExp(allowInWords: string = ""): RegExp {
         }
         source += "\\" + seperator;
     }
-    source += "\s]+)";
+    source += "\\s]+)";
     return new RegExp(source, "g");
 }
 
