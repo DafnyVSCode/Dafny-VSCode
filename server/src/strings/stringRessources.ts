@@ -65,7 +65,7 @@ export class Answer {
 
 export class Installer {
     public static Repository = "dafny-lang/dafny";
-    public static ReleaseUrl = `https://api.github.com/repos/${Installer.Repository}/releases/latest`;
+    public static ReleaseUrl = `https://api.github.com/repos/${Installer.Repository}/releases/tags/v2.3.0`;
 }
 
 export class EnvironmentConfig {
