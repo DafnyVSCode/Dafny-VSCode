@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.18.0
+* Fix no reporting of "timed out after" errors ([#59](https://github.com/DafnyVSCode/Dafny-VSCode/pull/59))
+* Fix whitespace character class escape in createWordRegExp ([#65](https://github.com/DafnyVSCode/Dafny-VSCode/pull/65))
+* Pin Dafny version to latest stable 2.3.0 ([#66](https://github.com/DafnyVSCode/Dafny-VSCode/issues/66) and [#67](https://github.com/DafnyVSCode/Dafny-VSCode/issues/67))
+* Update insecure dependencies
+
 ## 0.17.2
 * Improve highlighting for current dafny version ([#56](https://github.com/DafnyVSCode/Dafny-VSCode/pull/56))
 * Upgrade `https-proxy-agent` and `lodash` to fix security vulnerabilies
