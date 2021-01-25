@@ -87,3 +87,6 @@ Note that by submitting a Pull Request, you agree to release your changes under 
 * [@pipeaesac](https://github.com/pipeaesac)
 * [@fabianhauser](https://github.com/fabianhauser)
 * [@ssaavedra](https://github.com/ssaavedra)
+* [@saltiniroberto](https://github.com/saltiniroberto)
+* [@nhweston](https://github.com/nhweston)
+* [@kailingP](https://github.com/kailingP)
