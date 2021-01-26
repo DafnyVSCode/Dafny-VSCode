@@ -32,6 +32,6 @@ export default class DafnyLanguageClient extends LanguageClient {
             },
         };
 
-        super("dafny-vscode", "Dafny Language Server", serverOptions, clientOptions);
+        super("dafny-vscode-legacy", "Dafny Language Server", serverOptions, clientOptions);
     }
 }
