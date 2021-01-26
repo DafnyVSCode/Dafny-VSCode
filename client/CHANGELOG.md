@@ -1,5 +1,8 @@
 # Release Notes
 
+## 0.19.0
+* Market the plugin as legacy
+
 ## 0.18.0
 * Fix no reporting of "timed out after" errors ([#59](https://github.com/DafnyVSCode/Dafny-VSCode/pull/59))
 * Fix whitespace character class escape in createWordRegExp ([#65](https://github.com/DafnyVSCode/Dafny-VSCode/pull/65))

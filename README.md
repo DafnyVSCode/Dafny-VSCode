@@ -1,4 +1,6 @@
-# Dafny VSCode [![Marketplace Downloads Count](https://vsmarketplacebadge.apphb.com/installs-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)
+# Dafny 2 VSCode (Legacy) [![Marketplace Downloads Count](https://vsmarketplacebadge.apphb.com/installs-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)
+
+> ⚠ This plugin targets Dafny 2 and is deprecated. Consider switching to its [successor](https://github.com/DafnyVSCode/ide-vscode) that supports Dafny 3.0.0.
 
 > This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
 
