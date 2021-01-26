@@ -10,7 +10,7 @@ import * as vscode from "vscode";
 import { Context } from "../src/context";
 import { IVerificationResult } from "../src/IVerificationResult";
 
-const extensionID = "correctnessLab.dafny-vscode";
+const extensionID = "correctnessLab.dafny-vscode-legacy";
 const samplesFolder = vscode.extensions.getExtension(extensionID)!.extensionPath + "/test/sampleFolder/";
 
 export class UnitTestCallback {

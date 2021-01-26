@@ -1,5 +1,6 @@
-# Dafny for Visual Studio Code
+# Dafny 2 for Visual Studio Code (Legacy)
 
+> ⚠ This plugin targets Dafny 2 and is deprecated. Consider switching to its [successor](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode) that supports Dafny 3.0.0.
 
 This extension adds _Dafny_ support to Visual Studio Code.
 

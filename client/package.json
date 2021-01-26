@@ -1,7 +1,7 @@
 {
-    "name": "dafny-vscode",
-    "displayName": "Dafny",
-    "description": "Dafny for Visual Studio Code",
+    "name": "dafny-vscode-legacy",
+    "displayName": "Dafny 2 (Legacy)",
+    "description": "Dafny 2 for Visual Studio Code (Legacy)",
     "version": "0.18.0",
     "publisher": "correctnessLab",
     "homepage": "https://github.com/DafnyVSCode/",
