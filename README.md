@@ -1,14 +1,14 @@
-# Dafny 2 VSCode (Legacy) [![Marketplace Downloads Count](https://vsmarketplacebadge.apphb.com/installs-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)
+# Dafny 2 VSCode (Legacy) [![Marketplace Downloads Count](https://vsmarketplacebadge.apphb.com/installs-short/correctnessLab.dafny-vscode-legacy.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode-legacy)
 
 > ⚠ This plugin targets Dafny 2 and is deprecated. Consider switching to its [successor](https://github.com/DafnyVSCode/ide-vscode) that supports Dafny 3.0.0.
 
 > This repository contains the infrastructure necessary to support _Dafny_ for Visual Studio Code.
 
-To add Dafny to VSCode, please go to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode).
+To add Dafny 2 to VSCode, please go to the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode-legacy).
 
 | master | develop |
 | --- | --- |
-|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![VSCode Marketplace](https://vsmarketplacebadge.apphb.com/version-short/correctnessLab.dafny-vscode.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337) |
+|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=master)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![VSCode Marketplace](https://vsmarketplacebadge.apphb.com/version-short/correctnessLab.dafny-vscode-legacy.svg)](https://marketplace.visualstudio.com/items?itemName=correctnessLab.dafny-vscode-legacy)|[![Build Status](https://travis-ci.com/DafnyVSCode/Dafny-VSCode.svg?branch=develop)](https://travis-ci.com/DafnyVSCode/Dafny-VSCode)<br>[![Sounarcloud](https://sonarcloud.io/api/project_badges/measure?project=dafny-vscode_1337&metric=alert_status)](https://sonarcloud.io/dashboard?id=dafny-vscode_1337) |
 
 
 
